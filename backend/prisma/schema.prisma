@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+model Student {
+  id        Int         @id @default(autoincrement())
+  name      String
+  email     String      @unique
+  reputation Int        @default(0)
+  historyReps HistoryRep[]
+  createdAt DateTime    @default(now())
+}
+
+model HistoryRep {
+  id        Int      @id @default(autoincrement())
+  studentId Int      // Ссылка на студента
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)// Связь с моделью Student
+  change    Int      // Изменение репутации (может быть положительным или отрицательным)
+  reason    String?  // Причина изменения (опционально)
+  createdAt DateTime @default(now())
+}
