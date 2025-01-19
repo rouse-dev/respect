@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    --respect-purple-light: #716696;
+    --respect-purple: #635985;
+    --respect-purple-deep: #443C68;
+    --respect-purple-dark: #18122B;
+    padding: unset;
+    margin: unset;
+    box-sizing: border-box;
+    text-decoration: unset;
+    font-family: sans-serif;
+}
+
+body {
+    background-color: var(--respect-purple);
+}
