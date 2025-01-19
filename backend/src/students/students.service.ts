@@ -12,13 +12,15 @@ export class StudentsService {
 
   // СОЗДАНИЕ СТУДЕНТА
   async create(createStudentDto: CreateStudentDto) {
-    try {
-      return this.prisma.student.create({
-        data: createStudentDto,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    return this.prisma.student.create({
+      data: {
+        name: createStudentDto.name,
+        email: createStudentDto.email,
+        groups: {
+          connect: { id: createStudentDto.groupsId },
+        },
+      },
+    });
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ

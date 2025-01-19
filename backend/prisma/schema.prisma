@@ -22,6 +22,8 @@ model Student {
   reputation Int        @default(0)
   historyReps HistoryRep[]
   createdAt DateTime    @default(now())
+  groupsId  Int
+  groups    Groups      @relation(fields: [groupsId], references: [id], onDelete: Cascade)
 }
 
 model HistoryRep {
@@ -31,4 +33,10 @@ model HistoryRep {
   change    Int      // Изменение репутации (может быть положительным или отрицательным)
   reason    String?  // Причина изменения (опционально)
   createdAt DateTime @default(now())
+}
+
+model Groups {
+    id        Int      @id @default(autoincrement())
+    name      String
+    students  Student[]
 }
