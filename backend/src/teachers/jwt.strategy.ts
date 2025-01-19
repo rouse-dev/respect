@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -25,13 +25,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       });
   
       if (!teacher) {
-        throw new Error('Вы не зарегистрированы!');
+        throw new UnauthorizedException('Вы не зарегистрированы!');
       }
   
       return teacher;
 
     } catch (error) {
-      throw new Error('Вы не зарегистрированы!');
+      throw new UnauthorizedException('Вы не зарегистрированы!');
     }
   }
 }

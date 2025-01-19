@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Groups {
+    id        Int      @id @default(autoincrement())
+    name      String
+    students  Student[]
+}
+
 model Teacher {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -18,9 +24,10 @@ model Teacher {
 model Student {
   id        Int         @id @default(autoincrement())
   name      String
-  email     String      @unique
   reputation Int        @default(0)
   historyReps HistoryRep[]
+  groupsId  Int
+  groups    Groups      @relation(fields: [groupsId], references: [id], onDelete: Cascade)
   createdAt DateTime    @default(now())
 }
 

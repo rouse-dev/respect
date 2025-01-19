@@ -10,7 +10,7 @@ import {
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 
 @ApiTags('Студенты')
@@ -23,6 +23,7 @@ export class StudentsController {
   // СОЗДАНИЕ СТУДЕНТА
   @Post()
   @ApiOperation({ summary: 'Создание студента' })
+  @ApiBody({ type: CreateStudentDto })
   @ApiResponse({ status: 201, description: 'Студент успешно создан' })
   @ApiResponse({ status: 401, description: 'Требуется авторизация' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })

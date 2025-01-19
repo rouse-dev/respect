@@ -28,5 +28,6 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`[API] http://localhost:${port}/api`)
+  console.log(`[API] Documentation: http://localhost:${port}/api-docs`)
 }
 bootstrap();

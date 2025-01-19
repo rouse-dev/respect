@@ -1,5 +1,5 @@
-import Home from "../components/pages/home";
-import Profile from "../components/pages/profile";
+import Home from "../pages/home";
+import Profile from "../pages/profile";
 
 export const GuestRoutes: Array<any> = [
     {

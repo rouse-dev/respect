@@ -14,7 +14,7 @@ export class StudentsService {
   async create(createStudentDto: CreateStudentDto) {
     try {
       return this.prisma.student.create({
-        data: createStudentDto,
+        data: createStudentDto
       });
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -24,7 +24,11 @@ export class StudentsService {
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
   async findAll() {
     try {
-      return this.prisma.student.findMany();
+      return this.prisma.student.findMany({
+        include: {
+          groups: true,
+        },
+      });
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
