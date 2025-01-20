@@ -15,6 +15,7 @@ model Groups {
 
 model Teacher {
   id        Int      @id @default(autoincrement())
+  avatar    String   @default("uploads/avatars/default.jpg")
   email     String   @unique
   password  String
   name      String?

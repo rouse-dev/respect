@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { extname } from 'path';
 
 @Injectable()
 export class TeachersService {
@@ -20,7 +21,6 @@ export class TeachersService {
   // РЕГИСТРАЦИЯ УЧИТЕЛЯ
   async register(email: string, password: string, name?: string) {
     try {
-
       const existingTeacher = await this.prisma.teacher.findUnique({
         where: { email },
       });
@@ -40,40 +40,62 @@ export class TeachersService {
       });
 
       return { id: teacher.id, email: teacher.email, name: teacher.name };
-
     } catch (error) {
-      throw new InternalServerErrorException (error);
+      throw new InternalServerErrorException(error);
     }
   }
 
   // ЛОГИРОВАНИЕ УЧИТЕЛЯ
   async login(email: string, password: string) {
     try {
-
       const teacher = await this.prisma.teacher.findUnique({
         where: { email },
       });
-  
+
       if (!teacher) {
         throw new UnauthorizedException('Неверный email или пароль');
       }
-  
+
       const isPasswordValid = await bcrypt.compare(password, teacher.password);
-  
+
       if (!isPasswordValid) {
         throw new UnauthorizedException('Неверный email или пароль');
       }
-  
+
       const payload = { email: teacher.email, sub: teacher.id };
       const accessToken = this.jwtService.sign(payload, {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
       });
-  
-      return { accessToken };
 
+      return { accessToken };
     } catch (error) {
-      throw new InternalServerErrorException (error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ЗАМЕНА АВАТАРКИ УЧИТЕЛЯ
+  async changeAvatar(file: Express.Multer.File, teacherId: number) {
+    try {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = extname(file.originalname);
+      const filename = `uploads/avatars/${uniqueSuffix}${ext}`;
+
+      // СОХРАНЕНИЕ ФАЙЛА НА ДИСК
+      const fs = require('fs');
+      const path = require('path');
+      const uploadPath = path.join(__dirname, '..', '..', filename);
+
+      fs.writeFileSync(uploadPath, file.buffer);
+
+      const updatedTeacher = await this.prisma.teacher.update({
+        where: { id: teacherId },
+        data: { avatar: filename },
+      });
+
+      return updatedTeacher;
+    } catch (error) {
+      return new InternalServerErrorException(error);
     }
   }
 }

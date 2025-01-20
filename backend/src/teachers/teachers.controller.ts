@@ -1,9 +1,27 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+  Request,
+  Patch,
+} from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { RegisterTeacherDto } from './dto/register-teacher.dto';
 import { LoginTeacherDto } from './dto/login-teacher.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Учителя')
 @Controller('teachers')
@@ -15,7 +33,10 @@ export class TeachersController {
   @ApiOperation({ summary: 'Регистрация учителя' })
   @ApiBody({ type: RegisterTeacherDto })
   @ApiResponse({ status: 201, description: 'Учитель успешно зарегистрирован' })
-  @ApiResponse({ status: 409, description: 'Учитель с таким email уже существует' })
+  @ApiResponse({
+    status: 409,
+    description: 'Учитель с таким email уже существует',
+  })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async register(@Body() registerTeacherDto: RegisterTeacherDto) {
     return this.teachersService.register(
@@ -30,10 +51,44 @@ export class TeachersController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Логирование учителя' })
   @ApiBody({ type: LoginTeacherDto })
-  @ApiResponse({ status: 200, description: 'Успешный вход, возвращает JWT-токен' })
+  @ApiResponse({
+    status: 200,
+    description: 'Успешный вход, возвращает JWT-токен',
+  })
   @ApiResponse({ status: 401, description: 'Неверный email или пароль' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async login(@Body() loginTeacherDto: LoginTeacherDto) {
-    return this.teachersService.login(loginTeacherDto.email, loginTeacherDto.password);
+    return this.teachersService.login(
+      loginTeacherDto.email,
+      loginTeacherDto.password,
+    );
+  }
+
+  // ИЗМЕНЕНИЕ АВАТАРКИ УЧИТЕЛЯ
+  @Patch('avatar')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({ summary: 'Изменение аватарки учителя' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Загрузите новый аватар',
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiBearerAuth() // Указываем, что требуется JWT-токен
+  @ApiResponse({ status: 200, description: 'Аватар успешно изменен' }) // Укажите тип возвращаемого объекта
+  @ApiResponse({ status: 400, description: 'Некорректный запрос или файл не предоставлен' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    const teacherId = req.user.id;
+    return this.teachersService.changeAvatar(file, teacherId);
   }
 }

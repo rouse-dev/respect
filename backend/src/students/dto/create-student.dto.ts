@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsInt } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateStudentDto {
   @ApiProperty({ example: "Гумеров Динар", description: "Имя студента" })

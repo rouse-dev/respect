@@ -4,9 +4,9 @@ import {
   Post,
   Body,
   Param,
-  Put,
   Delete,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -49,7 +49,7 @@ export class GroupsController {
     return this.groupsService.getGroupById(+id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBody({ type: UpdateGroupDto })
   @ApiOperation({ summary: 'Обновление группы' })
   @ApiParam({ name: 'id', type: 'number', description: 'Идентификатор группы' })
