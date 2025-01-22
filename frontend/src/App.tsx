@@ -1,12 +1,17 @@
-import { Route, Routes } from "react-router-dom"
-import { AuthRoutes } from "./config/routes"
+import { Routes, Route } from "react-router-dom";
+import { AppProvider } from "./context/AppContext";
+import { AuthRoutes } from "./config/routes";
+import Login from "./pages/login";
 
-const App = () => {
+function App() {
   return (
-    <Routes>
+    <AppProvider>
+      <Routes>
       {AuthRoutes.map((el, i) => <Route key={i} path={el.path} Component={el.component} />)}
-    </Routes>
-  )
+      <Route path="/login" Component={Login} />
+      </Routes>
+    </AppProvider>
+  );
 }
 
-export default App
+export default App;
