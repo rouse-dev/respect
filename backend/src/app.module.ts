@@ -11,7 +11,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: path.resolve(__dirname, './.env'),
+      envFilePath: '.env',
     }),
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'uploads'),
