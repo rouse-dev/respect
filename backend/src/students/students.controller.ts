@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
-import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateManyStudentsDto, CreateStudentDto } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -29,6 +29,17 @@ export class StudentsController {
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.create(createStudentDto);
+  }
+
+  // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
+  @Post('many')
+  @ApiOperation({ summary: 'Создание множества студентов' })
+  @ApiBody({ type: CreateManyStudentsDto })
+  @ApiResponse({ status: 201, description: 'Студенты успешно созданы' })
+  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  createMany(@Body() createManyStudentsDto: CreateManyStudentsDto) {
+    return this.studentsService.createMany(createManyStudentsDto.students);
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ

@@ -21,6 +21,17 @@ export class StudentsService {
     }
   }
 
+  // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
+  async createMany(students: CreateStudentDto[]) {
+    try {
+      return this.prisma.student.createMany({
+        data: students,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
   async findAll() {
     try {
