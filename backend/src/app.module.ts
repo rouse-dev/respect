@@ -6,6 +6,7 @@ import { StudentsModule } from './students/students.module';
 import { GroupsModule } from './groups/groups.module';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { LessonsModule } from './lessons/lessons.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     TeachersModule,
     StudentsModule,
     GroupsModule,
+    LessonsModule,
   ],
   controllers: [],
   providers: [PrismaService],

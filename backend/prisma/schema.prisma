@@ -39,7 +39,7 @@ model HistoryRep {
   change       Int      // Изменение репутации (может быть положительным или отрицательным)
   reason       String?  // Причина изменения (опционально)
   lessonId     Int?     // Айди предмета (опционально)
-  lesson       Lessons? @relation(fields: [lessonId], references: [id], onDelete: SetNull) // Связь с моделью Lessons
+  lesson       Lessons? @relation(fields: [lessonId], references: [id], onDelete: Cascade) // Связь с моделью Lessons (каскадное удаление)
   createdAt    DateTime @default(now())
 }
 
