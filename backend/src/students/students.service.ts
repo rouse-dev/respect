@@ -14,7 +14,7 @@ export class StudentsService {
   async create(createStudentDto: CreateStudentDto) {
     try {
       return this.prisma.student.create({
-        data: createStudentDto
+        data: createStudentDto,
       });
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -48,23 +48,46 @@ export class StudentsService {
   // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
   async getReputationHistory(studentId: number) {
     try {
+      // ИЩЕМ СТУДЕНТА С ИСТОРИЕЙ РЕПУТАЦИИ И НАЗВАНИЕМ ПРЕДМЕТА
       const student = await this.prisma.student.findUnique({
         where: { id: studentId },
-        include: { historyReps: true }, // ВКЛЮЧАЕМ ИСТОРИЮ РЕПУТАЦИИ
+        include: {
+          historyReps: {
+            include: {
+              lesson: true,
+            },
+          },
+        },
       });
 
       if (!student) {
         throw new NotFoundException('Студент не найден');
       }
 
-      return student.historyReps;
+      // ФОРМАТИРУЕМ ОТВЕТ, ЧТОБЫ ВКЛЮЧИТЬ НАЗВАНИЕ ПРЕДМЕТА
+      const formattedHistory = student.historyReps.map((record) => ({
+        id: record.id,
+        change: record.change,
+        reason: record.reason,
+        createdAt: record.createdAt,
+        lesson: record.lesson ? record.lesson.name : null, // НАЗВАНИЕ ПРЕДМЕТА (ЕСЛИ ЕСТЬ)
+      }));
+
+      return formattedHistory;
     } catch (error) {
-      return this.prisma.student.findMany();
+      throw new InternalServerErrorException(
+        'Ошибка при получении истории репутации',
+      );
     }
   }
 
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
-  async updateReputation(studentId: number, change: number, reason?: string) {
+  async updateReputation(
+    studentId: number,
+    change: number,
+    reason?: string,
+    lessonId?: number,
+  ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
       const student = await this.prisma.student.findUnique({
@@ -73,6 +96,17 @@ export class StudentsService {
 
       if (!student) {
         throw new NotFoundException('Студент не найден');
+      }
+
+      // ЕСЛИ ПЕРЕДАН lessonId, ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ ПРЕДМЕТ
+      if (lessonId) {
+        const lesson = await this.prisma.lessons.findUnique({
+          where: { id: lessonId },
+        });
+
+        if (!lesson) {
+          throw new NotFoundException('Предмет не найден');
+        }
       }
 
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
@@ -91,6 +125,7 @@ export class StudentsService {
           studentId,
           change,
           reason,
+          lessonId,
         },
       });
 

@@ -8,10 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
-import { CreateManyStudentsDto, CreateStudentDto } from './dto/create-student.dto';
+import {
+  CreateManyStudentsDto,
+  CreateStudentDto,
+} from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Студенты')
 @ApiBearerAuth()
@@ -54,12 +62,11 @@ export class StudentsController {
 
   // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
   @Get(':id/history')
-  @ApiOperation({ summary: 'Получение истории репутации студента' })
-  @ApiResponse({ status: 200, description: 'История репутации' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
+  @ApiOperation({ summary: 'Получить историю репутации студента' })
+  @ApiResponse({ status: 200, description: 'История репутации успешно получена' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  getReputationHistory(@Param('id') id: string) {
+  async getReputationHistory(@Param('id') id: string) {
     return this.studentsService.getReputationHistory(+id);
   }
 
@@ -70,7 +77,12 @@ export class StudentsController {
   @ApiResponse({ status: 401, description: 'Требуется авторизация' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  updateReputation(@Param('id') id: string, @Body('change') change: number, @Body('reason') reason?: string) {
-    return this.studentsService.updateReputation(+id, change, reason);
+  updateReputation(
+    @Param('id') id: string,
+    @Body('change') change: number,
+    @Body('reason') reason?: string,
+    @Body('lessonId') lessonId?: number,
+  ) {
+    return this.studentsService.updateReputation(+id, change, reason, lessonId);
   }
 }
