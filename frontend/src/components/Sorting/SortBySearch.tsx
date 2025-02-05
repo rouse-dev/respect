@@ -1,4 +1,4 @@
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../store/AppContext";
 
 const SortBySearch = () => {
   const { search, setSearch } = useAppContext();

@@ -1,9 +1,17 @@
-import {createContext, useContext, useState, useEffect, ReactNode} from "react";
+import  { createContext, useContext, useState, ReactNode } from "react";
 
-interface studentInterface {
+interface Student {
+  id: number;
   name: string;
   group: string;
+  groupsId: number;
   respect: number;
+}
+
+interface Group {
+  id: number;
+  name: string;
+  students: Student[];
 }
 
 interface AppContextType {
@@ -12,9 +20,10 @@ interface AppContextType {
     avatar: string;
   };
   setUser: (user: { username: string; avatar: string }) => void;
-  currentGroup: string;
-  setCurrentGroup: (group: string) => void;
-  groups: string[];
+  currentGroup: Group | null;
+  setCurrentGroup: (group: Group | null) => void;
+  groups: Group[];
+  setGroups: (groups: Group[]) => void;
   search: string;
   setSearch: (search: string) => void;
   sortDirection: boolean;
@@ -22,12 +31,12 @@ interface AppContextType {
   currentSortMethod: string;
   setCurrentSortMethod: (method: string) => void;
   sortMethods: string[];
-  currentStudent: any;
-  setCurrentStudent: (student: any) => void;
-  students: studentInterface[];
-  setStudents: (students: studentInterface[]) => void;
-  sortedStudents: studentInterface[];
-  setSortedStudents: (students: studentInterface[]) => void;
+  currentStudent: Student | null;
+  setCurrentStudent: (student: Student | null) => void;
+  students: Student[];
+  setStudents: (students: Student[]) => void;
+  sortedStudents: Student[];
+  setSortedStudents: (students: Student[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -38,38 +47,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     avatar: "",
   });
 
-  const [currentGroup, setCurrentGroup] = useState("- группа -");
-  const [groups] = useState(["Все группы", "ИС-223", "ИС-222б", "ИС-221б"]);
-
+  const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [search, setSearch] = useState("");
   const [sortDirection, setSortDirection] = useState(true);
-  const [currentSortMethod, setCurrentSortMethod] = useState("");
+  const [currentSortMethod, setCurrentSortMethod] = useState("По фамилии");
   const [sortMethods] = useState(["По фамилии", "По группе", "По рейтингу"]);
-
-  const [currentStudent, setCurrentStudent] = useState({});
-  const [students, setStudents] = useState<studentInterface[]>([
-    {
-      name: "Абунагимов Айзат",
-      group: "ИС-223",
-      respect: 999,
-    },
-    {
-      name: "Касимов Ислам",
-      group: "ИС-223",
-      respect: 1,
-    },
-    {
-      name: "Закиров Раиф",
-      group: "ИС-221б",
-      respect: 228,
-    },
-  ]);
-
-  const [sortedStudents, setSortedStudents] = useState<studentInterface[]>([]);
-
-  useEffect(() => {
-    setCurrentSortMethod("По фамилии");
-  }, []);
+  const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [sortedStudents, setSortedStudents] = useState<Student[]>([]);
 
   return (
     <AppContext.Provider
@@ -79,6 +65,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         currentGroup,
         setCurrentGroup,
         groups,
+        setGroups,
         search,
         setSearch,
         sortDirection,

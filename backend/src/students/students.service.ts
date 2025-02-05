@@ -15,6 +15,9 @@ export class StudentsService {
     try {
       return this.prisma.student.create({
         data: createStudentDto,
+        include: {
+          groups: true,
+        },
       });
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -110,6 +113,10 @@ export class StudentsService {
       }
 
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
+      if(change < 0 && (student.reputation - (-change)) < 0) {
+        throw new InternalServerErrorException('Не хватает репутации!')
+      }
+
       const updatedStudent = await this.prisma.student.update({
         where: { id: studentId },
         data: {

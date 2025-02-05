@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Delete, Param, NotFoundException, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, NotFoundException, Patch, UseGuards, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -18,6 +18,14 @@ export class LessonsController {
   @ApiResponse({ status: 400, description: 'Неверные данные' })
   async create(@Body() createLessonDto: CreateLessonDto) {
     return this.lessonsService.create(createLessonDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Выдача всех учебных предметов' })
+  @ApiResponse({ status: 201, description: 'Предметы успешно выданы' })
+  @ApiResponse({ status: 400, description: 'Ошибка при выдаче предметов' })
+  async get() {
+    return this.lessonsService.getLessons();
   }
 
   @Patch(':id')

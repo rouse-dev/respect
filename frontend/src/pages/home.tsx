@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import HistoryPopup from "../components/history_popup";
 import Group from "../components/group";
 import Students from "../components/Students";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../store/AppContext";
 import Sort from "../components/Sorting/Sort";
+import userStore from "../store/userStore";
+import Add from "../components/add/add";
 
 const Home = () => {
   const { user, currentStudent, setCurrentStudent } = useAppContext();
@@ -21,12 +23,20 @@ const Home = () => {
       />
 
       <div className="flex flex-col sm:flex-row gap-5 justify-between mb-6 sm:mb-12">
-        <Group />
+        <div className="flex justify-center items-center gap-3">
+          <div className="order-1 mt-[-43px]"> <Add /></div>
+          <div className=""><Group /></div>
+          
+         
+        </div>
+
         <Link
           className="flex flex-row order-1 sm:order-2 justify-center items-center px-3 py-2 rounded-lg gap-4 bg-[--respect-purple-deep]"
           to="/profile"
         >
-          <p className="flex w-fit">{user.username || "- Фамилия И.О. -"}</p>
+          <p className="flex w-fit">
+            {userStore.username || "- Фамилия И.О. -"}
+          </p>
           <img
             className="w-11 h-11 rounded-[100%]"
             src={
@@ -39,7 +49,6 @@ const Home = () => {
       </div>
 
       <Sort></Sort>
-
       <Students />
     </div>
   );

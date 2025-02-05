@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../store/AppContext";
 
 const SortByParams = () => {
   const {
@@ -14,34 +14,34 @@ const SortByParams = () => {
     setSortedStudents,
   } = useAppContext();
 
-  useEffect(() => {
-    let result = [...students].filter((el) =>
-      currentGroup === groups[0] ? el : el.group === currentGroup
-    );
-    switch (currentSortMethod) {
-      case "По фамилии": {
-        result.sort((a, b) => {
-          if (sortDirection) return a.name.localeCompare(b.name, "ru");
-          else return b.name.localeCompare(a.name, "ru");
-        });
-        break;
-      }
-      case "По группе": {
-        result.sort((a, b) => {
-          if (sortDirection)
-            return a.group.localeCompare(b.group, "ru", { numeric: true });
-          else return b.group.localeCompare(a.group, "ru", { numeric: true });
-        });
-        break;
-      }
-      case "По рейтингу": {
-        if (sortDirection) result.sort((a, b) => a.respect - b.respect);
-        else result.sort((a, b) => b.respect - a.respect);
-        break;
-      }
-    }
-    setSortedStudents(result);
-  }, [currentGroup, currentSortMethod, sortDirection, students, groups]);
+  // useEffect(() => {
+  //   let result = [...students].filter((el) =>
+  //     currentGroup === groups[0] ? el : el.group === currentGroup
+  //   );
+  //   switch (currentSortMethod) {
+  //     case "По фамилии": {
+  //       result.sort((a, b) => {
+  //         if (sortDirection) return a.name.localeCompare(b.name, "ru");
+  //         else return b.name.localeCompare(a.name, "ru");
+  //       });
+  //       break;
+  //     }
+  //     case "По группе": {
+  //       result.sort((a, b) => {
+  //         if (sortDirection)
+  //           return a.group.localeCompare(b.group, "ru", { numeric: true });
+  //         else return b.group.localeCompare(a.group, "ru", { numeric: true });
+  //       });
+  //       break;
+  //     }
+  //     case "По рейтингу": {
+  //       if (sortDirection) result.sort((a, b) => a.respect - b.respect);
+  //       else result.sort((a, b) => b.respect - a.respect);
+  //       break;
+  //     }
+  //   }
+  //   setSortedStudents(result);
+  // }, [currentGroup, currentSortMethod, sortDirection, students, groups]);
 
   return (
     <div className="flex flex-row gap-2 sm:max-w-lg w-full">

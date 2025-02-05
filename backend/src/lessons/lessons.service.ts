@@ -14,6 +14,11 @@ export class LessonsService {
     });
   }
 
+  // ВЫДАЧА ВСЕХ ПРЕДМЕТОВ
+  async getLessons() {
+    return this.prisma.lessons.findMany()
+  }
+
   // ОБНОВЛЕНИЕ ПРЕДМЕТА
   async update(id: number, updateLessonDto: UpdateLessonDto) {
     const lesson = await this.prisma.lessons.findUnique({ where: { id } });

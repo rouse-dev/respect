@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import placeholder_avatar from '../assets/media/placeholder_avatar.png'
 import { Link } from "react-router-dom";
+import userStore from "../store/userStore";
 
 const Profile = () => {
     const [user, setUser] = useState({
@@ -8,10 +9,14 @@ const Profile = () => {
         avatar: ''
     });
 
+    const handleLogout = () => {
+        userStore.logoutUser();
+    }
+
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
             <div className="w-full flex flex-row justify-between sm:mb-12">
-                <button className="hidden sm:block w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]">Выход</button>
+                <button className="hidden sm:block w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" onClick={handleLogout}>Выход</button>
                 <Link className="w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/'>На главную</Link>
             </div>
             
@@ -29,7 +34,7 @@ const Profile = () => {
 
                 <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg">Сохранить изменения</button>
             </div>
-            <button className="sm:hidden w-full mb-3 sm:mb-12 px-3 py-2 rounded-lg bg-[--respect-purple-deep]">Выход</button>
+
         </div>
     )
 }

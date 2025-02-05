@@ -68,7 +68,7 @@ export class TeachersService {
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
       });
 
-      return { accessToken };
+      return { accessToken, teacher };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

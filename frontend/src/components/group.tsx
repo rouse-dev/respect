@@ -1,11 +1,33 @@
-import { useAppContext } from "../context/AppContext";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../store/AppContext";
+import { GetAllGroups } from "../service/server";
+import Preloader from "./preloader";
 
 const Group = () => {
-  const { currentGroup, setCurrentGroup, groups } = useAppContext();
+  const { currentGroup, setCurrentGroup, groups, setGroups, setSortedStudents, students } = useAppContext();
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await GetAllGroups();
+        if (response.succes && response.data) {
+          setGroups(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [setGroups]);
 
   return (
     <div
-      className="relative cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+      className="relative w-[250px] cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
       onClick={(e) => {
         const dropdown = e.currentTarget;
         dropdown.classList.toggle("rounded-b-lg");
@@ -23,22 +45,42 @@ const Group = () => {
               .classList.replace("fa-angle-up", "fa-angle-down");
       }}
     >
-      <p className="flex mr-auto">{currentGroup}</p>
+      <p className="flex mr-auto">
+        {currentGroup ? currentGroup.name : "Все группы"}
+      </p>
       <p className="hidden sm:block">|</p>
       <i className="fa fa-angle-up" aria-hidden="true"></i>
 
       <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
-        {groups.map((el, i) => (
-          <button
-            className="py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
-            key={i}
-            onClick={(_) => {
-              setCurrentGroup(el);
-            }}
-          >
-            {el}
-          </button>
-        ))}
+        {isLoading ? (
+          <div className="py-4">
+            <Preloader />
+          </div>
+        ) : (
+          <>
+            <button
+              className="py-2 hover:backdrop-brightness-110"
+              onClick={() => {
+                setCurrentGroup(null);
+                setSortedStudents(students);
+              }}
+            >
+              <div className="p-2">Все группы</div>
+            </button>
+            {groups.map((group) => (
+              <button
+                className="py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                key={group.id}
+                onClick={() => {
+                  setCurrentGroup(group);
+                  setSortedStudents(students.filter(el => el.groupsId === group.id)); 
+                }}
+              >
+                <div className="p-2">{group.name}</div>
+              </button>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
