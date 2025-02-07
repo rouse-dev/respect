@@ -4,7 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateStudentDto } from './dto/create-student.dto';
+import {
+  CreateManyStudentsDto,
+  CreateStudentDto,
+  StudentResponseDto,
+} from './dto/create-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -25,11 +29,19 @@ export class StudentsService {
   }
 
   // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
-  async createMany(students: CreateStudentDto[]) {
+  async createMany(students: CreateStudentDto[]): Promise<StudentResponseDto[]> {
     try {
-      return this.prisma.student.createMany({
-        data: students,
-      });
+      const createdStudents = await Promise.all(
+        students.map((student) =>
+          this.prisma.student.create({
+            data: student,
+            include: {
+              groups: true, // Включаем данные о группе
+            },
+          }),
+        ),
+      );
+      return createdStudents;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -113,8 +125,8 @@ export class StudentsService {
       }
 
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
-      if(change < 0 && (student.reputation - (-change)) < 0) {
-        throw new InternalServerErrorException('Не хватает репутации!')
+      if (change < 0 && student.reputation - -change < 0) {
+        throw new InternalServerErrorException('Не хватает репутации!');
       }
 
       const updatedStudent = await this.prisma.student.update({

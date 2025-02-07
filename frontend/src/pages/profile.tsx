@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import placeholder_avatar from '../assets/media/placeholder_avatar.png'
 import { Link } from "react-router-dom";
 import userStore from "../store/userStore";

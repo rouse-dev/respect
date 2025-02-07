@@ -5,11 +5,11 @@ import Preloader from "./preloader";
 import AddPopup from "./add_popup";
 import HistoryPopup from "./history_popup";
 import RemovePopup from "./remove_popup";
+import DiscardPopup from "./discard_popup";
 
 const Students = () => {
   const {
     search,
-    setCurrentStudent,
     currentStudent,
     currentGroup,
     currentSortMethod,
@@ -23,7 +23,8 @@ const Students = () => {
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isHistoryPopupOpen, setIsHistoryPopupOpen] = useState(false);
   const [isRemovePopupOpen, setIsRemovePopupOpen] = useState(false);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+  const [isDiscardPopupOpen, setIsDiscardPopupOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
     null
   );
 
@@ -50,7 +51,7 @@ const Students = () => {
   useEffect(() => {
     let result = [...students];
     if (currentGroup) {
-      result = result.filter((el) => el.groups?.name === currentGroup.name);
+      result = result.filter((el) => el.groups.name === currentGroup.name);
     }
     if (search.length > 0) {
       result = result.filter((el) =>
@@ -132,6 +133,7 @@ const Students = () => {
         </div>
 
         <div className="flex flex-col gap-3">
+          {sortedStudents.length === 0 && <div className="text-center font-bold">Ничего не найдено!</div>}
           {sortedStudents.map((el) => {
             const show =
               search.length === 0 ||
@@ -146,14 +148,15 @@ const Students = () => {
                     <p
                       className="px-3 py-2 w-2/3 text-xl sm:text-lg cursor-pointer hover:underline active:"
                       onClick={() => {
+                        console.log(sortedStudents)
                         setSelectedStudentId(el.id);
                         setIsHistoryPopupOpen(true);
                       }}
                     >
                       {el.name}
                     </p>
-                    <p className="px-3 py-2 sm:w-1/3 text-base sm:text-lg whitespace-nowrap">
-                      {el.groups?.name}
+                    <p className="px-3 py-2 sm:w-1/3 flex items-center text-base sm:text-lg whitespace-nowrap">
+                      {el.groups.name}
                     </p>
                   </div>
 
@@ -163,7 +166,7 @@ const Students = () => {
                     </p>
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-2/3">
                       <button
-                        className="w-full rounded-lg bg-red-400 transition-transform hover:bg-red-600 active:scale-95 hover:scale-105 order-3 sm:order-1"
+                        className="w-full rounded-lg bg-red-400 transition-transform hover:bg-red-600 active:scale-95 hover:scale-105 order-2 sm:order-2"
                         onClick={() => {
                           setSelectedStudentId(el.id);
                           setIsRemovePopupOpen(true);
@@ -177,13 +180,23 @@ const Students = () => {
                       </p>
 
                       <button
-                        className="w-full rounded-lg bg-[#7fad75] transition-transform hover:bg-[#4cb834] active:scale-95 hover:scale-105 order-1 sm:order-3"
+                        className="w-full rounded-lg bg-[#7fad75] transition-transform hover:bg-[#4cb834] active:scale-95 hover:scale-105 order-1 sm:order-1"
                         onClick={() => {
                           setSelectedStudentId(el.id);
                           setIsAddPopupOpen(true);
                         }}
                       >
                         <i className="fa fa-plus" aria-hidden="true"></i>
+                      </button>
+
+                      <button
+                        className="w-full rounded-lg bg-[#6f8abc] transition-transform hover:bg-[#4c6fb0] active:scale-95 hover:scale-105 order-3 sm:order-3"
+                        onClick={() => {
+                          setSelectedStudentId(el.id);
+                          setIsDiscardPopupOpen(true);
+                        }}
+                      >
+                        <i className="fa fa-check" aria-hidden="true"></i>
                       </button>
                     </div>
                   </div>
@@ -194,7 +207,7 @@ const Students = () => {
       </div>
 
       <AddPopup
-        studentId={selectedStudentId || ""}
+        studentId={selectedStudentId || 0}
         isOpen={isAddPopupOpen}
         onClose={() => {
           setIsAddPopupOpen(false);
@@ -204,7 +217,7 @@ const Students = () => {
       />
 
       <HistoryPopup
-        studentId={selectedStudentId || ""}
+        studentId={selectedStudentId || 0}
         isOpen={isHistoryPopupOpen}
         onClose={() => {
           setIsHistoryPopupOpen(false);
@@ -213,10 +226,19 @@ const Students = () => {
       />
 
       <RemovePopup
-        studentId={selectedStudentId || ""}
+        studentId={selectedStudentId || 0}
         isOpen={isRemovePopupOpen}
         onClose={() => {
           setIsRemovePopupOpen(false);
+          setSelectedStudentId(null);
+          fetchStudents();
+        }}
+      />
+      <DiscardPopup
+        studentId={selectedStudentId || 0}
+        isOpen={isDiscardPopupOpen}
+        onClose={() => {
+          setIsDiscardPopupOpen(false);
           setSelectedStudentId(null);
           fetchStudents();
         }}

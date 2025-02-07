@@ -1,4 +1,8 @@
 import axios from "axios";
+import { StudentData } from "../store/AppContext";
+import { toast } from "react-toastify";
+
+const API = import.meta.env.VITE_API_URL
 
 interface UserData {
   avatar: any;
@@ -8,20 +12,15 @@ interface UserData {
 }
 
 interface LoginUserData {
-  email: string,
-  password: string,
-}
-
-interface StudentData {
-  name: string;
-  groupsId: string;
+  email: string;
+  password: string;
 }
 
 interface ChangeRespectData {
-  studentId: number,
-  change: number,
-  reason: string,
-  lessonId: number,
+  studentId: number;
+  change: number;
+  reason: string;
+  lessonId: number;
 }
 
 const getToken = () => {
@@ -32,35 +31,17 @@ const getToken = () => {
   return userData;
 };
 
-export const RegisterTeach = async (for_user: UserData) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:3000/api/teachers/register",
-      {
-        email: for_user.email,
-        password: for_user.password,
-        name: for_user.name,
-      }
-    );
-    console.log(response.data);
-    return { succes: true, data: response.data };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Произошла ошибка",
-    };
-  }
-};
 
 export const LoginTeach = async (for_user: LoginUserData) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/api/teachers/login",
+      API+"/api/teachers/login",
       {
         email: for_user.email,
         password: for_user.password,
       }
     );
-    console.log(response.data);
+    toast.info('Добро пожаловать')
     return { success: true, data: response.data };
   } catch (error) {
     return {
@@ -72,7 +53,7 @@ export const LoginTeach = async (for_user: LoginUserData) => {
 export const ChangeAvatar = async (for_user: UserData) => {
   try {
     const response = await axios.patch(
-      "http://localhost:3000/api/teachers/avatar",
+      API+"/api/teachers/avatar",
       {
         avatar: for_user.avatar,
       }
@@ -89,7 +70,7 @@ export const ChangeAvatar = async (for_user: UserData) => {
 export const GetAllStudents = async () => {
   try {
     const token = getToken();
-    const response = await axios.get("http://localhost:3000/api/students", {
+    const response = await axios.get(API+"/api/students", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -107,7 +88,7 @@ export const CreateGroup = async (groupName: string) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      "http://localhost:3000/api/groups",
+      API+"/api/groups",
       { name: groupName },
       {
         headers: {
@@ -128,12 +109,11 @@ export const CreateGroup = async (groupName: string) => {
 export const GetAllGroups = async () => {
   try {
     const token = getToken();
-    const response = await axios.get("http://localhost:3000/api/groups", {
+    const response = await axios.get(API+"/api/groups", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
     return { succes: true, data: response.data };
   } catch (error) {
     return {
@@ -142,13 +122,11 @@ export const GetAllGroups = async () => {
   }
 };
 
-export const ChangeRespect = async (
-  newRep: ChangeRespectData
-) => {
+export const ChangeRespect = async (newRep: ChangeRespectData) => {
   try {
     const token = getToken();
     const response = await axios.patch(
-      `http://localhost:3000/api/students/${newRep.studentId}/reputation`,
+      API+`/api/students/${newRep.studentId}/reputation`,
       newRep,
       {
         headers: {
@@ -156,8 +134,7 @@ export const ChangeRespect = async (
         },
       }
     );
-    console.log(response);
-    return { succes: true, data: response.data };
+    return { succes: true, data: response };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Произошла ошибка",
@@ -165,11 +142,11 @@ export const ChangeRespect = async (
   }
 };
 
-export const HistoryStudent = async (studentId: string) => {
+export const HistoryStudent = async (studentId: number) => {
   try {
     const token = getToken();
     const response = await axios.get(
-      `http://localhost:3000/api/students/${studentId}/history`,
+      API+`/api/students/${studentId}/history`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -184,12 +161,12 @@ export const HistoryStudent = async (studentId: string) => {
     };
   }
 };
-export const AddStudent = async (for_user: StudentData) => {
+export const AddStudent = async (exported_students: StudentData[]) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      "http://localhost:3000/api/students",
-      { name: for_user.name, groupsId: for_user.groupsId },
+      API+"/api/students/many",
+      { students: exported_students },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -197,7 +174,7 @@ export const AddStudent = async (for_user: StudentData) => {
       }
     );
 
-    console.log(response);
+    console.log(response.data);
     return { succes: true, data: response.data };
   } catch (error) {
     return {
@@ -209,29 +186,26 @@ export const AddStudent = async (for_user: StudentData) => {
 export const getLessons = async () => {
   try {
     const token = getToken();
-    const response = await axios.get(
-      `http://localhost:3000/api/lessons`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(API+`/api/lessons`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : "Произшла ошибка"
-    }
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
   }
-}
+};
 
 export const addLesson = async (name: string) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      `http://localhost:3000/api/lessons`,
+      API+`/api/lessons`,
       {
-        name
+        name,
       },
       {
         headers: {
@@ -239,11 +213,11 @@ export const addLesson = async (name: string) => {
         },
       }
     );
-    console.log('Предмет успешно создан!')
+    console.log("Предмет успешно создан!");
     return response.data;
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : "Произшла ошибка"
-    }
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
   }
-}
+};

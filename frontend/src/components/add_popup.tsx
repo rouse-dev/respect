@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { ChangeRespect, getLessons } from "../service/server";
 import Preloader from "./preloader";
+import { Subject, useAppContext } from "../store/AppContext";
+import { toast } from "react-toastify";
+
 
 interface AddPopupProps {
   studentId: number;
@@ -9,25 +12,28 @@ interface AddPopupProps {
 }
 
 const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
-    const [allSubjects, setAllSubjects] = useState([]);
+    const {setPopupActive} = useAppContext();
+    const [allSubjects, setAllSubjects] = useState<Subject[]>([]);
     useEffect(() => {
         async function getAllLessons() {
             try {
                 const response = await getLessons();
                 setAllSubjects(response)
+               
             } catch (error) {
                 console.log(error)
             }
         }
         isOpen && getAllLessons();
+        setPopupActive(isOpen);
     }, [isOpen])
-    const [currentSubject, setCurrentSubject] = useState({name: null, id: Number});
-    const [amount, setAmount] = useState(0);// type number но из-за этого не показывает в начале placholder
+    const [currentSubject, setCurrentSubject] = useState<Subject>({id: 0, name: ''});
+    const [amount, setAmount] = useState(Number);// type number но из-за этого не показывает в начале placholder
     const [reason, setReason] = useState('');
     const [date, setDate] = useState(
         `${new Date().getFullYear()}-${String('0' + (new Date().getMonth() + 1)).slice(-2)}-${String('0' + new Date().getDate()).slice(-2)}`
     );
-    const [lesson, setLesson] = useState(0); // type number но из-за этого не показывает в начале placholder
+    const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: any) => {
@@ -49,7 +55,8 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
             });
 
             if (result.succes) {
-                onClose();
+                toast.success('Репутация прибавлена на '+amount)
+                onClose();   
             } else {
                 alert(result.error);
             }
@@ -96,6 +103,7 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
                         className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1" 
                         type="date" 
                         value={date}
+                        max={date}
                         onChange={(e) => setDate(e.target.value)}
                         required 
                     />
@@ -104,8 +112,10 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
                         placeholder="Пара" 
                         type="number" 
                         min={0}
+                        
+                        
                         value={lesson}
-                        onChange={(e) => setLesson(parseInt(e.target.value))}
+                        onChange={(e) => setLesson(+e.target.value)}
                         required 
                     />
                     <input 

@@ -27,7 +27,7 @@ const Group = () => {
 
   return (
     <div
-      className="relative w-[250px] cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+      className="relative w-full sm:w-[250px] cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
       onClick={(e) => {
         const dropdown = e.currentTarget;
         dropdown.classList.toggle("rounded-b-lg");

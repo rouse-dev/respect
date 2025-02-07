@@ -4,54 +4,44 @@ import LessonPopup from "./add_lesson";
 import StudentPopup from "./add_students";
 
 const Add = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
   const [isGroupPopup, setIsGroupPopup] = useState(false);
-  const [isLessonPopup,setIsLessonPopup] = useState(false);
-  const [isStudentPopup,setIsStudentPopup] = useState(false)
-
-  const HandleVisible = () => {
-    setIsVisible(!isVisible);
-  };
+  const [isLessonPopup, setIsLessonPopup] = useState(false);
+  const [isStudentPopup, setIsStudentPopup] = useState(false)
 
   return (
-    <div className="absolute z-20">
-      <div
-        className="w-[130px] flex justify-center bg-[--respect-purple-deep] text-lg cursor-pointer p-[8px] rounded-t-lg rounded-b-lg"
-        onClick={HandleVisible}
-      >
-        Добавить
-      </div>
-      <div
-        className={`w-[270px] gap-3 mt-3 flex flex-col items-center justify-center p-[8px] rounded-t-lg rounded-b-lg bg-[--respect-purple-deep] px-5 ${
-          isVisible ? "" : "hidden"
-        }`}
-      >
-        <div onClick={()=>setIsGroupPopup(true)} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
-          Добавить группу
-        </div>
-        <GroupPopup
-          isOpen={isGroupPopup}
-          onClose={() => {
-            setIsGroupPopup(false);
-          }}
-        />
-        <div onClick={()=>setIsStudentPopup(true)} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
-          Добавить студента
-        </div>
-        <StudentPopup
-        isOpen={isStudentPopup}
-        onClose={()=>setIsStudentPopup(false)}
-        />
-        <div onClick={()=>setIsLessonPopup(true)} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
-          Добавить предмет
-        </div>
-        <LessonPopup
-        isOpen={isLessonPopup}
-        onClose={()=>setIsLessonPopup(false)}
-        />
+    <>
+    <div
+      className="relative cursor-pointer selection:bg-transparent flex flex-row order-3 sm:order-2 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+      onClick={(e) => {
+        const dropdown = e.currentTarget;
+        dropdown.classList.toggle("rounded-b-lg");
+
+        dropdown.querySelector("div")!.classList.contains("hidden")
+          ? dropdown.querySelector("div")!.classList.replace("hidden", "flex")
+          : dropdown.querySelector("div")!.classList.replace("flex", "hidden");
+      }}
+    >
+      <p className="flex mr-auto">Добавить</p>
+
+      <div className="hidden z-20 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
+          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsGroupPopup(true)}}>Группу</button>
+          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsLessonPopup(true)}}>Предмет</button>
+          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsStudentPopup(true)}}>Студентов</button>
       </div>
     </div>
+    <GroupPopup
+      isOpen={isGroupPopup}
+      onClose={() => setIsGroupPopup(false)}
+    />
+    <StudentPopup
+      isOpen={isStudentPopup}
+      onClose={()=>setIsStudentPopup(false)}
+    />
+    <LessonPopup
+      isOpen={isLessonPopup}
+      onClose={()=>setIsLessonPopup(false)}
+    />
+    </>
   );
 };
 

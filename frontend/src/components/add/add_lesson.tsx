@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addLesson } from "../../service/server";
+import { toast } from "react-toastify";
+import { useAppContext } from "../../store/AppContext";
 
 interface AddLessonPopup{
     onClose:()=>void;
@@ -7,6 +9,7 @@ interface AddLessonPopup{
 }
 
 const LessonPopup = ({onClose,isOpen }:AddLessonPopup)=>{
+  const {setPopupActive} = useAppContext();
   const [loading, setLoading] = useState(false);
   const [newLesson, setLesson] = useState('');
 
@@ -23,12 +26,17 @@ const LessonPopup = ({onClose,isOpen }:AddLessonPopup)=>{
 
   const sender = () => {
     try {
+      toast.success('Предмет '+newLesson+' добавлен')
       addLessonFunc();
       onClose();
     } catch (error) {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    setPopupActive(isOpen);
+  }, [isOpen])
   
     if(!isOpen) return null
     return(
@@ -41,14 +49,13 @@ const LessonPopup = ({onClose,isOpen }:AddLessonPopup)=>{
           <input
             className="sm:max-w-xs w-full bg-[--respect-purple-add-inputs] rounded-lg py-2 pl-3 outline-none"
             placeholder="Название предмета"
-            value={newLesson}
             onChange={(txt) => {setLesson(txt.target.value)}}
             type="text"
           />
-          <button onClick={()=> sender()} disabled={loading} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
+          <button onClick={sender} disabled={loading} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
             Добавить
           </button>
-          <button onClick={()=>onClose()} disabled={loading} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
+          <button onClick={onClose} disabled={loading} className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer">
             Отмена
           </button>
         </form>

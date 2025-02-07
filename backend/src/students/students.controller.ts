@@ -11,6 +11,7 @@ import { StudentsService } from './students.service';
 import {
   CreateManyStudentsDto,
   CreateStudentDto,
+  StudentResponseDto,
 } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -43,11 +44,18 @@ export class StudentsController {
   @Post('many')
   @ApiOperation({ summary: 'Создание множества студентов' })
   @ApiBody({ type: CreateManyStudentsDto })
-  @ApiResponse({ status: 201, description: 'Студенты успешно созданы' })
+  @ApiResponse({
+    status: 201,
+    description: 'Студенты успешно созданы',
+    type: [StudentResponseDto], // Указываем тип ответа
+  })
   @ApiResponse({ status: 401, description: 'Требуется авторизация' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  createMany(@Body() createManyStudentsDto: CreateManyStudentsDto) {
-    return this.studentsService.createMany(createManyStudentsDto.students);
+  async createMany(@Body() createManyStudentsDto: CreateManyStudentsDto) {
+    const createdStudents = await this.studentsService.createMany(
+      createManyStudentsDto.students,
+    );
+    return createdStudents;
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
@@ -63,7 +71,10 @@ export class StudentsController {
   // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
   @Get(':id/history')
   @ApiOperation({ summary: 'Получить историю репутации студента' })
-  @ApiResponse({ status: 200, description: 'История репутации успешно получена' })
+  @ApiResponse({
+    status: 200,
+    description: 'История репутации успешно получена',
+  })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async getReputationHistory(@Param('id') id: string) {

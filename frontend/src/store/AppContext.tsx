@@ -3,15 +3,25 @@ import  { createContext, useContext, useState, ReactNode } from "react";
 interface Student {
   id: number;
   name: string;
-  group: string;
+  groups: Group;
   groupsId: number;
-  respect: number;
+  reputation: number;
 }
 
-interface Group {
+export interface Group {
   id: number;
   name: string;
   students: Student[];
+}
+
+export interface Subject {
+  id: number,
+  name: string
+}
+
+export interface StudentData {
+  name: string;
+  groupsId: string;
 }
 
 interface AppContextType {
@@ -37,6 +47,10 @@ interface AppContextType {
   setStudents: (students: Student[]) => void;
   sortedStudents: Student[];
   setSortedStudents: (students: Student[]) => void;
+  popupActive: boolean,
+  setPopupActive: (status: boolean) => void;
+  exportGroup: Group | null,
+  setExportGroup: (group: Group | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -56,6 +70,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [sortedStudents, setSortedStudents] = useState<Student[]>([]);
+  const [popupActive, setPopupActive] = useState(false);
+  const [exportGroup, setExportGroup] = useState<Group | null>(null)
 
   return (
     <AppContext.Provider
@@ -79,6 +95,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setStudents,
         sortedStudents,
         setSortedStudents,
+        popupActive,
+        setPopupActive,
+        exportGroup,
+        setExportGroup
       }}
     >
       {children}

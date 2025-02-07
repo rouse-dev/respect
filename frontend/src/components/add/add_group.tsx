@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateGroup, GetAllGroups } from "../../service/server";
 import { useAppContext } from "../../store/AppContext";
 import Preloader from "../preloader";
+import { toast } from "react-toastify";
 
 interface AddGroupPopup {
   onClose: () => void;
@@ -11,7 +12,7 @@ interface AddGroupPopup {
 const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
   if (!isOpen) return null;
 
-  const { setGroups } = useAppContext();
+  const { setGroups, setPopupActive } = useAppContext();
   const [isLoading, setLoading] = useState(false);
   const [groupName, setGroupName] = useState("");
 
@@ -26,6 +27,8 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
         const groupsResponse = await GetAllGroups();
         if (groupsResponse.succes && groupsResponse.data) {
           setGroups(groupsResponse.data);
+          
+          toast.success('Группа добавлена')
           onClose();
         }
       }
@@ -35,6 +38,10 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setPopupActive(isOpen);
+  }, [isOpen]);
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm">
@@ -61,7 +68,7 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
             Добавить
           </button>
           <button 
-            type="button"
+            type="reset"
             onClick={onClose}
             className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer"
           >

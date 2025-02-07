@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { HistoryStudent } from "../service/server";
 import Preloader from "./preloader";
+import { useAppContext } from "../store/AppContext";
 
 interface HistoryPopupProps {
-  studentId: string;
+  studentId: number;
   onClose: () => void;
   isOpen: boolean;
 }
@@ -15,6 +16,7 @@ interface HistoryItem {
 }
 
 const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
+  const {setPopupActive} = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,7 +28,7 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
       try {
         const result = await HistoryStudent(studentId);
         if (result.succes) {
-          setHistory(result.data);
+          setHistory([...result.data].reverse());
         } else {
           alert(result.error);
         }
@@ -37,7 +39,7 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
         setIsLoading(false);
       }
     };
-
+    setPopupActive(isOpen);
     fetchHistory();
   }, [studentId, isOpen]);
 
@@ -67,6 +69,7 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
           </div>
 
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
+            <p>{}</p>
             {history.length > 0 ? (
               history.map((item, index) => (
                 <div
