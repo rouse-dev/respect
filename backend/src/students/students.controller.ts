@@ -1,26 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Patch,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res } from '@nestjs/common';
 import { StudentsService } from './students.service';
-import {
-  CreateManyStudentsDto,
-  CreateStudentDto,
-  StudentResponseDto,
-} from './dto/create-student.dto';
+import { CreateManyStudentsDto, CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('Студенты')
 @ApiBearerAuth()
@@ -44,18 +27,11 @@ export class StudentsController {
   @Post('many')
   @ApiOperation({ summary: 'Создание множества студентов' })
   @ApiBody({ type: CreateManyStudentsDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Студенты успешно созданы',
-    type: [StudentResponseDto], // Указываем тип ответа
-  })
+  @ApiResponse({ status: 201, description: 'Студенты успешно созданы', type: [StudentResponseDto] })
   @ApiResponse({ status: 401, description: 'Требуется авторизация' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async createMany(@Body() createManyStudentsDto: CreateManyStudentsDto) {
-    const createdStudents = await this.studentsService.createMany(
-      createManyStudentsDto.students,
-    );
-    return createdStudents;
+    return this.studentsService.createMany(createManyStudentsDto.students);;
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
@@ -71,14 +47,21 @@ export class StudentsController {
   // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
   @Get(':id/history')
   @ApiOperation({ summary: 'Получить историю репутации студента' })
-  @ApiResponse({
-    status: 200,
-    description: 'История репутации успешно получена',
-  })
+  @ApiResponse({ status: 200, description: 'История репутации успешно получена' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async getReputationHistory(@Param('id') id: string) {
     return this.studentsService.getReputationHistory(+id);
+  }
+
+  // ПОЛУЧИТЬ EXCEL ФАЙЛ С ИСТОРИЕЙ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
+  @Get(':id/history/excel')
+  @ApiOperation({ summary: 'Получить excel файл с историей репутации студента' })
+  @ApiResponse({ status: 200, description: 'Excel файл с историей репутации успешно получен' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  getReputationHistoryExcel( @Param('id') studentId: string, @Body("name") name: string, @Res() res: Response ) {
+    return this.studentsService.downloadReputationHistoryExcel(+studentId, name, res);
   }
 
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
@@ -93,7 +76,8 @@ export class StudentsController {
     @Body('change') change: number,
     @Body('reason') reason?: string,
     @Body('lessonId') lessonId?: number,
+    @Body('isPunish') isPunish?: boolean
   ) {
-    return this.studentsService.updateReputation(+id, change, reason, lessonId);
+    return this.studentsService.updateReputation(+id, change, reason, lessonId, isPunish);
   }
 }

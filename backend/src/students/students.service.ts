@@ -1,14 +1,8 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateManyStudentsDto,
-  CreateStudentDto,
-  StudentResponseDto,
-} from './dto/create-student.dto';
+import { CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
+import * as ExcelJS from 'exceljs';
+import { Response } from 'express';
 
 @Injectable()
 export class StudentsService {
@@ -29,7 +23,9 @@ export class StudentsService {
   }
 
   // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
-  async createMany(students: CreateStudentDto[]): Promise<StudentResponseDto[]> {
+  async createMany(
+    students: CreateStudentDto[],
+  ): Promise<StudentResponseDto[]> {
     try {
       const createdStudents = await Promise.all(
         students.map((student) =>
@@ -96,12 +92,63 @@ export class StudentsService {
     }
   }
 
+  // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА
+  async downloadReputationHistoryExcel(studentId: number, name: string, res: Response) {
+    try {
+      const history = await this.getReputationHistory(studentId);
+
+      // Создаем Excel-файл
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('История репутации');
+
+      // Добавляем заголовки столбцов
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Изменение репутации', key: 'change', width: 20 },
+        { header: 'Причина', key: 'reason', width: 30 },
+        { header: 'Дата изменения', key: 'createdAt', width: 20 },
+        { header: 'Предмет', key: 'lesson', width: 20 },
+      ];
+
+      // Добавляем данные в таблицу
+      history.forEach((record) => {
+        worksheet.addRow({
+          id: record.id,
+          change: record.change,
+          reason: record.reason,
+          createdAt: record.createdAt,
+          lesson: record.lesson,
+        });
+      });
+
+      // Настраиваем ответ для скачивания файла
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=reputation_history_${name}.xlsx`,
+      );
+
+      // Отправляем файл клиенту
+      const buffer = await workbook.xlsx.writeBuffer();
+      res.send(buffer);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Ошибка при создании Excel-файла');
+    }
+  }
+
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
   async updateReputation(
     studentId: number,
     change: number,
     reason?: string,
     lessonId?: number,
+    isPunish?: boolean
   ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
@@ -125,7 +172,7 @@ export class StudentsService {
       }
 
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
-      if (change < 0 && student.reputation - -change < 0) {
+      if (isPunish === false && change < 0 && student.reputation - -change < 0) {
         throw new InternalServerErrorException('Не хватает репутации!');
       }
 
