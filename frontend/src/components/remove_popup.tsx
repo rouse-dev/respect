@@ -46,13 +46,13 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
 
         setIsLoading(true);
         try {
-         
             const fullReason = `${currentSubject.name}, Пара ${lesson}, ${date}: ${reason}`;
             const result = await ChangeRespect({
                 studentId,
                 change: -amount,
                 reason: fullReason,
                 lessonId: +currentSubject.id,
+                isPunish: true
             });
 
             if (result.succes) {

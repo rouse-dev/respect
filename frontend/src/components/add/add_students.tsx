@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { GetAllGroups, AddStudent } from "../../service/server";
 import Preloader from "../preloader";
-import { StudentData, useAppContext } from "../../store/AppContext";
+import { Group, StudentData, useAppContext } from "../../store/AppContext";
 import ExcelReader from "../excelReader";
 import { toast } from "react-toastify";
 
@@ -23,7 +23,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [data, setData] = useState<StudentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { students, setStudents, setPopupActive } = useAppContext();
+  const { students, setStudents, setPopupActive, selectedGroup, setSelectedGroup } = useAppContext();
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -120,12 +120,13 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
               {groups.map((el, i) => 
                   <button type="button" className="px-3 py-2 text-left hover:backdrop-brightness-110 last:rounded-b-sm" key={i} onClick={_ => {
                       setExportGroup(el);
+                      setSelectedGroup(el);
                   }}>{el.name}</button>
               )}
           </div>
       </div>
         
-        {selectedGroup && <ExcelReader setData={setData} selectedGroup={selectedGroup.id} />}
+        {selectedGroup && <ExcelReader setData={setData} />}
 
         <button
           type="submit"

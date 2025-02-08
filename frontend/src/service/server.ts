@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { StudentData } from "../store/AppContext";
 import { toast } from "react-toastify";
 
-const API = import.meta.env.VITE_API_URL
+const API = import.meta.env.VITE_API_URL;
 
 interface UserData {
   avatar: any;
@@ -21,6 +21,7 @@ interface ChangeRespectData {
   change: number;
   reason: string;
   lessonId: number;
+  isPunish?: boolean;
 }
 
 const getToken = () => {
@@ -31,17 +32,13 @@ const getToken = () => {
   return userData;
 };
 
-
 export const LoginTeach = async (for_user: LoginUserData) => {
   try {
-    const response = await axios.post(
-      API+"/api/teachers/login",
-      {
-        email: for_user.email,
-        password: for_user.password,
-      }
-    );
-    toast.info('Добро пожаловать')
+    const response = await axios.post(API + "/api/teachers/login", {
+      email: for_user.email,
+      password: for_user.password,
+    });
+    toast.info("Добро пожаловать");
     return { success: true, data: response.data };
   } catch (error) {
     return {
@@ -52,12 +49,9 @@ export const LoginTeach = async (for_user: LoginUserData) => {
 
 export const ChangeAvatar = async (for_user: UserData) => {
   try {
-    const response = await axios.patch(
-      API+"/api/teachers/avatar",
-      {
-        avatar: for_user.avatar,
-      }
-    );
+    const response = await axios.patch(API + "/api/teachers/avatar", {
+      avatar: for_user.avatar,
+    });
     console.log(response.data);
     return { succes: true, data: response.data };
   } catch (error) {
@@ -70,7 +64,7 @@ export const ChangeAvatar = async (for_user: UserData) => {
 export const GetAllStudents = async () => {
   try {
     const token = getToken();
-    const response = await axios.get(API+"/api/students", {
+    const response = await axios.get(API + "/api/students", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -88,7 +82,7 @@ export const CreateGroup = async (groupName: string) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      API+"/api/groups",
+      API + "/api/groups",
       { name: groupName },
       {
         headers: {
@@ -109,7 +103,7 @@ export const CreateGroup = async (groupName: string) => {
 export const GetAllGroups = async () => {
   try {
     const token = getToken();
-    const response = await axios.get(API+"/api/groups", {
+    const response = await axios.get(API + "/api/groups", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -126,7 +120,7 @@ export const ChangeRespect = async (newRep: ChangeRespectData) => {
   try {
     const token = getToken();
     const response = await axios.patch(
-      API+`/api/students/${newRep.studentId}/reputation`,
+      API + `/api/students/${newRep.studentId}/reputation`,
       newRep,
       {
         headers: {
@@ -146,7 +140,7 @@ export const HistoryStudent = async (studentId: number) => {
   try {
     const token = getToken();
     const response = await axios.get(
-      API+`/api/students/${studentId}/history`,
+      API + `/api/students/${studentId}/history`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -165,7 +159,7 @@ export const AddStudent = async (exported_students: StudentData[]) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      API+"/api/students/many",
+      API + "/api/students/many",
       { students: exported_students },
       {
         headers: {
@@ -186,7 +180,7 @@ export const AddStudent = async (exported_students: StudentData[]) => {
 export const getLessons = async () => {
   try {
     const token = getToken();
-    const response = await axios.get(API+`/api/lessons`, {
+    const response = await axios.get(API + `/api/lessons`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -203,7 +197,7 @@ export const addLesson = async (name: string) => {
   try {
     const token = getToken();
     const response = await axios.post(
-      API+`/api/lessons`,
+      API + `/api/lessons`,
       {
         name,
       },
@@ -219,5 +213,27 @@ export const addLesson = async (name: string) => {
     return {
       error: error instanceof Error ? error.message : "Произшла ошибка",
     };
+  }
+};
+
+export const exportDataWithExcel = async (studentId: number, name: string): Promise<Blob | null> => {
+  try {
+    const response: AxiosResponse<Blob> = await axios.get(
+      `http://localhost:3000/api/students/${studentId}/history/excel`,
+      {
+        params: { name },
+        responseType: "blob",
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при экспорте данных:", error);
+
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Произошла ошибка при экспорте данных.");
+    }
   }
 };

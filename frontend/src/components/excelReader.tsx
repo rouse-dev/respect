@@ -1,9 +1,9 @@
 import * as XLSX from 'xlsx';
 import { useEffect, useState } from 'react';
-import { useAppContext } from '../store/AppContext';
+import { ExcelReaderProps, useAppContext } from '../store/AppContext';
 
-const ExcelReader = () => {
-  const {exportGroup} = useAppContext();
+const ExcelReader = ({ setData }: ExcelReaderProps) => {
+  const {selectedGroup} = useAppContext();
   const [fileLoaded, setFileLoaded] = useState(false);
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,13 +21,18 @@ const ExcelReader = () => {
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
       const formattedData = jsonData.map((row) => ({
         name: `${row[0]} ${row[1]} ${row[2]}`,
-        groupsId: exportGroup
+        groupsId: selectedGroup?.groupsId
       }));
 
       if (formattedData[0]?.name.includes("Фамилия")) {
         formattedData.shift();
       }
-      console.log(formattedData);
+      if(jsonData.length === 0) {
+        alert('Excel таблица пуста!')
+      } else {
+        console.log(formattedData);
+        setData(formattedData);
+      }
     };
 
     reader.readAsBinaryString(file);

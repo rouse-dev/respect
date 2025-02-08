@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { HistoryStudent } from "../service/server";
-import Preloader from "./preloader";
-import { useAppContext } from "../store/AppContext";
+import { HistoryStudent } from "../../service/server";
+import Preloader from "../preloader";
+import { useAppContext } from "../../store/AppContext";
+import Paginator from "./paginator";
+import ExcelHistoryButton from "./ExcelHistoryButton";
 
 interface HistoryPopupProps {
   studentId: number;
@@ -16,9 +18,12 @@ interface HistoryItem {
 }
 
 const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
-  const {setPopupActive} = useAppContext();
+  const { setPopupActive } = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(Number);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -28,7 +33,10 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
       try {
         const result = await HistoryStudent(studentId);
         if (result.succes) {
-          setHistory([...result.data].reverse());
+          const reversedHistory = [...result.data].reverse();
+          setHistory(reversedHistory);
+          setPaginHistory(reversedHistory.slice(0, 3));
+          setTotalPages(Math.ceil(reversedHistory.length / 3));
         } else {
           alert(result.error);
         }
@@ -42,6 +50,15 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
     setPopupActive(isOpen);
     fetchHistory();
   }, [studentId, isOpen]);
+
+  useEffect(() => {
+    setPaginHistory(history.slice((currentPage - 1) * 3, currentPage * 3));
+  }, [history, currentPage]);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
 
   if (!isOpen) return null;
 
@@ -67,17 +84,15 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
           </div>
-
+          <ExcelHistoryButton studentId={studentId} name={"testing"} />
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
             <p>{}</p>
-            {history.length > 0 ? (
-              history.map((item, index) => (
+            {paginHistory.length > 0 ? (
+              paginHistory.map((item, index) => (
                 <div
                   key={index}
                   className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 rounded-lg  bg-[--respect-purple-dark] ${
-                    item.change > 0
-                      ? "border-green-500"
-                      : "border-red-500"
+                    item.change > 0 ? "border-green-500" : "border-red-500"
                   }`}
                 >
                   <div className="flex flex-col gap-1">
@@ -100,6 +115,13 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
             ) : (
               <p className="text-center py-4">История изменений пуста</p>
             )}
+          </div>
+          <div>
+            <Paginator
+              totalPages={totalPages}
+              currentPage={currentPage}
+              goToPage={goToPage}
+            />
           </div>
         </div>
       </div>

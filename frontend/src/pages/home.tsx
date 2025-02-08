@@ -2,7 +2,7 @@ import placeholder_avatar from "../assets/media/placeholder_avatar.png";
 import RemovePopup from "../components/remove_popup";
 import AddPopup from "../components/add_popup";
 import { Link } from "react-router-dom";
-import HistoryPopup from "../components/history_popup";
+import HistoryPopup from "../components/History/history_popup";
 import Group from "../components/group";
 import Students from "../components/Students";
 import { useAppContext } from "../store/AppContext";

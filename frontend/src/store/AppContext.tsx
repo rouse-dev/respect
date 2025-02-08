@@ -21,7 +21,11 @@ export interface Subject {
 
 export interface StudentData {
   name: string;
-  groupsId: string;
+  groupsId: number;
+}
+
+export interface ExcelReaderProps {
+  setData: (data: StudentData[]) => void;
 }
 
 interface AppContextType {
@@ -51,6 +55,8 @@ interface AppContextType {
   setPopupActive: (status: boolean) => void;
   exportGroup: Group | null,
   setExportGroup: (group: Group | null) => void;
+  selectedGroup: StudentData | null,
+  setSelectedGroup: (data: StudentData) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -71,7 +77,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [sortedStudents, setSortedStudents] = useState<Student[]>([]);
   const [popupActive, setPopupActive] = useState(false);
-  const [exportGroup, setExportGroup] = useState<Group | null>(null)
+  const [exportGroup, setExportGroup] = useState<Group | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<StudentData | null>(null);
 
   return (
     <AppContext.Provider
@@ -98,7 +105,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         popupActive,
         setPopupActive,
         exportGroup,
-        setExportGroup
+        setExportGroup,
+        selectedGroup,
+        setSelectedGroup
       }}
     >
       {children}

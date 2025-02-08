@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { GetAllStudents } from "../service/server";
 import Preloader from "./preloader";
 import AddPopup from "./add_popup";
-import HistoryPopup from "./history_popup";
+import HistoryPopup from "./History/history_popup";
 import RemovePopup from "./remove_popup";
 import DiscardPopup from "./discard_popup";
 

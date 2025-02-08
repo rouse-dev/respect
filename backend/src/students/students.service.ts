@@ -172,7 +172,7 @@ export class StudentsService {
       }
 
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
-      if (isPunish === false && change < 0 && student.reputation - -change < 0) {
+      if (!isPunish && change < 0 && student.reputation - -change < 0) {
         throw new InternalServerErrorException('Не хватает репутации!');
       }
 
