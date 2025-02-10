@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { HistoryStudent } from "../../service/server";
 import Preloader from "../preloader";
 import { useAppContext } from "../../store/AppContext";
-import Paginator from "./paginator";
+import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
 
 interface HistoryPopupProps {
@@ -69,29 +69,38 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
         id="respect_history_popup"
         className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm"
       >
+        
         <div
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-2xl w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-[--respect-purple] max-w-2xl w-full p-6 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
-          }}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">История изменений респекта</h2>
-            <button
-              className="bg-[--respect-purple-dark] p-2 rounded-lg"
+          }} >
+            <div className="flex justify-end"> <button
+              className="bg-[--respect-purple-dark] p-2 rounded-lg h-10 "
               onClick={onClose}
             >
               <i className="fa fa-times" aria-hidden="true"></i>
-            </button>
+            </button></div>
+            
+          <div className="flex justify-between gap-5">
+            <p className="h-10 w-full  bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">Группа:</p>
+            <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">Репутация:</p>
+           
           </div>
-          <ExcelHistoryButton studentId={studentId} name={"testing"} />
+          <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">ФИО</p>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">История изменений респекта</h2>
+            <ExcelHistoryButton studentId={studentId} />
+            
+          </div>
+          
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
-            <p>{}</p>
+            
             {paginHistory.length > 0 ? (
               paginHistory.map((item, index) => (
                 <div
                   key={index}
-                  className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 rounded-lg  bg-[--respect-purple-dark] ${
+                  className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 w-full rounded-lg  bg-[--respect-purple-dark] ${
                     item.change > 0 ? "border-green-500" : "border-red-500"
                   }`}
                 >

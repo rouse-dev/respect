@@ -1,4 +1,4 @@
-import placeholder_avatar from "../assets/media/placeholder_avatar.png";
+import placeholder_avatar from "../assets/media/placeholder_avatar.jpg";
 import RemovePopup from "../components/remove_popup";
 import AddPopup from "../components/add_popup";
 import { Link } from "react-router-dom";

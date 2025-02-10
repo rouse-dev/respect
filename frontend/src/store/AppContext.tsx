@@ -20,12 +20,18 @@ export interface Subject {
 }
 
 export interface StudentData {
+  id: number;
+  name: string;
+  groupsId: number;
+}
+
+export interface setSetData {
   name: string;
   groupsId: number;
 }
 
 export interface ExcelReaderProps {
-  setData: (data: StudentData[]) => void;
+  setData: (data: setSetData[]) => void;
 }
 
 interface AppContextType {

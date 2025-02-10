@@ -21,7 +21,7 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
       const formattedData = jsonData.map((row) => ({
         name: `${row[0]} ${row[1]} ${row[2]}`,
-        groupsId: selectedGroup?.groupsId
+        groupsId: selectedGroup?.id || 0
       }));
 
       if (formattedData[0]?.name.includes("Фамилия")) {
@@ -47,7 +47,6 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
       <h1>{fileLoaded ? 'Файл выбран.' : 'Загрузите Excel файл'}</h1>
       <label htmlFor={'excel_file_input'} className='p-3 bg-[--respect-purple-dark] text-center rounded-md cursor-pointer'>{fileLoaded ? 'Поменять' : 'Выбрать файл'}</label>
       <input id='excel_file_input' className='hidden' type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-      
     </div>
   );
 };

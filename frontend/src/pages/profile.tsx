@@ -1,5 +1,5 @@
 import { useState } from "react";
-import placeholder_avatar from '../assets/media/placeholder_avatar.png'
+import placeholder_avatar from '../assets/media/placeholder_avatar.jpg'
 import { Link } from "react-router-dom";
 import userStore from "../store/userStore";
 

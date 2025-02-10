@@ -218,11 +218,15 @@ export const addLesson = async (name: string) => {
 
 export const exportDataWithExcel = async (studentId: number, name: string): Promise<Blob | null> => {
   try {
+    const token = getToken();
     const response: AxiosResponse<Blob> = await axios.get(
       `http://localhost:3000/api/students/${studentId}/history/excel`,
       {
         params: { name },
         responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
     );
 

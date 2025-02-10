@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import * as ExcelJS from 'exceljs';
@@ -61,7 +65,7 @@ export class StudentsService {
     try {
       // ИЩЕМ СТУДЕНТА С ИСТОРИЕЙ РЕПУТАЦИИ И НАЗВАНИЕМ ПРЕДМЕТА
       const student = await this.prisma.student.findUnique({
-        where: { id: studentId },
+        where: { id: +studentId },
         include: {
           historyReps: {
             include: {
@@ -92,16 +96,13 @@ export class StudentsService {
     }
   }
 
-  // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА
-  async downloadReputationHistoryExcel(studentId: number, name: string, res: Response) {
+  // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТ
+  async downloadReputationHistoryExcel(studentId: number, res: Response) {
     try {
       const history = await this.getReputationHistory(studentId);
-
-      // Создаем Excel-файл
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('История репутации');
 
-      // Добавляем заголовки столбцов
       worksheet.columns = [
         { header: 'ID', key: 'id', width: 10 },
         { header: 'Изменение репутации', key: 'change', width: 20 },
@@ -110,7 +111,6 @@ export class StudentsService {
         { header: 'Предмет', key: 'lesson', width: 20 },
       ];
 
-      // Добавляем данные в таблицу
       history.forEach((record) => {
         worksheet.addRow({
           id: record.id,
@@ -121,19 +121,17 @@ export class StudentsService {
         });
       });
 
-      // Настраиваем ответ для скачивания файла
       res.setHeader(
         'Content-Type',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       );
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename=reputation_history_${name}.xlsx`,
+        `attachment; filename=reputation_history_${studentId}.xlsx`,
       );
 
-      // Отправляем файл клиенту
       const buffer = await workbook.xlsx.writeBuffer();
-      res.send(buffer);
+      res.send(Buffer.from(buffer));
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -148,7 +146,7 @@ export class StudentsService {
     change: number,
     reason?: string,
     lessonId?: number,
-    isPunish?: boolean
+    isPunish?: boolean,
   ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ

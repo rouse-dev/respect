@@ -60,8 +60,8 @@ export class StudentsController {
   @ApiResponse({ status: 200, description: 'Excel файл с историей репутации успешно получен' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  getReputationHistoryExcel( @Param('id') studentId: string, @Body("name") name: string, @Res() res: Response ) {
-    return this.studentsService.downloadReputationHistoryExcel(+studentId, name, res);
+  getReputationHistoryExcel( @Param('id') studentId: number, @Res() res: Response ) {
+    return this.studentsService.downloadReputationHistoryExcel(studentId, res);
   }
 
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
