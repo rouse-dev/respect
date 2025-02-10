@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateManyStudentsDto, CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -60,8 +60,24 @@ export class StudentsController {
   @ApiResponse({ status: 200, description: 'Excel файл с историей репутации успешно получен' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  getReputationHistoryExcel( @Param('id') studentId: number, @Res() res: Response ) {
-    return this.studentsService.downloadReputationHistoryExcel(studentId, res);
+  async downloadReputationHistoryExcel(@Param('id') studentId: number, @Res() res: Response) {
+    try {
+      const buffer = await this.studentsService.generateReputationHistoryExcel(studentId);
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="reputation_history_${studentId}.xlsx"`,
+      );
+      res.send(buffer);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Ошибка при скачивании файла');
+    }
   }
 
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА

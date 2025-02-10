@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Patch,
+  Res,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { RegisterTeacherDto } from './dto/register-teacher.dto';
@@ -22,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @ApiTags('Учителя')
 @Controller('teachers')
@@ -57,11 +59,28 @@ export class TeachersController {
   })
   @ApiResponse({ status: 401, description: 'Неверный email или пароль' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async login(@Body() loginTeacherDto: LoginTeacherDto) {
+  async login(
+    @Body() loginTeacherDto: LoginTeacherDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     return this.teachersService.login(
       loginTeacherDto.email,
       loginTeacherDto.password,
+      response,
     );
+  }
+
+  // ВЫХОД ИЗ АККАУНТА УЧИТЕЛЯ
+  @Post('logout')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Выход из аккаунта учителя' })
+  @ApiResponse({
+    status: 200,
+    description: 'Успешный выход, cookie с токеном удален',
+  })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async logout(@Res({ passthrough: true }) response: Response) {
+    return this.teachersService.logout(response);
   }
 
   // ИЗМЕНЕНИЕ АВАТАРКИ УЧИТЕЛЯ
@@ -84,7 +103,10 @@ export class TeachersController {
   })
   @ApiBearerAuth() // Указываем, что требуется JWT-токен
   @ApiResponse({ status: 200, description: 'Аватар успешно изменен' }) // Укажите тип возвращаемого объекта
-  @ApiResponse({ status: 400, description: 'Некорректный запрос или файл не предоставлен' })
+  @ApiResponse({
+    status: 400,
+    description: 'Некорректный запрос или файл не предоставлен',
+  })
   @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req) {

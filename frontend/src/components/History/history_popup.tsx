@@ -7,6 +7,7 @@ import ExcelHistoryButton from "./ExcelHistoryButton";
 
 interface HistoryPopupProps {
   studentId: number;
+  name: string;
   onClose: () => void;
   isOpen: boolean;
 }
@@ -17,7 +18,7 @@ interface HistoryItem {
   createdAt: string;
 }
 
-const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
+const HistoryPopup = ({ studentId, name, onClose, isOpen }: HistoryPopupProps) => {
   const { setPopupActive } = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
@@ -90,7 +91,7 @@ const HistoryPopup = ({ studentId, onClose, isOpen }: HistoryPopupProps) => {
           <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">ФИО</p>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">История изменений респекта</h2>
-            <ExcelHistoryButton studentId={studentId} />
+            <ExcelHistoryButton studentId={studentId} name={name} />
             
           </div>
           

@@ -3,12 +3,14 @@ import {
   ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
+  Res,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { extname } from 'path';
+import { Response } from 'express';
 
 @Injectable()
 export class TeachersService {
@@ -46,7 +48,11 @@ export class TeachersService {
   }
 
   // ЛОГИРОВАНИЕ УЧИТЕЛЯ
-  async login(email: string, password: string) {
+  async login(
+    email: string,
+    password: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     try {
       const teacher = await this.prisma.teacher.findUnique({
         where: { email },
@@ -68,9 +74,30 @@ export class TeachersService {
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
       });
 
+      response.cookie('jwt', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 2592000000,
+      });
+
       return { accessToken, teacher };
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ВЫХОД ИЗ АККАУНТА
+  async logout(@Res({ passthrough: true }) response: Response) {
+    try {
+      response.clearCookie('jwt', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+      return { message: 'Вы вышли с аккаунта!' };
+    } catch (error) {
+      return new InternalServerErrorException(error);
     }
   }
 

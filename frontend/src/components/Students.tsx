@@ -24,9 +24,8 @@ const Students = () => {
   const [isHistoryPopupOpen, setIsHistoryPopupOpen] = useState(false);
   const [isRemovePopupOpen, setIsRemovePopupOpen] = useState(false);
   const [isDiscardPopupOpen, setIsDiscardPopupOpen] = useState(false);
-  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
-    null
-  );
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+  const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
 
 
   const fetchStudents = async () => {
@@ -150,6 +149,7 @@ const Students = () => {
                       onClick={() => {
                         console.log(sortedStudents)
                         setSelectedStudentId(el.id);
+                        setSelectedStudentName(el.name);
                         setIsHistoryPopupOpen(true);
                       }}
                     >
@@ -218,6 +218,7 @@ const Students = () => {
 
       <HistoryPopup
         studentId={selectedStudentId || 0}
+        name={selectedStudentName || 'noname'}
         isOpen={isHistoryPopupOpen}
         onClose={() => {
           setIsHistoryPopupOpen(false);

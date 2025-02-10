@@ -6,7 +6,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import * as ExcelJS from 'exceljs';
-import { Response } from 'express';
 
 @Injectable()
 export class StudentsService {
@@ -97,9 +96,10 @@ export class StudentsService {
   }
 
   // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТ
-  async downloadReputationHistoryExcel(studentId: number, res: Response) {
+  async generateReputationHistoryExcel(studentId: number): Promise<ExcelJS.Buffer> {
     try {
       const history = await this.getReputationHistory(studentId);
+
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('История репутации');
 
@@ -113,26 +113,17 @@ export class StudentsService {
 
       history.forEach((record) => {
         worksheet.addRow({
-          id: record.id,
-          change: record.change,
-          reason: record.reason,
-          createdAt: record.createdAt,
-          lesson: record.lesson,
+          id: record.id || '',
+          change: record.change || '',
+          reason: record.reason || '',
+          createdAt: record.createdAt.toLocaleString(),
+          lesson: record.lesson || '',
         });
       });
 
-      res.setHeader(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      );
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename=reputation_history_${studentId}.xlsx`,
-      );
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      res.send(Buffer.from(buffer));
+      return await workbook.xlsx.writeBuffer();
     } catch (error) {
+      console.error('Ошибка при создании Excel-файла:', error);
       if (error instanceof NotFoundException) {
         throw error;
       }

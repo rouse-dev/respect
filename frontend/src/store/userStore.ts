@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { LoginTeach } from "../service/server";
+import { LoginTeach, logoutTeach } from "../service/server";
 
 
 interface ILoginInfo {
@@ -14,7 +14,6 @@ interface ILoginResponse {
       name: string;
       email: string;
     };
-    accessToken: string;
   };
 }
 
@@ -22,7 +21,6 @@ class UserStore {
   username: string = "";
   email: string = "";
   isAuth: boolean = false;
-  token: string = "";
 
   constructor() {
     makeAutoObservable(this);
@@ -39,20 +37,19 @@ class UserStore {
       if (userData && username && email) {
         this.username = username;
         this.email = email;
-        this.token = userData;
       }
     }
   }
 
-  logoutUser(): void {
+  async logoutUser(): Promise<void> {
     this.isAuth = false;
     this.username = "";
     this.email = "";
-    this.token = "";
     localStorage.removeItem("userData");
     localStorage.removeItem("isAuth");
     localStorage.removeItem("username");
     localStorage.removeItem("email");
+    await logoutTeach();
   }
 
   async authUser(userInfo: ILoginInfo): Promise<void> {
@@ -62,10 +59,8 @@ class UserStore {
         const userData = response.data;
         this.username = userData.teacher.name;
         this.email = userData.teacher.email;
-        this.token = userData.accessToken;
         this.isAuth = true;
 
-        localStorage.setItem("userData", userData.accessToken);
         localStorage.setItem("username", userData.teacher.name);
         localStorage.setItem("email", userData.teacher.email);
         localStorage.setItem("isAuth", "true");
