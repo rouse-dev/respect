@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupPopup from "./add_group";
 import LessonPopup from "./add_lesson";
 import StudentPopup from "./add_students";
+import { useAppContext } from "../../store/AppContext";
 
 const Add = () => {
   const [isGroupPopup, setIsGroupPopup] = useState(false);
   const [isLessonPopup, setIsLessonPopup] = useState(false);
-  const [isStudentPopup, setIsStudentPopup] = useState(false)
+  const [isStudentPopup, setIsStudentPopup] = useState(false);
+
+  const {setPopupActive, popupActive} = useAppContext();
+
+  useEffect(() => {
+    console.log(popupActive)
+  }, [])
 
   return (
     <>
@@ -24,22 +31,46 @@ const Add = () => {
       <p className="flex mr-auto">Добавить</p>
 
       <div className="hidden z-20 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
-          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsGroupPopup(true)}}>Группу</button>
-          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsLessonPopup(true)}}>Предмет</button>
-          <button className="py-2 hover:backdrop-brightness-110" onClick={()=>{setIsStudentPopup(true)}}>Студентов</button>
+          <button className="py-2 hover:backdrop-brightness-110" 
+            onClick={()=>{
+              setIsGroupPopup(true);
+              setPopupActive(true);
+            }}
+          >Группу</button>
+          <button className="py-2 hover:backdrop-brightness-110" 
+            onClick={()=>{
+              setIsLessonPopup(true);
+              setPopupActive(true);
+            }}
+          >Предмет</button>
+          <button className="py-2 hover:backdrop-brightness-110" 
+            onClick={()=>{
+              setIsStudentPopup(true);
+              setPopupActive(true);
+            }}
+          >Студентов</button>
       </div>
     </div>
     <GroupPopup
       isOpen={isGroupPopup}
-      onClose={() => setIsGroupPopup(false)}
+      onClose={() => {
+        setIsGroupPopup(false);
+        setPopupActive(false);
+      }}
     />
     <StudentPopup
       isOpen={isStudentPopup}
-      onClose={()=>setIsStudentPopup(false)}
+      onClose={()=>{
+        setIsStudentPopup(false);
+        setPopupActive(false);
+      }}
     />
     <LessonPopup
       isOpen={isLessonPopup}
-      onClose={()=>setIsLessonPopup(false)}
+      onClose={()=>{
+        setIsLessonPopup(false);
+        setPopupActive(false);
+      }}
     />
     </>
   );

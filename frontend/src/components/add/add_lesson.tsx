@@ -8,8 +8,7 @@ interface AddLessonPopup{
     isOpen: boolean;
 }
 
-const LessonPopup = ({onClose,isOpen }:AddLessonPopup)=>{
-  const {setPopupActive} = useAppContext();
+const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
   const [loading, setLoading] = useState(false);
   const [newLesson, setLesson] = useState('');
 
@@ -33,10 +32,6 @@ const LessonPopup = ({onClose,isOpen }:AddLessonPopup)=>{
       console.log(error)
     }
   }
-
-  useEffect(() => {
-    setPopupActive(isOpen);
-  }, [isOpen])
   
     if(!isOpen) return null
     return(

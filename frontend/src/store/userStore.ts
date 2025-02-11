@@ -31,10 +31,9 @@ class UserStore {
     const isAuth = localStorage.getItem("isAuth");
     if (isAuth === "true") {
       this.isAuth = true;
-      const userData = localStorage.getItem("userData");
       const username = localStorage.getItem("username");
       const email = localStorage.getItem("email");
-      if (userData && username && email) {
+      if (username && email) {
         this.username = username;
         this.email = email;
       }

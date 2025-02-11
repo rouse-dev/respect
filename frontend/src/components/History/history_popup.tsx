@@ -4,6 +4,7 @@ import Preloader from "../preloader";
 import { useAppContext } from "../../store/AppContext";
 import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
+import Filter from "./Filter";
 
 interface HistoryPopupProps {
   studentId: number;
@@ -18,13 +19,21 @@ interface HistoryItem {
   createdAt: string;
 }
 
-const HistoryPopup = ({ studentId, name, onClose, isOpen }: HistoryPopupProps) => {
+const HistoryPopup = ({
+  studentId,
+  name,
+  onClose,
+  isOpen,
+}: HistoryPopupProps) => {
   const { setPopupActive } = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [sortedHistory, setSortedHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(Number);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [sortRespect, setSortRespect] = useState('Все');
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -36,6 +45,7 @@ const HistoryPopup = ({ studentId, name, onClose, isOpen }: HistoryPopupProps) =
         if (result.succes) {
           const reversedHistory = [...result.data].reverse();
           setHistory(reversedHistory);
+          setSortedHistory(reversedHistory);
           setPaginHistory(reversedHistory.slice(0, 3));
           setTotalPages(Math.ceil(reversedHistory.length / 3));
         } else {
@@ -53,13 +63,16 @@ const HistoryPopup = ({ studentId, name, onClose, isOpen }: HistoryPopupProps) =
   }, [studentId, isOpen]);
 
   useEffect(() => {
-    setPaginHistory(history.slice((currentPage - 1) * 3, currentPage * 3));
-  }, [history, currentPage]);
+      setPaginHistory(sortedHistory.slice((currentPage - 1) * 3, currentPage * 3));
+  }, [sortedHistory, currentPage]);
+
+  useEffect(() => {
+
+  }, [sortRespect])
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
   };
-
 
   if (!isOpen) return null;
 
@@ -70,33 +83,37 @@ const HistoryPopup = ({ studentId, name, onClose, isOpen }: HistoryPopupProps) =
         id="respect_history_popup"
         className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm"
       >
-        
         <div
           className="flex flex-col gap-3 bg-[--respect-purple] max-w-2xl w-full p-6 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
-          }} >
-            <div className="flex justify-end"> <button
+          }}
+        >
+          <div className="flex justify-end">
+            {" "}
+            <button
               className="bg-[--respect-purple-dark] p-2 rounded-lg h-10 "
               onClick={onClose}
             >
               <i className="fa fa-times" aria-hidden="true"></i>
-            </button></div>
-            
-          <div className="flex justify-between gap-5">
-            <p className="h-10 w-full  bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">Группа:</p>
-            <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">Репутация:</p>
-           
+            </button>
           </div>
-          <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">ФИО</p>
+          <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
+            ФИО
+          </p>
+          <div className="flex justify-between gap-5">
+            <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
+              Репутация:
+            </p>
+            <Filter sortRespect={sortRespect} setSortRespect={setSortRespect} />
+          </div>
+
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">История изменений респекта</h2>
             <ExcelHistoryButton studentId={studentId} name={name} />
-            
           </div>
-          
+
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
-            
             {paginHistory.length > 0 ? (
               paginHistory.map((item, index) => (
                 <div

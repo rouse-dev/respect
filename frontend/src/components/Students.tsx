@@ -17,7 +17,8 @@ const Students = () => {
     students,
     sortedStudents,
     setStudents,
-    setSortedStudents
+    setSortedStudents,
+    setPopupActive
   } = useAppContext();
   const [isLoading, setLoading] = useState(false);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
@@ -26,7 +27,6 @@ const Students = () => {
   const [isDiscardPopupOpen, setIsDiscardPopupOpen] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
-
 
   const fetchStudents = async () => {
     try {
@@ -147,7 +147,7 @@ const Students = () => {
                     <p
                       className="px-3 py-2 w-2/3 text-xl sm:text-lg cursor-pointer hover:underline active:"
                       onClick={() => {
-                        console.log(sortedStudents)
+                        setPopupActive(true);
                         setSelectedStudentId(el.id);
                         setSelectedStudentName(el.name);
                         setIsHistoryPopupOpen(true);
@@ -168,6 +168,7 @@ const Students = () => {
                       <button
                         className="w-full rounded-lg bg-red-400 transition-transform hover:bg-red-600 active:scale-95 hover:scale-105 order-2 sm:order-2"
                         onClick={() => {
+                          setPopupActive(true);
                           setSelectedStudentId(el.id);
                           setIsRemovePopupOpen(true);
                         }}
@@ -182,6 +183,7 @@ const Students = () => {
                       <button
                         className="w-full rounded-lg bg-[#7fad75] transition-transform hover:bg-[#4cb834] active:scale-95 hover:scale-105 order-1 sm:order-1"
                         onClick={() => {
+                          setPopupActive(true);
                           setSelectedStudentId(el.id);
                           setIsAddPopupOpen(true);
                         }}
@@ -192,6 +194,7 @@ const Students = () => {
                       <button
                         className="w-full rounded-lg bg-[#6f8abc] transition-transform hover:bg-[#4c6fb0] active:scale-95 hover:scale-105 order-3 sm:order-3"
                         onClick={() => {
+                          setPopupActive(true);
                           setSelectedStudentId(el.id);
                           setIsDiscardPopupOpen(true);
                         }}
@@ -213,6 +216,7 @@ const Students = () => {
           setIsAddPopupOpen(false);
           setSelectedStudentId(null);
           fetchStudents();
+          setPopupActive(false);
         }}
       />
 
@@ -223,6 +227,7 @@ const Students = () => {
         onClose={() => {
           setIsHistoryPopupOpen(false);
           setSelectedStudentId(null);
+          setPopupActive(false);
         }}
       />
 
@@ -233,6 +238,7 @@ const Students = () => {
           setIsRemovePopupOpen(false);
           setSelectedStudentId(null);
           fetchStudents();
+          setPopupActive(false);
         }}
       />
       <DiscardPopup
@@ -242,6 +248,7 @@ const Students = () => {
           setIsDiscardPopupOpen(false);
           setSelectedStudentId(null);
           fetchStudents();
+          setPopupActive(false);
         }}
       />
     </>

@@ -12,7 +12,7 @@ interface AddGroupPopup {
 const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
   if (!isOpen) return null;
 
-  const { setGroups, setPopupActive } = useAppContext();
+  const { setGroups } = useAppContext();
   const [isLoading, setLoading] = useState(false);
   const [groupName, setGroupName] = useState("");
 
@@ -38,10 +38,6 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    setPopupActive(isOpen);
-  }, [isOpen]);
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm">

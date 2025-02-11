@@ -23,7 +23,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [data, setData] = useState<StudentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { students, setStudents, setPopupActive, selectedGroup, setSelectedGroup } = useAppContext();
+  const { students, setStudents, selectedGroup, setSelectedGroup } = useAppContext();
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -36,12 +36,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
       }
       setIsLoading(false);
     };
-    if (isOpen) {
-      fetchGroups();
-    } else {
-      setExportGroup(null);
-    }
-    setPopupActive(isOpen);
+    isOpen ? fetchGroups() : setExportGroup(null);
   }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +132,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
         </button>
         <button
           type="button"
-          onClick={() => onClose()}
+          onClick={onClose}
           disabled={isLoading}
           className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer disabled:opacity-50"
         >

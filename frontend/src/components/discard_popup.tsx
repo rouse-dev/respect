@@ -1,7 +1,7 @@
 import {  useEffect, useState } from "react";
 import { ChangeRespect, getLessons } from "../service/server";
 import Preloader from "./preloader";
-import { Subject, useAppContext } from "../store/AppContext";
+import { Subject } from "../store/AppContext";
 import { toast } from "react-toastify";
 
 interface RemovePopupProps {
@@ -11,7 +11,6 @@ interface RemovePopupProps {
 }
 
 const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
-    const {setPopupActive} = useAppContext();
     const [allSubjects, setAllSubjects] = useState<Subject[]>([]);
         useEffect(() => {
             async function getAllLessons() {
@@ -22,7 +21,6 @@ const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
                     console.log(error)
                 }
             }
-            setPopupActive(isOpen);
             isOpen && getAllLessons();
         }, [isOpen])
        
