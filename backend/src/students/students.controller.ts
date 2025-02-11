@@ -92,8 +92,9 @@ export class StudentsController {
     @Body('change') change: number,
     @Body('reason') reason?: string,
     @Body('lessonId') lessonId?: number,
-    @Body('isPunish') isPunish?: boolean
+    @Body('isPunish') isPunish?: boolean,
+    @Body('newLesson') newLesson?: string
   ) {
-    return this.studentsService.updateReputation(+id, change, reason, lessonId, isPunish);
+    return this.studentsService.updateReputation(+id, change, reason, lessonId, isPunish, newLesson);
   }
 }

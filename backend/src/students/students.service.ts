@@ -96,31 +96,44 @@ export class StudentsService {
   }
 
   // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТ
-  async generateReputationHistoryExcel(studentId: number): Promise<ExcelJS.Buffer> {
+  async generateReputationHistoryExcel(
+    studentId: number,
+  ): Promise<ExcelJS.Buffer> {
     try {
       const history = await this.getReputationHistory(studentId);
-
+      const studentName = await this.prisma.student.findUnique({ where: { id: +studentId } });
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('История репутации');
+  
+      worksheet.addRow([studentName.name]);
+      worksheet.mergeCells('A1:E1');
+  
+      const mergedCell = worksheet.getCell('A1');
+      mergedCell.font = { bold: true, size: 14 };
+      mergedCell.alignment = { horizontal: 'center' };
 
+      worksheet.addRow(['ID', 'Изменение репутации', 'Причина', 'Дата изменения', 'Предмет']);
       worksheet.columns = [
-        { header: 'ID', key: 'id', width: 10 },
-        { header: 'Изменение репутации', key: 'change', width: 20 },
-        { header: 'Причина', key: 'reason', width: 30 },
-        { header: 'Дата изменения', key: 'createdAt', width: 20 },
-        { header: 'Предмет', key: 'lesson', width: 20 },
+        { key: 'id', width: 10 },
+        { key: 'change', width: 20 },
+        { key: 'reason', width: 30 },
+        { key: 'createdAt', width: 20 },
+        { key: 'lesson', width: 20 },
       ];
-
       history.forEach((record) => {
+        const createdAt = typeof record.createdAt === 'string' 
+          ? new Date(record.createdAt) 
+          : record.createdAt;
+  
         worksheet.addRow({
-          id: record.id || '',
-          change: record.change || '',
-          reason: record.reason || '',
-          createdAt: record.createdAt.toLocaleString(),
-          lesson: record.lesson || '',
+          id: record.id ?? '',
+          change: record.change ?? '',
+          reason: record.reason ?? '',
+          createdAt: createdAt ? createdAt.toLocaleString() : '',
+          lesson: record.lesson ?? '',
         });
       });
-
+  
       return await workbook.xlsx.writeBuffer();
     } catch (error) {
       console.error('Ошибка при создании Excel-файла:', error);
@@ -138,6 +151,7 @@ export class StudentsService {
     reason?: string,
     lessonId?: number,
     isPunish?: boolean,
+    newLesson?: string,
   ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
@@ -150,13 +164,29 @@ export class StudentsService {
       }
 
       // ЕСЛИ ПЕРЕДАН lessonId, ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ ПРЕДМЕТ
-      if (lessonId) {
+      if (lessonId !== -1) {
         const lesson = await this.prisma.lessons.findUnique({
           where: { id: lessonId },
         });
 
         if (!lesson) {
           throw new NotFoundException('Предмет не найден');
+        }
+      } else {
+        // Проверяем, существует ли уже предмет с таким именем
+        const existingLesson = await this.prisma.lessons.findFirst({
+          where: { name: newLesson },
+        });
+
+        if (existingLesson) {
+          lessonId = existingLesson.id;
+        } else {
+          const newLessonRecord = await this.prisma.lessons.create({
+            data: {
+              name: newLesson,
+            },
+          });
+          lessonId = newLessonRecord.id;
         }
       }
 
@@ -180,7 +210,7 @@ export class StudentsService {
           studentId,
           change,
           reason,
-          lessonId
+          lessonId,
         },
       });
 

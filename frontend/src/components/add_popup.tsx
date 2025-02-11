@@ -16,7 +16,7 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
     async function getAllLessons() {
       try {
         const response = await getLessons();
-        
+
         setAllSubjects(response);
       } catch (error) {
         console.log(error);
@@ -52,7 +52,7 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
         change: amount,
         reason: reason,
         lessonId: +currentSubject.id,
-        newLesson: newLesson
+        newLesson: newLesson,
       });
 
       if (result.succes) {
@@ -112,24 +112,27 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
             <i className="fa fa-angle-up" aria-hidden="true"></i>
 
             <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
-                {allSubjects.map((el, i) => (
-                    <button
-                    type="button"
-                    className="px-3 py-2 text-left hover:backdrop-brightness-110 last:rounded-b-sm"
-                    key={i}
-                    onClick={(_) => {
-                        setCurrentSubject(el);
-                        setIsLessonNew(false);
-                        setNewLesson("");
-                    }}
-                    >
-                    {el.name}
-                    </button>
-                ))}
+              {allSubjects.map((el, i) => (
                 <button
-                    className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
-                    onClick={() => {setIsLessonNew(true); setCurrentSubject({ id: -1, name: '- новый предмет -' })}}
+                  type="button"
+                  className="px-3 py-2 text-left hover:backdrop-brightness-110 last:rounded-b-sm"
+                  key={i}
+                  onClick={(_) => {
+                    setCurrentSubject(el);
+                    setIsLessonNew(false);
+                    setNewLesson("");
+                  }}
                 >
+                  {el.name}
+                </button>
+              ))}
+              <button
+                className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                onClick={() => {
+                  setIsLessonNew(true);
+                  setCurrentSubject({ id: -1, name: "- новый предмет -" });
+                }}
+              >
                 - новый предмет -
               </button>
             </div>

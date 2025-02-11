@@ -17,6 +17,7 @@ interface HistoryItem {
   change: number;
   reason: string;
   createdAt: string;
+  lesson?: string;
 }
 
 const HistoryPopup = ({
@@ -154,7 +155,7 @@ const HistoryPopup = ({
                       {new Date(item.createdAt).toLocaleDateString()}
                     </p>
 
-                    <p>{item.reason}</p>
+                    <p>{item.lesson} | {item.reason}</p>
                   </div>
                   <p
                     className={`font-bold ${
