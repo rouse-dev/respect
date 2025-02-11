@@ -25,10 +25,10 @@ const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
         }, [isOpen])
        
     const [currentSubject, setCurrentSubject] = useState<Subject>({id: 0, name: ''});
-
     const [isLoading, setIsLoading] = useState(false);
     const [amount, setAmount] = useState(1);
-   
+    const [isLessonNew, setIsLessonNew] = useState(false);
+    const [newLesson, setNewLesson] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -103,8 +103,21 @@ const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
                                     setCurrentSubject(el);
                                 }}>{el.name}</button>
                             )}
+                            <button
+                                className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                                onClick={() => {setIsLessonNew(true); setCurrentSubject({ id: -1, name: '- новый предмет -' })}}
+                            >
+                                - новый предмет -
+                            </button>
                         </div>
                     </div>
+                    {isLessonNew && (
+                        <input
+                        type="text"
+                        className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+                        placeholder="Название предмета"
+                        />
+                    )}
                     <div className="cursor-pointer flex flex-row items-center gap-3 bg-[--respect-purple-deep] rounded-lg px-3 py-1" onClick={e => {
                         const button = e.currentTarget;
                         const input = button.querySelector('input[type=radio]') as HTMLElement;

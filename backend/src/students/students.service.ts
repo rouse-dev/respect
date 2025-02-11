@@ -180,7 +180,7 @@ export class StudentsService {
           studentId,
           change,
           reason,
-          lessonId,
+          lessonId
         },
       });
 

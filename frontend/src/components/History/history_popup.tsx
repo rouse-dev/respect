@@ -34,10 +34,11 @@ const HistoryPopup = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   const [sortRespect, setSortRespect] = useState('Все');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!isOpen || !studentId) return;
+      if (!isOpen) return;
 
       setIsLoading(true);
       try {
@@ -63,15 +64,36 @@ const HistoryPopup = ({
   }, [studentId, isOpen]);
 
   useEffect(() => {
-      setPaginHistory(sortedHistory.slice((currentPage - 1) * 3, currentPage * 3));
-  }, [sortedHistory, currentPage]);
+    let filteredHistory = [...history];
 
-  useEffect(() => {
+    // Фильтрация по типу изменений
+    if (sortRespect === 'Зачисления') {
+      filteredHistory = filteredHistory.filter(item => item.change > 0);
+    } else if (sortRespect === 'Списания') {
+      filteredHistory = filteredHistory.filter(item => item.change < 0);
+    }
 
-  }, [sortRespect])
+    // Фильтрация по дате
+    if (selectedDate) {
+      filteredHistory = filteredHistory.filter(item => {
+        const itemDate = new Date(item.createdAt).toLocaleDateString();
+        const selectedDateFormatted = new Date(selectedDate).toLocaleDateString();
+        return itemDate === selectedDateFormatted;
+      });
+    }
+
+    setSortedHistory(filteredHistory);
+    setPaginHistory(filteredHistory.slice((currentPage - 1) * 3, currentPage * 3));
+    setTotalPages(Math.ceil(filteredHistory.length / 3));
+  }, [sortRespect, selectedDate, currentPage, history]);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+    setCurrentPage(1);
   };
 
   if (!isOpen) return null;
@@ -101,11 +123,16 @@ const HistoryPopup = ({
           <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
             ФИО
           </p>
-          <div className="flex justify-between gap-5">
+          <div className="flex justify-between gap-3">
             <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
               Репутация:
             </p>
-            <Filter sortRespect={sortRespect} setSortRespect={setSortRespect} />
+            <Filter 
+              sortRespect={sortRespect} 
+              setSortRespect={setSortRespect} 
+              selectedDate={selectedDate} 
+              setSelectedDate={handleDateChange} 
+            />
           </div>
 
           <div className="flex justify-between items-center mb-4">

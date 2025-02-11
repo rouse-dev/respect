@@ -34,6 +34,8 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
     );
     const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
     const [isLoading, setIsLoading] = useState(false);
+    const [isLessonNew, setIsLessonNew] = useState(false);
+    const [newLesson, setNewLesson] = useState("");
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -95,8 +97,22 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
                                     setCurrentSubject(el);
                                 }}>{el.name}</button>
                             )}
+                            <button
+                                className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                                onClick={() => {setIsLessonNew(true); setCurrentSubject({ id: -1, name: '- новый предмет -' })}}
+                            >
+                                - новый предмет -
+                            </button>
                         </div>
                     </div>
+
+                    {isLessonNew && (
+                        <input
+                        type="text"
+                        className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+                        placeholder="Название предмета"
+                        />
+                    )}
                     
                     <input 
                         className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1" 
@@ -109,18 +125,28 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
                     <input 
                         className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1" 
                         placeholder="Пара" 
-                        type="number" 
+                        type="text" 
                         min={0}
-                        value={lesson}
-                        onChange={(e) => setLesson(+e.target.value)}
+                        onChange={(e) => {
+                            if (isNaN(+e.target.value)) {
+                                e.target.value = e.target.value.slice(0, e.target.value.length - 2);
+                                return
+                            };
+                            setLesson(+e.target.value);
+                        }}
                         required 
                     />
                     <input 
                         className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1" 
                         placeholder="Кол-во респекта" 
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(parseInt(e.target.value))}
+                        type="text"
+                        onChange={(e) => {
+                            if (isNaN(+e.target.value)) {
+                                e.target.value = e.target.value.slice(0, e.target.value.length - 2);
+                                return
+                            };
+                            setAmount(parseInt(e.target.value));
+                        }}
                         required 
                         min="0"
                     />

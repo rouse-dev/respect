@@ -25,6 +25,7 @@ interface ChangeRespectData {
   reason: string;
   lessonId: number;
   isPunish?: boolean;
+  newLesson?: string;
 }
 
 export const LoginTeach = async (for_user: LoginUserData) => {
