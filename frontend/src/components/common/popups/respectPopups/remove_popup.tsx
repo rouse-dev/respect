@@ -1,22 +1,21 @@
-import { useEffect, useState } from "react";
-import { ChangeRespect, getLessons } from "../service/server";
-import Preloader from "./preloader";
-import { Subject } from "../store/AppContext";
+import React, { useEffect, useState } from "react";
+import { ChangeRespect, getLessons } from "../../../../service/server";
+import Preloader from "../../preloader/preloader";
+import { Student, Subject } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
 
-interface AddPopupProps {
-  studentId: number;
+interface RemovePopupProps {
+  student: Student;
   onClose: () => void;
   isOpen: boolean;
 }
 
-const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
+const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   const [allSubjects, setAllSubjects] = useState<Subject[]>([]);
   useEffect(() => {
     async function getAllLessons() {
       try {
         const response = await getLessons();
-
         setAllSubjects(response);
       } catch (error) {
         console.log(error);
@@ -28,17 +27,19 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
     id: 0,
     name: "",
   });
-  const [amount, setAmount] = useState(Number);
+  const [amount, setAmount] = useState(Number); // type number но из-за этого не показывает в начале placholder
   const [reason, setReason] = useState("");
   const [date, setDate] = useState(
-    new Date().toLocaleDateString().split(".").reverse().join("-")
+    `${new Date().getFullYear()}-${String(
+      "0" + (new Date().getMonth() + 1)
+    ).slice(-2)}-${String("0" + new Date().getDate()).slice(-2)}`
   );
-  const [lesson, setLesson] = useState(Number);
+  const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
   const [isLoading, setIsLoading] = useState(false);
   const [isLessonNew, setIsLessonNew] = useState(false);
   const [newLesson, setNewLesson] = useState("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentSubject) {
       alert("Пожалуйста, выберите предмет");
@@ -47,16 +48,19 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
 
     setIsLoading(true);
     try {
+      const fullReason = `${currentSubject.name}, Пара ${lesson}, ${date}: ${reason}`;
       const result = await ChangeRespect({
-        studentId,
-        change: amount,
-        reason: reason,
+        date:date,
+        studentId: student.id,
+        change: -amount,
+        reason: fullReason,
         lessonId: +currentSubject.id,
+        isPunish: true,
         newLesson: newLesson,
       });
 
       if (result.succes) {
-        toast.success("Репутация прибавлена на " + amount);
+        toast.error("Репутация снижена на " + amount);
         onClose();
       } else {
         alert(result.error);
@@ -79,7 +83,7 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-72 w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-[--respect-purple] max-w-80 w-full p-5 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}
@@ -119,8 +123,6 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
                   key={i}
                   onClick={(_) => {
                     setCurrentSubject(el);
-                    setIsLessonNew(false);
-                    setNewLesson("");
                   }}
                 >
                   {el.name}
@@ -142,14 +144,24 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
             <input
               type="text"
               className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
-              onChange={(el) => setNewLesson(el.target.value)}
               placeholder="Название предмета"
+              onChange={(el) => setNewLesson(el.target.value)}
             />
           )}
+
+          <input
+            className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+            type="date"
+            value={date}
+            max={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             placeholder="Пара"
             type="text"
+            min={0}
             onChange={(e) => {
               if (isNaN(+e.target.value)) {
                 e.target.value = e.target.value.slice(
@@ -177,10 +189,12 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
               setAmount(parseInt(e.target.value));
             }}
             required
+            min="0"
           />
           <textarea
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             placeholder="Причина"
+            value={reason}
             onChange={(e) => setReason(e.target.value)}
             required
           />
@@ -189,7 +203,7 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
             className="bg-[--respect-purple-dark] p-3 rounded-lg mt-2"
             type="submit"
           >
-            Добавить
+            Убавить
           </button>
           <button
             className="bg-[--respect-purple-dark] p-3 rounded-lg"
@@ -204,4 +218,4 @@ const AddPopup = ({ studentId, onClose, isOpen }: AddPopupProps) => {
   );
 };
 
-export default AddPopup;
+export default RemovePopup;

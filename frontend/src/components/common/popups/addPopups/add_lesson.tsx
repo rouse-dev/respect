@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { addLesson } from "../../service/server";
+import { addLesson } from "../../../../service/server";
 import { toast } from "react-toastify";
-import { useAppContext } from "../../store/AppContext";
 
 interface AddLessonPopup{
     onClose:()=>void;

@@ -152,6 +152,8 @@ export class StudentsService {
     lessonId?: number,
     isPunish?: boolean,
     newLesson?: string,
+    correctDate?: string,
+    correctClass?: number
   ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
@@ -211,6 +213,8 @@ export class StudentsService {
           change,
           reason,
           lessonId,
+          class: correctClass,
+          createdAt: correctDate ? new Date(correctDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
         },
       });
 

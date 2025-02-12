@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { useCallback, useEffect, useState } from 'react';
-import { ExcelReaderProps, useAppContext } from '../store/AppContext';
+import { ExcelReaderProps, useAppContext } from '../../../store/AppContext';
 import { useDropzone } from 'react-dropzone';
 
 const ExcelReader = ({ setData }: ExcelReaderProps) => {

@@ -1,32 +1,20 @@
-import { useAppContext } from "../store/AppContext";
+import { useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
-import { GetAllStudents } from "../service/server";
-import Preloader from "./preloader";
-import AddPopup from "./add_popup";
-import HistoryPopup from "./History/history_popup";
-import RemovePopup from "./remove_popup";
-import DiscardPopup from "./discard_popup";
+import { GetAllStudents } from "../../service/server";
+import Preloader from "../common/preloader/preloader";
+import HistoryPopup from "../common/popups/historyPopup/history_popup";
+import RespectButtons from "../common/popups/respectPopups/respect_buttons";
+import HistoryButton from "../common/popups/historyPopup/history_button";
 
 const Students = () => {
-  const {
-    search,
-    currentStudent,
-    currentGroup,
-    currentSortMethod,
-    sortDirection,
-    students,
-    sortedStudents,
-    setStudents,
-    setSortedStudents,
-    setPopupActive
-  } = useAppContext();
+  const { search, currentStudent, currentGroup, currentSortMethod, sortDirection, students, sortedStudents, setStudents, setSortedStudents, setPopupActive } = useAppContext();
   const [isLoading, setLoading] = useState(false);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isHistoryPopupOpen, setIsHistoryPopupOpen] = useState(false);
   const [isRemovePopupOpen, setIsRemovePopupOpen] = useState(false);
   const [isDiscardPopupOpen, setIsDiscardPopupOpen] = useState(false);
-  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
-  const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<number>(0);
+  const [selectedStudentName, setSelectedStudentName] = useState<string>('');
 
   const fetchStudents = async () => {
     try {
@@ -144,17 +132,7 @@ const Students = () => {
                   className={`flex flex-row bg-[--respect-purple] rounded-lg py-1`}
                 >
                   <div className="flex flex-col sm:flex-row justify-between sm:gap-5 w-2/3 sm:w-1/2">
-                    <p
-                      className="px-3 py-2 w-2/3 text-xl sm:text-lg cursor-pointer hover:underline active:"
-                      onClick={() => {
-                        setPopupActive(true);
-                        setSelectedStudentId(el.id);
-                        setSelectedStudentName(el.name);
-                        setIsHistoryPopupOpen(true);
-                      }}
-                    >
-                      {el.name}
-                    </p>
+                    <HistoryButton student={el} />
                     <p className="px-3 py-2 sm:w-1/3 flex items-center text-base sm:text-lg whitespace-nowrap">
                       {el.groups.name}
                     </p>
@@ -164,93 +142,13 @@ const Students = () => {
                     <p className="sm:w-1/3 text-xl whitespace-nowrap sm:text-lg sm:ml-5 hidden sm:block">
                       {el.reputation}
                     </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-2/3">
-                      <button
-                        className="w-full rounded-lg bg-red-400 transition-transform hover:bg-red-600 active:scale-95 hover:scale-105 order-2 sm:order-2"
-                        onClick={() => {
-                          setPopupActive(true);
-                          setSelectedStudentId(el.id);
-                          setIsRemovePopupOpen(true);
-                        }}
-                      >
-                        <i className="fa fa-minus" aria-hidden="true"></i>
-                      </button>
-
-                      <p className="sm:w-1/3 text-xl whitespace-nowrap sm:text-lg sm:ml-5 sm:hidden order-2">
-                        {el.reputation}
-                      </p>
-
-                      <button
-                        className="w-full rounded-lg bg-[#7fad75] transition-transform hover:bg-[#4cb834] active:scale-95 hover:scale-105 order-1 sm:order-1"
-                        onClick={() => {
-                          setPopupActive(true);
-                          setSelectedStudentId(el.id);
-                          setIsAddPopupOpen(true);
-                        }}
-                      >
-                        <i className="fa fa-plus" aria-hidden="true"></i>
-                      </button>
-
-                      <button
-                        className="w-full rounded-lg bg-[#6f8abc] transition-transform hover:bg-[#4c6fb0] active:scale-95 hover:scale-105 order-3 sm:order-3"
-                        onClick={() => {
-                          setPopupActive(true);
-                          setSelectedStudentId(el.id);
-                          setIsDiscardPopupOpen(true);
-                        }}
-                      >
-                        <i className="fa fa-check" aria-hidden="true"></i>
-                      </button>
-                    </div>
+                    <RespectButtons student={el} fetchStudents={fetchStudents} />
                   </div>
                 </div>
               );
           })}
         </div>
       </div>
-
-      <AddPopup
-        studentId={selectedStudentId || 0}
-        isOpen={isAddPopupOpen}
-        onClose={() => {
-          setIsAddPopupOpen(false);
-          setSelectedStudentId(null);
-          fetchStudents();
-          setPopupActive(false);
-        }}
-      />
-
-      <HistoryPopup
-        studentId={selectedStudentId || 0}
-        name={selectedStudentName || 'noname'}
-        isOpen={isHistoryPopupOpen}
-        onClose={() => {
-          setIsHistoryPopupOpen(false);
-          setSelectedStudentId(null);
-          setPopupActive(false);
-        }}
-      />
-
-      <RemovePopup
-        studentId={selectedStudentId || 0}
-        isOpen={isRemovePopupOpen}
-        onClose={() => {
-          setIsRemovePopupOpen(false);
-          setSelectedStudentId(null);
-          fetchStudents();
-          setPopupActive(false);
-        }}
-      />
-      <DiscardPopup
-        studentId={selectedStudentId || 0}
-        isOpen={isDiscardPopupOpen}
-        onClose={() => {
-          setIsDiscardPopupOpen(false);
-          setSelectedStudentId(null);
-          fetchStudents();
-          setPopupActive(false);
-        }}
-      />
     </>
   );
 };

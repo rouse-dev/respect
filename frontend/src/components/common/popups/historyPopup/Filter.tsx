@@ -1,7 +1,7 @@
 interface FilterInterface {
   sortRespect: string,
   setSortRespect: (sort: string) => void,
-  selectedDate: string | null,
+  selectedDate: string,
   setSelectedDate: (date: string) => void
 }
 
@@ -27,12 +27,18 @@ const Filter = ({sortRespect, setSortRespect, selectedDate, setSelectedDate}: Fi
           }
         }
       }}>{sortRespect}</button>
-      <input
-        type="date"
-        className="h-10 w-full bg-[--respect-purple-dark] rounded-lg pl-4"
-        value={selectedDate || ''}
-        onChange={(e) => setSelectedDate(e.target.value)}
-      ></input>
+      <div className="flex flex-row gap-3">
+        <input
+          type="date"
+          className="h-10 w-full bg-[--respect-purple-dark] rounded-lg px-2"
+          onChange={(e) => setSelectedDate(e.target.value)}
+          max={new Date().toLocaleDateString().split('.').reverse().join('-')}
+        ></input>
+        <button disabled={selectedDate.length < 1} className="bg-[--respect-purple-dark] rounded-md px-3 disabled:text-gray-400" onClick={(e) => {
+          (e.currentTarget.parentElement!.querySelector('input[type=date]') as HTMLInputElement).value = '';
+          setSelectedDate('');
+        }}><i className="fa fa-calendar-times-o" aria-hidden="true"></i></button>
+      </div>
     </div>
   );
 };

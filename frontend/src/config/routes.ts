@@ -1,5 +1,5 @@
 import Home from "../pages/Home";
-import Login from "../pages/login";
+import Login from "../pages/Login";
 import Profile from "../pages/Profile";
 
 export const GuestRoutes: Array<any> = [

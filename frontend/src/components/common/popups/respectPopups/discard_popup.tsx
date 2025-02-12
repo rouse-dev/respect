@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { ChangeRespect, getLessons } from "../service/server";
-import Preloader from "./preloader";
-import { Subject } from "../store/AppContext";
+import { ChangeRespect, getLessons } from "../../../../service/server";
+import Preloader from "../../preloader/preloader";
+import { Student, Subject } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
 
 interface RemovePopupProps {
-  studentId: number;
+  student: Student;
   onClose: () => void;
   isOpen: boolean;
 }
 
-const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
+const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   const [allSubjects, setAllSubjects] = useState<Subject[]>([]);
   useEffect(() => {
     async function getAllLessons() {
@@ -66,7 +66,8 @@ const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
     setIsLoading(true);
     try {
       const result = await ChangeRespect({
-        studentId,
+        
+        studentId: student.id,
         change: deduction,
         reason,
         lessonId: +currentSubject.id,
@@ -96,7 +97,7 @@ const DiscardPopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-72 w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-[--respect-purple] max-w-80 w-full p-5 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}

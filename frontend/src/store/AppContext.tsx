@@ -1,6 +1,6 @@
 import  { createContext, useContext, useState, ReactNode } from "react";
 
-interface Student {
+export interface Student {
   id: number;
   name: string;
   groups: Group;

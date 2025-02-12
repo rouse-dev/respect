@@ -21,6 +21,8 @@ interface LoginUserData {
 
 interface ChangeRespectData {
   studentId: number;
+  date?: string;
+  class?:number;
   change: number;
   reason: string;
   lessonId: number;

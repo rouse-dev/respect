@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import GroupPopup from "./add_group";
 import LessonPopup from "./add_lesson";
 import StudentPopup from "./add_students";
-import { useAppContext } from "../../store/AppContext";
+import { useAppContext } from "../../../../store/AppContext";
 
 const Add = () => {
   const [isGroupPopup, setIsGroupPopup] = useState(false);

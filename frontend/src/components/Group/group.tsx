@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../store/AppContext";
-import { GetAllGroups } from "../service/server";
-import Preloader from "./preloader";
+import { useAppContext } from "../../store/AppContext";
+import { GetAllGroups } from "../../service/server";
+import Preloader from "../common/preloader/preloader";
 
 const Group = () => {
   const { currentGroup, setCurrentGroup, groups, setGroups, setSortedStudents, students } = useAppContext();

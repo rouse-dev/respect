@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { GetAllGroups, AddStudent } from "../../service/server";
-import Preloader from "../preloader";
-import { Group, StudentData, useAppContext } from "../../store/AppContext";
-import ExcelReader from "../excelReader";
+import { GetAllGroups, AddStudent } from "../../../../service/server";
+import Preloader from "../../preloader/preloader";
+import { Group, StudentData, useAppContext } from "../../../../store/AppContext";
+import ExcelReader from "../../utils/excelReader";
 import { toast } from "react-toastify";
 
-import hint from '../../assets/media/hint.png';
+import hint from '../../../../assets/media/hint.png';
 
 interface AddStudentPopup {
   onClose: () => void;

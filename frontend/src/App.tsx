@@ -3,7 +3,7 @@ import { AppProvider } from "./store/AppContext";
 import { AuthRoutes, GuestRoutes } from "./config/routes";
 import { observer } from "mobx-react-lite";
 import userStore from "./store/userStore";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 
 const App = observer(() => {

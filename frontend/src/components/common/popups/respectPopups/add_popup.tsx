@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { ChangeRespect, getLessons } from "../service/server";
-import Preloader from "./preloader";
-import { Subject } from "../store/AppContext";
+import { ChangeRespect, getLessons } from "../../../../service/server";
+import Preloader from "../../preloader/preloader";
+import { Student, Subject } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
 
-interface RemovePopupProps {
-  studentId: number;
+interface AddPopupProps {
+  student: Student;
   onClose: () => void;
   isOpen: boolean;
 }
 
-const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
+const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
   const [allSubjects, setAllSubjects] = useState<Subject[]>([]);
   useEffect(() => {
     async function getAllLessons() {
       try {
         const response = await getLessons();
+
         setAllSubjects(response);
       } catch (error) {
         console.log(error);
@@ -27,14 +28,12 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
     id: 0,
     name: "",
   });
-  const [amount, setAmount] = useState(Number); // type number но из-за этого не показывает в начале placholder
+  const [amount, setAmount] = useState(Number);
   const [reason, setReason] = useState("");
   const [date, setDate] = useState(
-    `${new Date().getFullYear()}-${String(
-      "0" + (new Date().getMonth() + 1)
-    ).slice(-2)}-${String("0" + new Date().getDate()).slice(-2)}`
+    new Date().toLocaleDateString().split(".").reverse().join("-")
   );
-  const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
+  const [lesson, setLesson] = useState(Number);
   const [isLoading, setIsLoading] = useState(false);
   const [isLessonNew, setIsLessonNew] = useState(false);
   const [newLesson, setNewLesson] = useState("");
@@ -45,21 +44,22 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
       alert("Пожалуйста, выберите предмет");
       return;
     }
+    console.log(lesson,date)
 
     setIsLoading(true);
     try {
-      const fullReason = `${currentSubject.name}, Пара ${lesson}, ${date}: ${reason}`;
       const result = await ChangeRespect({
-        studentId,
-        change: -amount,
-        reason: fullReason,
+        date:date,
+        class:lesson,
+        studentId: student.id,
+        change: amount,
+        reason: reason,
         lessonId: +currentSubject.id,
-        isPunish: true,
         newLesson: newLesson,
       });
 
       if (result.succes) {
-        toast.error("Репутация снижена на " + amount);
+        toast.success("Репутация прибавлена на " + amount);
         onClose();
       } else {
         alert(result.error);
@@ -82,7 +82,7 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-72 w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-[--respect-purple] max-w-80 w-full p-5 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}
@@ -122,6 +122,8 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
                   key={i}
                   onClick={(_) => {
                     setCurrentSubject(el);
+                    setIsLessonNew(false);
+                    setNewLesson("");
                   }}
                 >
                   {el.name}
@@ -143,11 +145,10 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
             <input
               type="text"
               className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
-              placeholder="Название предмета"
               onChange={(el) => setNewLesson(el.target.value)}
+              placeholder="Название предмета"
             />
           )}
-
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             type="date"
@@ -159,8 +160,8 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             placeholder="Пара"
+           
             type="text"
-            min={0}
             onChange={(e) => {
               if (isNaN(+e.target.value)) {
                 e.target.value = e.target.value.slice(
@@ -188,12 +189,10 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
               setAmount(parseInt(e.target.value));
             }}
             required
-            min="0"
           />
           <textarea
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             placeholder="Причина"
-            value={reason}
             onChange={(e) => setReason(e.target.value)}
             required
           />
@@ -202,7 +201,7 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
             className="bg-[--respect-purple-dark] p-3 rounded-lg mt-2"
             type="submit"
           >
-            Убавить
+            Добавить
           </button>
           <button
             className="bg-[--respect-purple-dark] p-3 rounded-lg"
@@ -217,4 +216,4 @@ const RemovePopup = ({ studentId, onClose, isOpen }: RemovePopupProps) => {
   );
 };
 
-export default RemovePopup;
+export default AddPopup;
