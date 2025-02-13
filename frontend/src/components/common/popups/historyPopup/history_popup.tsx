@@ -18,6 +18,7 @@ interface HistoryItem {
   reason: string;
   createdAt: string;
   lesson?: string;
+  class: string;
 }
 
 const HistoryPopup = ({
@@ -27,7 +28,7 @@ const HistoryPopup = ({
 }: HistoryPopupProps) => {
   const { setPopupActive } = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [sortedHistory, setSortedHistory] = useState<HistoryItem[]>([]);
+  const [_, setSortedHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(Number);
@@ -95,7 +96,6 @@ const HistoryPopup = ({
     setSelectedDate(date);
     setCurrentPage(1);
   };
-
   if (!isOpen) return null;
 
   return (
@@ -153,7 +153,7 @@ const HistoryPopup = ({
                      {new Date(item.createdAt).toLocaleDateString()}
                     </p>
 
-                    <p>{item.lesson} | {item.reason}</p>
+                    <p>{item.lesson} {item.class == "" ? "" : `| Пара: ${item.class} `}| {item.reason}</p>
                   </div>
                   <p
                     className={`font-bold ${

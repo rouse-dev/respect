@@ -131,6 +131,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
               ))}
               <button
                 className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                type="button"
                 onClick={() => {
                   setIsLessonNew(true);
                   setCurrentSubject({ id: -1, name: "- новый предмет -" });

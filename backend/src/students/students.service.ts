@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -84,7 +85,8 @@ export class StudentsService {
         change: record.change,
         reason: record.reason,
         createdAt: record.createdAt,
-        lesson: record.lesson ? record.lesson.name : null, // НАЗВАНИЕ ПРЕДМЕТА (ЕСЛИ ЕСТЬ)
+        lesson: record.lesson ? record.lesson.name : null,
+        class: record.class ? record.class : "",
       }));
 
       return formattedHistory;
@@ -112,13 +114,13 @@ export class StudentsService {
       mergedCell.font = { bold: true, size: 14 };
       mergedCell.alignment = { horizontal: 'center' };
 
-      worksheet.addRow(['ID', 'Изменение репутации', 'Причина', 'Дата изменения', 'Предмет']);
+      worksheet.addRow(['Предмет', 'Пара', 'Изменение репутации', 'Дата изменения', 'Причина' ]);
       worksheet.columns = [
-        { key: 'id', width: 10 },
-        { key: 'change', width: 20 },
-        { key: 'reason', width: 30 },
-        { key: 'createdAt', width: 20 },
         { key: 'lesson', width: 20 },
+        { key: 'class', width: 20 },
+        { key: 'change', width: 25 },
+        { key: 'createdAt', width: 20 },
+        { key: 'reason', width: 30 },
       ];
       history.forEach((record) => {
         const createdAt = typeof record.createdAt === 'string' 
@@ -126,11 +128,11 @@ export class StudentsService {
           : record.createdAt;
   
         worksheet.addRow({
-          id: record.id ?? '',
           change: record.change ?? '',
           reason: record.reason ?? '',
           createdAt: createdAt ? createdAt.toLocaleString() : '',
           lesson: record.lesson ?? '',
+          class: record.class ?? ''
         });
       });
   
@@ -160,26 +162,30 @@ export class StudentsService {
       const student = await this.prisma.student.findUnique({
         where: { id: studentId },
       });
-
+  
       if (!student) {
         throw new NotFoundException('Студент не найден');
       }
-
+  
       // ЕСЛИ ПЕРЕДАН lessonId, ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ ПРЕДМЕТ
       if (lessonId !== -1) {
         const lesson = await this.prisma.lessons.findUnique({
           where: { id: lessonId },
         });
-
+  
         if (!lesson) {
           throw new NotFoundException('Предмет не найден');
         }
       } else {
+        if (!newLesson) {
+          throw new BadRequestException('Необходимо указать новый предмет');
+        }
+  
         // Проверяем, существует ли уже предмет с таким именем
         const existingLesson = await this.prisma.lessons.findFirst({
           where: { name: newLesson },
         });
-
+  
         if (existingLesson) {
           lessonId = existingLesson.id;
         } else {
@@ -191,12 +197,12 @@ export class StudentsService {
           lessonId = newLessonRecord.id;
         }
       }
-
+  
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
-      if (!isPunish && change < 0 && student.reputation - -change < 0) {
-        throw new InternalServerErrorException('Не хватает репутации!');
+      if (!isPunish && change < 0 && student.reputation + change < 0) {
+        throw new BadRequestException('Не хватает репутации!');
       }
-
+  
       const updatedStudent = await this.prisma.student.update({
         where: { id: studentId },
         data: {
@@ -205,7 +211,7 @@ export class StudentsService {
           },
         },
       });
-
+  
       // ДОБАВЛЯЕМ ЗАПИСЬ В ИСТОРИЮ РЕПУТАЦИЙ
       await this.prisma.historyRep.create({
         data: {
@@ -214,13 +220,14 @@ export class StudentsService {
           reason,
           lessonId,
           class: correctClass,
-          createdAt: correctDate ? new Date(correctDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+          createdAt: correctDate ? new Date(correctDate) : new Date(),
         },
       });
-
+  
       return updatedStudent;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      console.error('Ошибка при обновлении репутации:', error);
+      throw new InternalServerErrorException('Произошла ошибка при обновлении репутации');
     }
   }
 }

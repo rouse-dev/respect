@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { addLesson } from "../../../../service/server";
 import { toast } from "react-toastify";
 

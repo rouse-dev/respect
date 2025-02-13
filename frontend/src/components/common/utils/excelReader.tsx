@@ -46,7 +46,7 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
     }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, isDragActive } = useDropzone({ onDrop });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e)

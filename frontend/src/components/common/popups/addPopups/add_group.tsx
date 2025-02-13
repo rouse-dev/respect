@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateGroup, GetAllGroups } from "../../../../service/server";
 import { useAppContext } from "../../../../store/AppContext";
 import Preloader from "../../preloader/preloader";
