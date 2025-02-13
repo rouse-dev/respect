@@ -41,7 +41,7 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
     ) as HTMLInputElement;
 
     if (!selectedOption) {
-      alert("Пожалуйста, выберите причину списания");
+      toast.info("Пожалуйста, выберите причину списания");
       return;
     }
 
@@ -74,10 +74,10 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
         newLesson: newLesson,
       });
       if (result.succes) {
-        toast("Долг списан");
+        toast.info("Долг списан");
         onClose();
       } else {
-        alert(result.error);
+        toast.error("Не хватает репутации!")
       }
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);

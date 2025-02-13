@@ -18,3 +18,12 @@
 body {
     background-color: var(--respect-purple);
 }
+
+.toastClassName {
+    color: white;
+    background-color: var(--respect-purple-light);
+}
+
+.progressClassName{
+    background-color: var(--respect-purple-deep);
+}

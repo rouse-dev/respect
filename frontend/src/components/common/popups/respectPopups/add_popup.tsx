@@ -41,7 +41,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!currentSubject) {
-      alert("Пожалуйста, выберите предмет");
+      toast.info("Пожалуйста, выберите предмет");
       return;
     }
     console.log(lesson,date)
@@ -62,7 +62,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
         toast.success("Репутация прибавлена на " + amount);
         onClose();
       } else {
-        alert(result.error);
+        toast.error(result.error);
       }
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);
@@ -152,8 +152,8 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             type="date"
-            value={date}
-            max={date}
+            defaultValue={date}
+            max={new Date().toLocaleDateString().split('.').reverse().join('-')}
             onChange={(e) => setDate(e.target.value)}
             required
           />

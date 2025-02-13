@@ -5,6 +5,7 @@ import { Student, useAppContext } from "../../../../store/AppContext";
 import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
 import Filter from "./Filter";
+import { toast } from "react-toastify";
 
 interface HistoryPopupProps {
   student: Student
@@ -49,11 +50,11 @@ const HistoryPopup = ({
           setPaginHistory(reversedHistory.slice(0, 3));
           setTotalPages(Math.ceil(reversedHistory.length / 3));
         } else {
-          alert(result.error);
+          toast.error(result.error);
         }
       } catch (error) {
         console.error("Ошибка при загрузке истории:", error);
-        alert("Произошла ошибка при загрузке истории");
+        toast.error("Произошла ошибка при загрузке истории");
       } finally {
         setIsLoading(false);
       }

@@ -23,7 +23,18 @@ const App = observer(() => {
 
         <Route path="/login" Component={Login} />
       </Routes>
-      <ToastContainer position='top-center' theme="dark" autoClose={1750}/>
+      <ToastContainer 
+        draggable
+        autoClose={1700}
+        closeButton={false}
+        pauseOnHover={false}
+        closeOnClick={true}
+        stacked={true}
+        position={"top-center"}
+        draggableDirection={"y"}
+        toastClassName={"toastClassName"}
+        progressClassName={"progressClassName"}
+        style={{boxShadow:'0px 0px 20px var(--respect-purple-dark)'}}/>
     </AppProvider>
   );
 });

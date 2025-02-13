@@ -2,19 +2,12 @@ import { useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import { GetAllStudents } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
-import HistoryPopup from "../common/popups/historyPopup/history_popup";
 import RespectButtons from "../common/popups/respectPopups/respect_buttons";
 import HistoryButton from "../common/popups/historyPopup/history_button";
 
 const Students = () => {
-  const { search, currentStudent, currentGroup, currentSortMethod, sortDirection, students, sortedStudents, setStudents, setSortedStudents, setPopupActive } = useAppContext();
+  const { search, currentStudent, sortedStudents, setStudents, setSortedStudents } = useAppContext();
   const [isLoading, setLoading] = useState(false);
-  const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
-  const [isHistoryPopupOpen, setIsHistoryPopupOpen] = useState(false);
-  const [isRemovePopupOpen, setIsRemovePopupOpen] = useState(false);
-  const [isDiscardPopupOpen, setIsDiscardPopupOpen] = useState(false);
-  const [selectedStudentId, setSelectedStudentId] = useState<number>(0);
-  const [selectedStudentName, setSelectedStudentName] = useState<string>('');
 
   const fetchStudents = async () => {
     try {
@@ -34,50 +27,6 @@ const Students = () => {
   useEffect(() => {
     fetchStudents();
   }, []);
-
-  useEffect(() => {
-    let result = [...students];
-    if (currentGroup) {
-      result = result.filter((el) => el.groups.name === currentGroup.name);
-    }
-    if (search.length > 0) {
-      result = result.filter((el) =>
-        el.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    switch (currentSortMethod) {
-      case "По фамилии": {
-        result.sort((a, b) => {
-          const compareResult = a.name.localeCompare(b.name, "ru");
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      case "По группе": {
-        result.sort((a, b) => {
-          const compareResult = a.groups.name.localeCompare(
-            b.groups.name,
-            "ru",
-            { numeric: true }
-          );
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      case "По рейтингу": {
-        result.sort((a, b) => {
-          const compareResult = a.reputation - b.reputation;
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      default:
-        break;
-    }
-
-    setSortedStudents(result);
-  }, [search, students, currentGroup, currentSortMethod, sortDirection]);
 
   useEffect(() => {
     const popupElement = document.getElementById("respect_history_popup");
@@ -137,7 +86,6 @@ const Students = () => {
                       {el.groups.name}
                     </p>
                   </div>
-
                   <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-2 px-3 py-2 w-1/3 sm:w-1/2">
                     <p className="sm:w-1/3 text-xl whitespace-nowrap sm:text-lg sm:ml-5 hidden sm:block">
                       {el.reputation}

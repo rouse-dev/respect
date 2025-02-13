@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import { useCallback, useEffect, useState } from 'react';
 import { ExcelReaderProps, useAppContext } from '../../../store/AppContext';
 import { useDropzone } from 'react-dropzone';
+import { toast } from 'react-toastify';
 
 const ExcelReader = ({ setData }: ExcelReaderProps) => {
   const { selectedGroup } = useAppContext();
@@ -29,7 +30,7 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
         formattedData.shift();
       }
       if (jsonData.length === 0) {
-        alert('Excel таблица пуста!');
+        toast.error('Excel таблица пуста!');
       } else {
         console.log(formattedData);
         setData(formattedData);

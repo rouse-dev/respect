@@ -10,7 +10,6 @@ const HomeContainer = () => {
     console.log(popupActive);
     document.body.style.overflow = popupActive ? "hidden" : "";
   }, [popupActive]);
-  console.log(userStore.username);
 
   return (
     <Home

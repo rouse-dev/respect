@@ -42,7 +42,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentSubject) {
-      alert("Пожалуйста, выберите предмет");
+      toast.info("Пожалуйста, выберите предмет");
       return;
     }
 
@@ -60,10 +60,10 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
       });
 
       if (result.succes) {
-        toast.error("Репутация снижена на " + amount);
+        toast.success("Репутация снижена на " + amount);
         onClose();
       } else {
-        alert(result.error);
+        toast.error(result.error);
       }
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);
@@ -152,8 +152,8 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             type="date"
-            value={date}
-            max={date}
+            defaultValue={date}
+            max={new Date().toLocaleDateString().split('.').reverse().join('-')}
             onChange={(e) => setDate(e.target.value)}
             required
           />

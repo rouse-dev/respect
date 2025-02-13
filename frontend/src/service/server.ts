@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { StudentData } from "../store/AppContext";
 import { toast } from "react-toastify";
 
@@ -36,10 +36,12 @@ export const LoginTeach = async (for_user: LoginUserData) => {
       email: for_user.email,
       password: for_user.password,
     });
-    toast.info("Добро пожаловать");
+    toast.success("Добро пожаловать");
     return { success: true, data: response.data };
   } catch (error) {
+    toast.error("Неправльные данные")
     return {
+      
       error: error instanceof Error ? error.message : "Произошла ошибка",
     };
   }
