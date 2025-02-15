@@ -1,14 +1,20 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AppProvider } from "./store/AppContext";
 import { AuthRoutes, GuestRoutes } from "./config/routes";
 import { observer } from "mobx-react-lite";
-import userStore from "./store/userStore";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
+import useUserStore from "./store/userStore";
+import { useEffect } from "react";
 
 const App = observer(() => {
-  const auth = userStore.isAuth;
-  console.log(auth);
+  const {auth} = useUserStore();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    !auth && AuthRoutes.find(el => el.path === window.location.pathname) && navigate('/login');
+    auth && GuestRoutes.find(el => el.path === window.location.pathname) && navigate('/');
+  }, [auth, window.location.pathname]);
   return (
     <AppProvider>
       <Routes>

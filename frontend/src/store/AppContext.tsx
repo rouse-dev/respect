@@ -35,11 +35,6 @@ export interface ExcelReaderProps {
 }
 
 interface AppContextType {
-  user: {
-    username: string;
-    avatar: string;
-  };
-  setUser: (user: { username: string; avatar: string }) => void;
   currentGroup: Group | null;
   setCurrentGroup: (group: Group | null) => void;
   groups: Group[];
@@ -68,11 +63,6 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState({
-    username: "",
-    avatar: "",
-  });
-
   const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
   const [search, setSearch] = useState("");
@@ -89,8 +79,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AppContext.Provider
       value={{
-        user,
-        setUser,
         currentGroup,
         setCurrentGroup,
         groups,

@@ -2,7 +2,13 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Profile from "../pages/Profile";
 
-export const GuestRoutes: Array<any> = [
+interface RouteInterface {
+  name: string,
+  path: string,
+  component: (() => JSX.Element)
+}
+
+export const GuestRoutes: RouteInterface[] = [
   {
     name: "Авторизация",
     path: "/login",
@@ -10,7 +16,7 @@ export const GuestRoutes: Array<any> = [
   },
 ];
 
-export const AuthRoutes: Array<any> = [
+export const AuthRoutes: RouteInterface[] = [
   {
     name: "Главная",
     path: "/",

@@ -1,20 +1,16 @@
-import { useState } from "react";
 import Profile from "./Profile";
-import userStore from "../../store/userStore";
 import placeholder_avatar from "../../assets/media/placeholder_avatar.jpg";
+import useUserStore from "../../store/userStore";
 
 const ProfileContainer = () => {
-  const [user, setUser] = useState({
-    username: "",
-    avatar: "",
-  });
+  const {LogoutUser} = useUserStore();
   const handleLogout = () => {
-    userStore.logoutUser();
+    LogoutUser();
   };
 
   return (
     <Profile
-      user={user}
+      useUserStore={useUserStore()}
       handleLogout={handleLogout}
       placeholder_avatar={placeholder_avatar}
     />

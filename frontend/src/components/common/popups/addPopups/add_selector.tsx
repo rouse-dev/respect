@@ -9,11 +9,7 @@ const Add = () => {
   const [isLessonPopup, setIsLessonPopup] = useState(false);
   const [isStudentPopup, setIsStudentPopup] = useState(false);
 
-  const {setPopupActive, popupActive} = useAppContext();
-
-  useEffect(() => {
-    console.log(popupActive)
-  }, [])
+  const {setPopupActive} = useAppContext();
 
   return (
     <>

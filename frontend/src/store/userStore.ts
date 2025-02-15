@@ -1,74 +1,62 @@
-import { makeAutoObservable } from "mobx";
-import { LoginTeach, logoutTeach } from "../service/server";
+import { create } from "zustand";
+import client from "../service/client";
 
-
-interface ILoginInfo {
-  email: string;
-  password: string;
+interface UserLoginInterface {
+    email: string,
+    password: string,
 }
 
-interface ILoginResponse {
-  success?: boolean;
-  data?: {
-    teacher: {
-      name: string;
-      email: string;
+interface UserStoreInterface {
+    auth: boolean,
+    name: string,
+    email: string,
+    avatar: string,
+    LoginUser: (data: UserLoginInterface) => void,
+    CheckAuth: () => void,
+    LogoutUser: () => void
+}
+
+interface GetResponseInterface {
+    auth: boolean,
+    name: string,
+    email: string,
+    avatar: string
+}
+
+const TryGetUser = async () => {
+    const response = await client.get<GetResponseInterface>('/api/teachers/me').then(res => res).catch(_ => Object());
+    return {
+        auth: Object.keys(response).length > 0,
+        name: response.data ? response.data.name : '',
+        email: response.data ? response.data.email : '',
+        avatar: response.data ? response.data.avata : ''
     };
-  };
 }
 
-class UserStore {
-  username: string = "";
-  email: string = "";
-  isAuth: boolean = false;
+const useUserStore = create<UserStoreInterface>()((set) => {
+    const userData = {
+        auth: false,
+        name: '',
+        email: '',
+        avatar: '',
+        LoginUser: (data: UserLoginInterface) => {
+            client.post('/api/teachers/login', data).then(_ => {
+                TryGetUser().then(res => set(res));
+            })
+        },
+        CheckAuth: () => {
+            TryGetUser().then(res => set(res));
+        },
+        LogoutUser: () => {
+            client.post('/api/teachers/logout').then(_ => {
+                TryGetUser().then(res => set(res));
+            });
+        }
+    };
 
-  constructor() {
-    makeAutoObservable(this);
-    this.checkAuth();
-  }
+    TryGetUser().then(res => set(res));
 
-  checkAuth(): void {
-    const isAuth = localStorage.getItem("isAuth");
-    if (isAuth === "true") {
-      this.isAuth = true;
-      const username = localStorage.getItem("username");
-      const email = localStorage.getItem("email");
-      if (username && email) {
-        this.username = username;
-        this.email = email;
-      }
-    }
-  }
+    return userData;
+});
 
-  async logoutUser(): Promise<void> {
-    this.isAuth = false;
-    this.username = "";
-    this.email = "";
-    localStorage.removeItem("userData");
-    localStorage.removeItem("isAuth");
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    await logoutTeach();
-  }
-
-  async authUser(userInfo: ILoginInfo): Promise<void> {
-    try {
-      const response: ILoginResponse = await LoginTeach(userInfo);
-      if (response.success && response.data) {
-        const userData = response.data;
-        this.username = userData.teacher.name;
-        this.email = userData.teacher.email;
-        this.isAuth = true;
-
-        localStorage.setItem("username", userData.teacher.name);
-        localStorage.setItem("email", userData.teacher.email);
-        localStorage.setItem("isAuth", "true");
-      }
-    } catch (error) {
-      console.error("Authentication error:", error);
-    }
-  }
-}
-
-const userStore = new UserStore();
-export default userStore;
+export default useUserStore;

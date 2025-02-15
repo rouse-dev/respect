@@ -42,7 +42,7 @@ export const LoginTeach = async (for_user: LoginUserData) => {
   }
 };
 
-export const logoutTeach = async () => {
+export const LogoutTeach = async () => {
   try {
     const response = await client.post("/api/teachers/logout");
     return response.data.message;
@@ -70,7 +70,6 @@ export const ChangeAvatar = async (for_user: UserData) => {
 export const GetAllStudents = async () => {
   try {
     const response = await client.get("/api/students");
-    console.log(response);
     return { succes: true, data: response.data };
   } catch (error) {
     return {

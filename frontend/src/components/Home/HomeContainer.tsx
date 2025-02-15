@@ -1,20 +1,18 @@
 import { useEffect } from "react";
 import { useAppContext } from "../../store/AppContext";
-import userStore from "../../store/userStore";
 import Home from "./Home";
 import placeholder_avatar from "../../assets/media/placeholder_avatar.jpg";
+import useUserStore from "../../store/userStore";
 
 const HomeContainer = () => {
-  const { user, popupActive } = useAppContext();
+  const { popupActive } = useAppContext();
   useEffect(() => {
-    console.log(popupActive);
     document.body.style.overflow = popupActive ? "hidden" : "";
   }, [popupActive]);
 
   return (
     <Home
-      userStore={userStore}
-      user={user}
+      useUserStore={useUserStore()}
       placeholder_avatar={placeholder_avatar}
     />
   );

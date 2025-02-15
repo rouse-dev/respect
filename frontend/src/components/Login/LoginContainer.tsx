@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import userStore from "../../store/userStore";
 import Login from "./Login";
+import useUserStore from "../../store/userStore";
 
 const LoginContainer = () => {
+  const {LoginUser} = useUserStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await userStore.authUser({ email, password });
-    if (userStore.isAuth) {
-      navigate("/");
-    }
+    LoginUser({email, password});
   };
   return (
     <Login

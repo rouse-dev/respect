@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 
-interface userInterface {
-    username: string,
+interface useUserStoreInterface {
+    auth: boolean,
+    name: string,
+    email: string,
     avatar: string
 }
 interface ProfileInterface {
     handleLogout: () => void,
-    user: userInterface,
+    useUserStore: useUserStoreInterface,
     placeholder_avatar: string,
 }
 
-const Profile = ({ handleLogout, user, placeholder_avatar }: ProfileInterface) => {
+const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInterface) => {
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
             <div className="w-full flex flex-row justify-between sm:mb-12">
@@ -18,7 +20,7 @@ const Profile = ({ handleLogout, user, placeholder_avatar }: ProfileInterface) =
                 <Link className="w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/'>На главную</Link>
             </div>
             <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
-                <img className="max-w-28 max-h-28 w-full h-full rounded-[100%]" src={user.avatar ? `http://localhost:0000/some_folder/${user.avatar}` : placeholder_avatar} />
+                <img className="max-w-28 max-h-28 w-full h-full rounded-[100%]" src={useUserStore.avatar ? `http://localhost:3000/${useUserStore.avatar}` : placeholder_avatar} />
                 <input className="hidden" type="file" id="avatar_file" accept="image/*" />
                 <button className="bg-[--respect-purple-dark] mb-2 px-3 py-2 rounded-lg" onClick={e => {
                     const input: HTMLElement = e.currentTarget.parentElement!.querySelector('input[type=file]') as HTMLElement;
