@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import client from "../service/client";
+import { toast } from "react-toastify";
 
 interface UserLoginInterface {
     email: string,
@@ -41,7 +42,10 @@ const useUserStore = create<UserStoreInterface>()((set) => {
         avatar: '',
         LoginUser: (data: UserLoginInterface) => {
             client.post('/api/teachers/login', data).then(_ => {
-                TryGetUser().then(res => set(res));
+                TryGetUser().then(res => {
+                    set(res);
+                    toast.success(`Добро пожаловать, ${res.name}!`);
+                });
             })
         },
         CheckAuth: () => {
@@ -50,6 +54,7 @@ const useUserStore = create<UserStoreInterface>()((set) => {
         LogoutUser: () => {
             client.post('/api/teachers/logout').then(_ => {
                 TryGetUser().then(res => set(res));
+                toast.info('До свидания!')
             });
         }
     };
