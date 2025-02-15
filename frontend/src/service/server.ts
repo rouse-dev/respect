@@ -1,11 +1,6 @@
-import axios from "axios";
 import { StudentData } from "../store/AppContext";
 import { toast } from "react-toastify";
-
-const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-});
+import client from "./client";
 
 interface UserData {
   avatar: any;
@@ -32,7 +27,7 @@ interface ChangeRespectData {
 
 export const LoginTeach = async (for_user: LoginUserData) => {
   try {
-    const response = await instance.post("/api/teachers/login", {
+    const response = await client.post("/api/teachers/login", {
       email: for_user.email,
       password: for_user.password,
     });
@@ -49,7 +44,7 @@ export const LoginTeach = async (for_user: LoginUserData) => {
 
 export const logoutTeach = async () => {
   try {
-    const response = await instance.post("/api/teachers/logout");
+    const response = await client.post("/api/teachers/logout");
     return response.data.message;
   } catch (error) {
     return {
@@ -60,7 +55,7 @@ export const logoutTeach = async () => {
 
 export const ChangeAvatar = async (for_user: UserData) => {
   try {
-    const response = await instance.patch("/api/teachers/avatar", {
+    const response = await client.patch("/api/teachers/avatar", {
       avatar: for_user.avatar,
     });
     console.log(response.data);
@@ -74,7 +69,7 @@ export const ChangeAvatar = async (for_user: UserData) => {
 
 export const GetAllStudents = async () => {
   try {
-    const response = await instance.get("/api/students");
+    const response = await client.get("/api/students");
     console.log(response);
     return { succes: true, data: response.data };
   } catch (error) {
@@ -85,7 +80,7 @@ export const GetAllStudents = async () => {
 };
 export const CreateGroup = async (groupName: string) => {
   try {
-    const response = await instance.post("/api/groups", { name: groupName });
+    const response = await client.post("/api/groups", { name: groupName });
 
     console.log(response);
     return { succes: true, data: response.data };
@@ -98,7 +93,7 @@ export const CreateGroup = async (groupName: string) => {
 
 export const GetAllGroups = async () => {
   try {
-    const response = await instance.get("/api/groups");
+    const response = await client.get("/api/groups");
     return { succes: true, data: response.data };
   } catch (error) {
     return {
@@ -109,7 +104,7 @@ export const GetAllGroups = async () => {
 
 export const ChangeRespect = async (newRep: ChangeRespectData) => {
   try {
-    const response = await instance.patch(
+    const response = await client.patch(
       `/api/students/${newRep.studentId}/reputation`,
       newRep
     );
@@ -123,7 +118,7 @@ export const ChangeRespect = async (newRep: ChangeRespectData) => {
 
 export const HistoryStudent = async (studentId: number) => {
   try {
-    const response = await instance.get(`/api/students/${studentId}/history`);
+    const response = await client.get(`/api/students/${studentId}/history`);
     console.log(response);
     return { succes: true, data: response.data };
   } catch (error) {
@@ -134,7 +129,7 @@ export const HistoryStudent = async (studentId: number) => {
 };
 export const AddStudent = async (exported_students: StudentData[]) => {
   try {
-    const response = await instance.post("/api/students/many", {
+    const response = await client.post("/api/students/many", {
       students: exported_students,
     });
 
@@ -149,7 +144,7 @@ export const AddStudent = async (exported_students: StudentData[]) => {
 
 export const getLessons = async () => {
   try {
-    const response = await instance.get(`/api/lessons`);
+    const response = await client.get(`/api/lessons`);
     return response.data;
   } catch (error) {
     return {
@@ -160,7 +155,7 @@ export const getLessons = async () => {
 
 export const addLesson = async (name: string) => {
   try {
-    const response = await instance.post(`/api/lessons`, {
+    const response = await client.post(`/api/lessons`, {
       name,
     });
     console.log("Предмет успешно создан!");
@@ -174,7 +169,7 @@ export const addLesson = async (name: string) => {
 
 export const exportHistoryExcel = async (studentId: number) => {
   try {
-    const response = await instance.get(`/api/students/${studentId}/history/excel`, { responseType: 'blob' })
+    const response = await client.get(`/api/students/${studentId}/history/excel`, { responseType: 'blob' })
     return response.data;
   } catch (error) {
     return {

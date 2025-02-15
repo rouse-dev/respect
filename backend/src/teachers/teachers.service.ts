@@ -3,6 +3,7 @@ import {
   ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
+  NotFoundException,
   Res,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -81,7 +82,7 @@ export class TeachersService {
         maxAge: 2592000000,
       });
 
-      return { accessToken, teacher };
+      return {  }; //accessToken, teacher
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -123,6 +124,26 @@ export class TeachersService {
       return updatedTeacher;
     } catch (error) {
       return new InternalServerErrorException(error);
+    }
+  }
+
+  async me(userId: number) {
+    try {
+      const teacher = await this.prisma.teacher.findUnique({
+        where: { id: userId },
+      });
+
+      if (!teacher) {
+        throw new NotFoundException('Учитель не найден');
+      }
+      // Не возвращаем пароль
+      const { password, ...result } = teacher;
+      return result;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error);
     }
   }
 }

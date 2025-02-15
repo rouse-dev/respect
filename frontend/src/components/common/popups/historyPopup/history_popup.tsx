@@ -35,7 +35,8 @@ const HistoryPopup = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   const [sortRespect, setSortRespect] = useState('Все');
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate1, setSelectedDate1] = useState<string>('');
+  const [selectedDate2, setSelectedDate2] = useState<string>('');
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -75,25 +76,33 @@ const HistoryPopup = ({
     }
 
     // Фильтрация по дате
-    if (selectedDate) {
+    if (selectedDate1.length || selectedDate2.length) {
       filteredHistory = filteredHistory.filter(item => {
-        const itemDate = new Date(item.createdAt).toLocaleDateString();
-        const selectedDateFormatted = new Date(selectedDate).toLocaleDateString();
-        return itemDate === selectedDateFormatted;
+        const itemDate = new Date(item.createdAt).getTime();
+        const date1Formatted = selectedDate1.length ? new Date(selectedDate1).getTime() : 0;
+        const date2Formatted = selectedDate2.length ? new Date(selectedDate2).getTime() : 0;
+
+        if (selectedDate1 && selectedDate2) {
+          return (itemDate >= date1Formatted) && (itemDate <= date2Formatted);
+        } else {
+          if (selectedDate1) return itemDate >= date1Formatted;
+          if (selectedDate2) return itemDate <= date2Formatted;
+        }
       });
     }
 
     setSortedHistory(filteredHistory);
     setPaginHistory(filteredHistory.slice((currentPage - 1) * 3, currentPage * 3));
     setTotalPages(Math.ceil(filteredHistory.length / 3));
-  }, [sortRespect, selectedDate, currentPage, history]);
+  }, [sortRespect, selectedDate1, selectedDate2, currentPage, history]);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleDateChange = (date: string) => {
-    setSelectedDate(date);
+  const handleDateChange = (date1?: string, date2?: string) => {
+    (date1 !== undefined) && setSelectedDate1(date1);
+    (date2 !== undefined) && setSelectedDate2(date2);
     setCurrentPage(1);
   };
   if (!isOpen) return null;
@@ -115,6 +124,9 @@ const HistoryPopup = ({
             <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
               {student.name}
             </p>
+            <p className="w-fit whitespace-nowrap px-4 h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
+              Репутация: {student.reputation}
+            </p>
             <button
               className="bg-[--respect-purple-dark] px-[14px] rounded-lg h-10 "
               onClick={onClose}
@@ -123,14 +135,12 @@ const HistoryPopup = ({
             </button>
           </div>
           <div className="flex justify-between gap-3">
-            <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
-              Репутация: {student.reputation}
-            </p>
             <Filter 
               sortRespect={sortRespect} 
               setSortRespect={setSortRespect}
-              selectedDate={selectedDate}
-              setSelectedDate={handleDateChange}
+              selectedDate1={selectedDate1}
+              selectedDate2={selectedDate2}
+              setSelectedDates={handleDateChange}
             />
           </div>
 

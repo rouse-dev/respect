@@ -9,6 +9,8 @@ import {
   Request,
   Patch,
   Res,
+  Get,
+  NotFoundException,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { RegisterTeacherDto } from './dto/register-teacher.dto';
@@ -113,4 +115,18 @@ export class TeachersController {
     const teacherId = req.user.id;
     return this.teachersService.changeAvatar(file, teacherId);
   }
+
+    // ВЫВОД ИНФОРМАЦИИ ВОШЕДШЕГО УЧИТЕЛЯ
+    @Get('me')
+    @UseGuards(AuthGuard('jwt'))
+    @ApiOperation({ summary: 'Вывод информации вошедшего учителя' })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Информация о учителе получена' })
+    @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+    @ApiResponse({ status: 404, description: 'Учитель не найден' })
+    @ApiResponse({ status: 500, description: 'Ошибка сервера' })
+    async getMe(@Request() req) {
+      const userId = req.user.id; // Получаем ID из JWT
+      return this.teachersService.me(userId);
+    }
 }

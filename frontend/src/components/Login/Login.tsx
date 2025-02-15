@@ -1,3 +1,5 @@
+import apt from '../../assets/media/apt.png'
+
 interface LoginInterface {
   handleSubmit: (arg: React.FormEvent) => void;
   email: string;
@@ -8,7 +10,8 @@ interface LoginInterface {
 
 const Login = ({  handleSubmit, email, setEmail, password, setPassword }: LoginInterface) => {
   return (
-    <div className="flex flex-col justify-center items-center bg-[--respect-purple] w-full h-[100vh] p-5">
+    <div className="flex gap-6 flex-col justify-center items-center bg-[--respect-purple] w-full h-[100vh] p-5">
+      <img className='w-full max-w-32' src={apt} />
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center gap-3 w-full max-w-80 p-5 bg-[--respect-purple-deep] rounded-lg text-white"
