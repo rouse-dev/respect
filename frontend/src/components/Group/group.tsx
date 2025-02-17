@@ -29,7 +29,7 @@ const Group = () => {
 
   return (
     <div
-      className="relative w-full sm:w-[250px] cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+      className="relative w-full sm:w-[250px] cursor-pointer selection:bg-transparent flex flex-row order-2 sm:order-1 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-(--respect-purple-deep)"
       onClick={(e) => {
         const dropdown = e.currentTarget;
         dropdown.classList.toggle("rounded-b-lg");
@@ -46,7 +46,7 @@ const Group = () => {
       <p className="hidden sm:block">|</p>
       {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
-      <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
+      <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
         {isLoading ? (
           <div className="py-4">
             <Preloader />

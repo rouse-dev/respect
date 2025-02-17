@@ -113,23 +113,23 @@ const HistoryPopup = ({
       {isLoading && <Preloader />}
       <div
         id="respect_history_popup"
-        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm"
+        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-xs"
       >
         <div
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-2xl w-full p-6 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-(--respect-purple) max-w-2xl w-full p-6 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}
         >
           <div className="flex justify-end gap-3">
-            <p className="w-full h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
+            <p className="w-full h-10 bg-(--respect-purple-dark) flex items-center justify-center rounded-lg">
               {student.name}
             </p>
-            <p className="w-fit whitespace-nowrap px-4 h-10 bg-[--respect-purple-dark] flex items-center justify-center rounded-lg">
+            <p className="w-fit whitespace-nowrap px-4 h-10 bg-(--respect-purple-dark) flex items-center justify-center rounded-lg">
               Репутация: {student.reputation}
             </p>
             <button
-              className="bg-[--respect-purple-dark] px-[13px] rounded-lg h-10 "
+              className="bg-(--respect-purple-dark) px-[13px] rounded-lg h-10 "
               onClick={onClose}
             >
               <FaTimes />
@@ -155,7 +155,7 @@ const HistoryPopup = ({
               paginHistory.map((item, index) => (
                 <div
                   key={index}
-                  className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 w-full rounded-lg  bg-[--respect-purple-dark] ${
+                  className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 w-full rounded-lg  bg-(--respect-purple-dark) ${
                     item.change > 0 ? "border-green-500" : "border-red-500"
                   }`}
                 >

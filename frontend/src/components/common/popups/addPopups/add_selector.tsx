@@ -14,7 +14,7 @@ const Add = () => {
   return (
     <>
     <div
-      className="relative cursor-pointer selection:bg-transparent flex flex-row order-3 sm:order-2 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+      className="relative cursor-pointer selection:bg-transparent flex flex-row order-3 sm:order-2 justify-end items-center px-5 py-2 rounded-t-lg rounded-b-lg gap-5 bg-(--respect-purple-deep)"
       onClick={(e) => {
         const dropdown = e.currentTarget;
         dropdown.classList.toggle("rounded-b-lg");
@@ -26,7 +26,7 @@ const Add = () => {
     >
       <p className="flex mr-auto">Добавить</p>
 
-      <div className="hidden z-20 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
+      <div className="hidden z-20 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
           <button className="py-2 hover:backdrop-brightness-110" 
             onClick={()=>{
               setIsGroupPopup(true);

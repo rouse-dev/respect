@@ -81,17 +81,17 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
       {isLoading && <Preloader />}
       <div
         id="respect_add_popup"
-        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm"
+        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-xs"
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 bg-[--respect-purple] max-w-80 w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-(--respect-purple) max-w-80 w-full p-5 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}
         >
           <div
-            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-1 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-1 rounded-t-lg rounded-b-lg gap-5 bg-(--respect-purple-deep)"
             onClick={(e) => {
               const dropdown = e.currentTarget;
               dropdown.classList.toggle("rounded-b-lg");
@@ -110,7 +110,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
             <p className="hidden sm:block">|</p>
             {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
-            <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
+            <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
               {allSubjects.map((el, i) => (
                 <button
                   type="button"
@@ -139,14 +139,14 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           {isLessonNew && (
             <input
               type="text"
-              className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+              className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
               placeholder="Название предмета"
               onChange={(el) => setNewLesson(el.target.value)}
             />
           )}
 
           <input
-            className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+            className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
             type="date"
             defaultValue={date}
             max={new Date().toLocaleDateString().split('.').reverse().join('-')}
@@ -154,7 +154,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
             required
           />
           <input
-            className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+            className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
             placeholder="Пара"
             type="text"
             min={0}
@@ -172,7 +172,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
             required
           />
           <input
-            className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+            className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
             placeholder="Кол-во респекта"
             type="text"
             onChange={(e) => {
@@ -189,7 +189,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
             min="0"
           />
           <textarea
-            className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
+            className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
             placeholder="Причина"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -197,13 +197,13 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           />
 
           <button
-            className="bg-[--respect-purple-dark] p-3 rounded-lg mt-2"
+            className="bg-(--respect-purple-dark) p-3 rounded-lg mt-2"
             type="submit"
           >
             Убавить
           </button>
           <button
-            className="bg-[--respect-purple-dark] p-3 rounded-lg"
+            className="bg-(--respect-purple-dark) p-3 rounded-lg"
             type="button"
             onClick={onClose}
           >

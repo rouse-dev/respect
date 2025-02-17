@@ -55,7 +55,7 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
   return (
     <div className='flex flex-col gap-3' {...getRootProps()}>
       <h1>{fileLoaded ? 'Файл выбран.' : 'Загрузите Excel файл'}</h1>
-      <label htmlFor={'excel_file_input'} className='p-3 bg-[--respect-purple-dark] text-center rounded-md cursor-pointer'>
+      <label htmlFor={'excel_file_input'} className='p-3 bg-(--respect-purple-dark) text-center rounded-md cursor-pointer'>
         {fileLoaded ? 'Поменять' : 'Выбрать файл'}
       </label>
       <input id='excel_file_input' className='hidden' type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
