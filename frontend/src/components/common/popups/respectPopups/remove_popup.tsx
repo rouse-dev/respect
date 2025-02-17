@@ -3,6 +3,7 @@ import { ChangeRespect, getLessons } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { Student, Subject } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
 interface RemovePopupProps {
   student: Student;
@@ -38,6 +39,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLessonNew, setIsLessonNew] = useState(false);
   const [newLesson, setNewLesson] = useState("");
+  const [dropdown, setDropdown] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,11 +91,12 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           }}
         >
           <div
-            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-3 py-1 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
+            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-1 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
             onClick={(e) => {
               const dropdown = e.currentTarget;
               dropdown.classList.toggle("rounded-b-lg");
 
+              setDropdown(dropdown.querySelector("div")!.classList.contains("hidden"));
               dropdown.querySelector("div")!.classList.contains("hidden")
                 ? dropdown
                     .querySelector("div")!
@@ -101,19 +104,11 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
                 : dropdown
                     .querySelector("div")!
                     .classList.replace("flex", "hidden");
-
-              dropdown.querySelector("i")!.classList.contains("fa-angle-down")
-                ? dropdown
-                    .querySelector("i")!
-                    .classList.replace("fa-angle-down", "fa-angle-up")
-                : dropdown
-                    .querySelector("i")!
-                    .classList.replace("fa-angle-up", "fa-angle-down");
             }}
           >
             <p className="flex mr-auto">{currentSubject.name || "Предмет"}</p>
             <p className="hidden sm:block">|</p>
-            <i className="fa fa-angle-up" aria-hidden="true"></i>
+            {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
             <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
               {allSubjects.map((el, i) => (

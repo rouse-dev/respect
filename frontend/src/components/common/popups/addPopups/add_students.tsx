@@ -6,6 +6,7 @@ import ExcelReader from "../../utils/excelReader";
 import { toast } from "react-toastify";
 
 import hint from '../../../../assets/media/hint.png';
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
 interface AddStudentPopup {
   onClose: () => void;
@@ -24,6 +25,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { students, setStudents, selectedGroup, setSelectedGroup } = useAppContext();
+  const [dropdown, setDropdown] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -78,7 +80,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
         )}
 
         <div className="w-full">
-          <div className="ml-auto -mb-7 flex flex-row items-center justify-center w-8 h-8 bg-[--respect-purple-dark] rounded-[100%] cursor-help"
+          <div className="hidden md:flex ml-auto -mb-7  flex-row items-center justify-center w-8 h-8 bg-[--respect-purple-dark] rounded-[100%] cursor-help"
           onMouseEnter={_ => {
             const hint = document.getElementById('hint_image');
             hint!.classList.remove('hidden');
@@ -95,21 +97,18 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
           >?</div>
           <img id="hint_image" className="absolute hidden rounded-md max-w-64" src={hint} />
         </div>
-        <div className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-3 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-dark]" onClick={e => {
+        <div className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-2 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-dark]" onClick={e => {
           const dropdown = e.currentTarget;
           dropdown.classList.toggle('rounded-b-lg');
 
+          setDropdown(dropdown.querySelector("div")!.classList.contains("hidden"));
           dropdown.querySelector('div')!.classList.contains('hidden')?
           dropdown.querySelector('div')!.classList.replace('hidden', 'flex'):
           dropdown.querySelector('div')!.classList.replace('flex', 'hidden');
-
-          dropdown.querySelector('i')!.classList.contains('fa-angle-down')?
-          dropdown.querySelector('i')!.classList.replace('fa-angle-down', 'fa-angle-up'):
-          dropdown.querySelector('i')!.classList.replace('fa-angle-up', 'fa-angle-down');
       }}>
           <p className="flex mr-auto">{exportGroup?.name || 'Группа'}</p>
           <p className="hidden sm:block">|</p>
-          <i className="fa fa-angle-up" aria-hidden="true"></i>
+          {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
           <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-dark] bg-[--respect-purple]">
               {groups.map((el, i) => 

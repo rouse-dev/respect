@@ -23,7 +23,7 @@ const Home = ({ useUserStore, placeholder_avatar }: HomeInterface) => {
       </div>
       <Link className="flex flex-row order-1 sm:order-2 justify-center items-center px-3 py-2 rounded-lg gap-4 bg-[--respect-purple-deep]"
         to="/profile">
-        <p className="flex w-fit">
+        <p className="flex w-fit whitespace-nowrap overflow-hidden">
           {useUserStore.name ? useUserStore.name : "- Фамилия И.О. -"}
         </p>
         <img

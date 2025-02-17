@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../../store/AppContext";
 import { GetAllGroups } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
 const Group = () => {
   const { currentGroup, setCurrentGroup, groups, setGroups, setSortedStudents, students } = useAppContext();
   const [isLoading, setLoading] = useState(false);
+  const [dropdown, setDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,24 +34,17 @@ const Group = () => {
         const dropdown = e.currentTarget;
         dropdown.classList.toggle("rounded-b-lg");
 
+        setDropdown(dropdown.querySelector("div")!.classList.contains("hidden"));
         dropdown.querySelector("div")!.classList.contains("hidden")
           ? dropdown.querySelector("div")!.classList.replace("hidden", "flex")
           : dropdown.querySelector("div")!.classList.replace("flex", "hidden");
-
-        dropdown.querySelector("i")!.classList.contains("fa-angle-down")
-          ? dropdown
-              .querySelector("i")!
-              .classList.replace("fa-angle-down", "fa-angle-up")
-          : dropdown
-              .querySelector("i")!
-              .classList.replace("fa-angle-up", "fa-angle-down");
       }}
     >
       <p className="flex mr-auto">
         {currentGroup ? currentGroup.name : "Все группы"}
       </p>
       <p className="hidden sm:block">|</p>
-      <i className="fa fa-angle-up" aria-hidden="true"></i>
+      {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
       <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
         {isLoading ? (
