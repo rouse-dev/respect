@@ -83,11 +83,11 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
           <div className="hidden md:flex ml-auto -mb-7  flex-row items-center justify-center w-8 h-8 bg-(--respect-purple-dark) rounded-[100%] cursor-help"
           onMouseEnter={_ => {
             const hint = document.getElementById('hint_image');
-            hint!.classList.remove('hidden');
+            hint!.classList.replace('hidden', 'flex');
           }}
           onMouseLeave={_ => {
             const hint = document.getElementById('hint_image');
-            hint!.classList.add('hidden');
+            hint!.classList.replace('flex', 'hidden');
           }}
           onMouseMove={e => {
             const hint = document.getElementById('hint_image');
@@ -95,7 +95,10 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
             hint!.style.top = e.clientY + 15 + 'px';
           }}
           >?</div>
-          <img id="hint_image" className="absolute hidden rounded-md max-w-64" src={hint} />
+          <div id="hint_image" className="absolute hidden rounded-md max-w-64 flex-col items-center justify-center gap-1 p-4 bg-(--respect-purple-deep) shadow-[0px_0px_50px_var(--respect-purple-dark)]">
+            <p>Пример файла:</p>
+            <img className="rounded-b-md w-full" src={hint} />
+          </div>
         </div>
         <div className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-2 rounded-t-lg rounded-b-lg gap-5 bg-(--respect-purple-dark)" onClick={e => {
           const dropdown = e.currentTarget;

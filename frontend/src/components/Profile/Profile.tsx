@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import AvatarContainer from "./AvatarContainer";
+import { IoMdExit } from "react-icons/io";
+import { ImUndo2 } from "react-icons/im";
 
 interface useUserStoreInterface {
     auth: boolean,
@@ -16,16 +19,11 @@ const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInte
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
             <div className="w-full flex flex-row justify-between sm:mb-12">
-                <button className="hidden sm:block w-full sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" onClick={handleLogout}>Выход</button>
-                <Link className="w-full sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" to='/'>На главную</Link>
+                <button className="hidden sm:flex flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" onClick={handleLogout}>Выход <IoMdExit /></button>
+                <Link className="flex flex-row items-center justify-center gap-2 w-full text-center sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" to='/'>На главную <ImUndo2 /></Link>
             </div>
             <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-(--respect-purple-deep) rounded-lg">
-                <img className="max-w-28 max-h-28 w-full h-full rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : placeholder_avatar} />
-                <input className="hidden" type="file" id="avatar_file" accept="image/*" />
-                <button className="bg-(--respect-purple-dark) mb-2 px-3 py-2 rounded-lg" onClick={e => {
-                    const input: HTMLElement = e.currentTarget.parentElement!.querySelector('input[type=file]') as HTMLElement;
-                    input.click();
-                }}>Загрузить файл</button>
+                <AvatarContainer useUserStore={useUserStore} placeholder_avatar={placeholder_avatar} />
 
                 <input className="bg-(--respect-purple-light) w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Имя" type="text" required />
                 <input className="bg-(--respect-purple-light) w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" required />
@@ -33,6 +31,7 @@ const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInte
 
                 <button className="bg-(--respect-purple-dark) w-full mt-2 px-2 py-4 rounded-lg">Сохранить изменения</button>
             </div>
+            <button className="flex sm:hidden flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" onClick={handleLogout}>Выход <IoMdExit /></button>
         </div>
     )
 }

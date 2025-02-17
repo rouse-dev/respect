@@ -52,11 +52,9 @@ export const LogoutTeach = async () => {
   }
 }
 
-export const ChangeAvatar = async (for_user: UserData) => {
+export const ChangeAvatar = async (for_user: FormData) => {
   try {
-    const response = await client.patch("/api/teachers/avatar", {
-      avatar: for_user.avatar,
-    });
+    const response = await client.patch("/api/teachers/avatar", for_user);
     
     return { succes: true, data: response.data };
   } catch (error) {
