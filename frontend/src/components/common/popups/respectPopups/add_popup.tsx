@@ -153,16 +153,16 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
           <input
             className="bg-[--respect-purple-deep] outline-none rounded-lg px-3 py-1"
             placeholder="Пара"
-           
             type="text"
             onChange={(e) => {
               if (isNaN(+e.target.value)) {
                 e.target.value = e.target.value.slice(
-                  0,
-                  e.target.value.length - 2
+                  0, e.target.value.length - 2
                 );
                 return;
-              }
+              } else {
+                e.target.value = e.target.value.slice(-1);
+              };
               setLesson(+e.target.value);
             }}
             required
