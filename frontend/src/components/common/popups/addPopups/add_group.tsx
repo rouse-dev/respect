@@ -33,7 +33,7 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

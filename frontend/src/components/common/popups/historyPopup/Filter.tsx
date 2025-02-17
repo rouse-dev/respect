@@ -1,3 +1,5 @@
+import { FaRegCalendarTimes } from "react-icons/fa";
+
 interface FilterInterface {
   sortRespect: string,
   setSortRespect: (sort: string) => void,
@@ -42,12 +44,12 @@ const Filter = ({sortRespect, setSortRespect, selectedDate1, selectedDate2, setS
           onChange={(e) => setSelectedDates(undefined, e.target.value)}
           max={new Date().toLocaleDateString().split('.').reverse().join('-')}
         ></input>
-        <button disabled={!(selectedDate1.length > 0 || selectedDate2.length > 0)} className="self-stretch bg-[--respect-purple-dark] rounded-md px-3 disabled:text-gray-400" onClick={(e) => {
+        <button disabled={!(selectedDate1.length > 0 || selectedDate2.length > 0)} className="self-stretch bg-[--respect-purple-dark] rounded-md px-[13px] disabled:text-gray-400" onClick={(e) => {
           e.currentTarget.parentElement!.querySelectorAll('input[type=date]').forEach(input_elem => {
             (input_elem as HTMLInputElement).value = '';
           });
           setSelectedDates('', '');
-        }}><i className="fa fa-calendar-times-o" aria-hidden="true"></i></button>
+        }}><FaRegCalendarTimes /></button>
       </div>
     </div>
   );

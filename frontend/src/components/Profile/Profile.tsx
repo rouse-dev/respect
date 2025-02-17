@@ -20,7 +20,7 @@ const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInte
                 <Link className="w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/'>На главную</Link>
             </div>
             <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
-                <img className="max-w-28 max-h-28 w-full h-full rounded-[100%]" src={useUserStore.avatar ? `http://localhost:3000/${useUserStore.avatar}` : placeholder_avatar} />
+                <img className="max-w-28 max-h-28 w-full h-full rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : placeholder_avatar} />
                 <input className="hidden" type="file" id="avatar_file" accept="image/*" />
                 <button className="bg-[--respect-purple-dark] mb-2 px-3 py-2 rounded-lg" onClick={e => {
                     const input: HTMLElement = e.currentTarget.parentElement!.querySelector('input[type=file]') as HTMLElement;

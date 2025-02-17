@@ -20,7 +20,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
 
         setAllSubjects(response);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     isOpen && getAllLessons();
@@ -44,7 +44,6 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
       toast.info("Пожалуйста, выберите предмет");
       return;
     }
-    console.log(lesson,date)
 
     setIsLoading(true);
     try {

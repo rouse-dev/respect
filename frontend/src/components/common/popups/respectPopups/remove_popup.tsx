@@ -19,7 +19,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
         const response = await getLessons();
         setAllSubjects(response);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     isOpen && getAllLessons();

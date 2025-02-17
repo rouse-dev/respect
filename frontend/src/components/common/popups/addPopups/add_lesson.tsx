@@ -16,7 +16,7 @@ const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
       setLoading(true);
       await addLesson(newLesson)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -28,7 +28,7 @@ const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
       addLessonFunc();
       onClose();
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
   

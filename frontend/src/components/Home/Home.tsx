@@ -30,7 +30,7 @@ const Home = ({ useUserStore, placeholder_avatar }: HomeInterface) => {
           className="w-11 h-11 rounded-[100%]"
           src={
             useUserStore.avatar
-              ? `http://localhost:3000/${useUserStore.avatar}`
+              ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}`
               : placeholder_avatar
           }
         />

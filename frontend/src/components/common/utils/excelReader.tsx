@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ExcelReaderProps, useAppContext } from '../../../store/AppContext';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
@@ -10,8 +10,6 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
 
   const handleFile = (file: File) => {
     setFileLoaded(true);
-
-    console.log(file)
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -33,7 +31,6 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
       if (jsonData.length === 0) {
         toast.error('Excel таблица пуста!');
       } else {
-        console.log(formattedData);
         setData(formattedData);
       }
     };
@@ -50,16 +47,10 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
   const { getRootProps, isDragActive } = useDropzone({ onDrop });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e)
     const file = e.target.files?.[0];
     if (!file) return;
-    
     handleFile(file);
   };
-
-  useEffect(() => {
-    console.log(fileLoaded);
-  }, [fileLoaded]);
 
   return (
     <div className='flex flex-col gap-3' {...getRootProps()}>
