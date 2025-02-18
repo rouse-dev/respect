@@ -97,7 +97,7 @@ const SortByParams = () => {
         </div>
       </div>
       <button
-        className="px-4 py-2 rounded-lg gap-5 bg-(--respect-purple-deep) cursor-pointer"
+        className="px-4 py-2 rounded-lg gap-5 bg-(--respect-purple-deep) cursor-pointer hover:scale-98 hover:opacity-90"
         onClick={(_) => {
           setSortDirection(!sortDirection);
         }}

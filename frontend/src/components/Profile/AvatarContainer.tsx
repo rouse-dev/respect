@@ -6,15 +6,14 @@ interface useUserStoreInterface {
 }
 
 interface AvatarContainerInterface {
-    useUserStore: useUserStoreInterface,
-    placeholder_avatar: string
+    useUserStore: useUserStoreInterface
 }
 
-const AvatarContainer = ({ useUserStore, placeholder_avatar }: AvatarContainerInterface) => {
+const AvatarContainer = ({ useUserStore }: AvatarContainerInterface) => {
     const AvatarForm = new FormData();
     return (
         <>
-        <img id="avatar_img" className="max-w-28 max-h-28 w-full h-28 aspect-square rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : placeholder_avatar} />
+        <img id="avatar_img" className="max-w-28 max-h-28 w-full h-28 aspect-square rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : `${import.meta.env.VITE_API_URL}/uploads/avatars/default.jpg`} />
         <input className="hidden" type="file" id="avatar_file" accept="image/*" onChange={e => {
             const file = e.target.files![0];
             const reader = new FileReader();

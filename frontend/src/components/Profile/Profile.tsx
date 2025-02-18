@@ -11,11 +11,10 @@ interface useUserStoreInterface {
 }
 interface ProfileInterface {
     handleLogout: () => void,
-    useUserStore: useUserStoreInterface,
-    placeholder_avatar: string,
+    useUserStore: useUserStoreInterface
 }
 
-const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInterface) => {
+const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
             <div className="w-full flex flex-row justify-between sm:mb-12">
@@ -23,7 +22,7 @@ const Profile = ({ handleLogout, useUserStore, placeholder_avatar }: ProfileInte
                 <Link className="flex flex-row items-center justify-center gap-2 w-full text-center sm:w-fit px-3 py-2 rounded-lg bg-(--respect-purple-deep)" to='/'>На главную <ImUndo2 /></Link>
             </div>
             <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-(--respect-purple-deep) rounded-lg">
-                <AvatarContainer useUserStore={useUserStore} placeholder_avatar={placeholder_avatar} />
+                <AvatarContainer useUserStore={useUserStore} />
 
                 <input className="bg-(--respect-purple-light) w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Имя" type="text" required />
                 <input className="bg-(--respect-purple-light) w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" required />

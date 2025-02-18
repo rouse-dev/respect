@@ -45,8 +45,8 @@ const useUserStore = create<UserStoreInterface>()((set) => {
                 TryGetUser().then(res => {
                     set(res);
                     toast.success(`Добро пожаловать, ${res.name}!`);
-                });
-            })
+                })
+            }).catch(_ => toast.error('Неправильный логин или пароль!'))
         },
         CheckAuth: () => {
             TryGetUser().then(res => set(res));

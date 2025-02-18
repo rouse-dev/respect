@@ -38,7 +38,7 @@ const Login = ({  handleSubmit, email, setEmail, password, setPassword }: LoginI
 
         <button
           type="submit"
-          className="bg-(--respect-purple-dark) w-full mt-2 px-2 py-4 rounded-lg"
+          className="bg-(--respect-purple-dark) w-full mt-2 px-2 py-4 rounded-lg cursor-pointer hover:opacity-80"
         >
           Войти
         </button>

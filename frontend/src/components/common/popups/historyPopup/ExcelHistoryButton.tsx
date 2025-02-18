@@ -23,7 +23,7 @@ const ExcelHistoryButton = ({ studentId, name }: DownloadReputationHistoryButton
   };
 
   return (
-    <button onClick={handleDownload}>
+    <button onClick={handleDownload} className="cursor-pointer hover:opacity-50">
       Скачать историю репутации
     </button>
   );

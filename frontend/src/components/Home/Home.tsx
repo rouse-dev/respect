@@ -10,11 +10,10 @@ interface useUserStoreInterface {
 }
 
 interface HomeInterface {
-    useUserStore: useUserStoreInterface,
-    placeholder_avatar: string
+    useUserStore: useUserStoreInterface
 }
 
-const Home = ({ useUserStore, placeholder_avatar }: HomeInterface) => {
+const Home = ({ useUserStore }: HomeInterface) => {
   return (
       <div className="flex flex-col sm:flex-row gap-5 justify-between mb-6 sm:mb-12">
       <div className="flex justify-center items-center gap-3 order-2 sm:order-1">
@@ -31,7 +30,7 @@ const Home = ({ useUserStore, placeholder_avatar }: HomeInterface) => {
           src={
             useUserStore.avatar
               ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}`
-              : placeholder_avatar
+              : `${import.meta.env.VITE_API_URL}/uploads/avatars/default.jpg`
           }
         />
       </Link>

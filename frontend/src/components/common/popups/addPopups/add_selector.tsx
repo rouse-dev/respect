@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GroupPopup from "./add_group";
 import LessonPopup from "./add_lesson";
 import StudentPopup from "./add_students";
