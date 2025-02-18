@@ -12,7 +12,7 @@ import { LessonsModule } from './lessons/lessons.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '../.env',
     }),
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'uploads'),
