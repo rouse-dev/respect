@@ -85,7 +85,7 @@ const SortByParams = () => {
         <div className="hidden z-10 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
           {sortMethods.map((el, i) => (
             <button
-              className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm text-left"
+              className="px-3 py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm text-left"
               key={i}
               onClick={(_) => {
                 setCurrentSortMethod(el);
@@ -97,7 +97,7 @@ const SortByParams = () => {
         </div>
       </div>
       <button
-        className="px-4 py-2 rounded-lg gap-5 bg-(--respect-purple-deep)"
+        className="px-4 py-2 rounded-lg gap-5 bg-(--respect-purple-deep) cursor-pointer"
         onClick={(_) => {
           setSortDirection(!sortDirection);
         }}

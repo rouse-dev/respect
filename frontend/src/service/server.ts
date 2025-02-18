@@ -2,13 +2,6 @@ import { StudentData } from "../store/AppContext";
 import { toast } from "react-toastify";
 import client from "./client";
 
-interface UserData {
-  avatar: any;
-  email: string;
-  password: string;
-  name: string;
-}
-
 interface LoginUserData {
   email: string;
   password: string;

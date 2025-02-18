@@ -60,11 +60,11 @@ const Group = () => {
                 setSortedStudents(students);
               }}
             >
-              <div className="p-2">Все группы</div>
+              <div className="p-2 cursor-pointer">Все группы</div>
             </button>
             {groups.map((group) => (
               <button
-                className="py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                className="py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm"
                 key={group.id}
                 onClick={() => {
                   setCurrentGroup(group);

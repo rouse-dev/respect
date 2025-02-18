@@ -1,13 +1,12 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AppProvider } from "./store/AppContext";
 import { AuthRoutes, GuestRoutes } from "./config/routes";
-import { observer } from "mobx-react-lite";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import useUserStore from "./store/userStore";
 import { useEffect } from "react";
 
-const App = observer(() => {
+const App = () => {
   const {auth} = useUserStore();
   const navigate = useNavigate();
   
@@ -43,6 +42,6 @@ const App = observer(() => {
         style={{boxShadow:'0px 0px 20px var(--respect-purple-dark)'}}/>
     </AppProvider>
   );
-});
+};
 
 export default App;

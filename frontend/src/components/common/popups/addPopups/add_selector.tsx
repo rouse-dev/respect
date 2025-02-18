@@ -27,19 +27,19 @@ const Add = () => {
       <p className="flex mr-auto">Добавить</p>
 
       <div className="hidden z-20 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
-          <button className="py-2 hover:backdrop-brightness-110" 
+          <button className="py-2 hover:backdrop-brightness-110 cursor-pointer" 
             onClick={()=>{
               setIsGroupPopup(true);
               setPopupActive(true);
             }}
           >Группу</button>
-          <button className="py-2 hover:backdrop-brightness-110" 
+          <button className="py-2 hover:backdrop-brightness-110 cursor-pointer" 
             onClick={()=>{
               setIsLessonPopup(true);
               setPopupActive(true);
             }}
           >Предмет</button>
-          <button className="py-2 hover:backdrop-brightness-110" 
+          <button className="py-2 hover:backdrop-brightness-110 cursor-pointer" 
             onClick={()=>{
               setIsStudentPopup(true);
               setPopupActive(true);

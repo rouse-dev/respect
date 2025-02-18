@@ -4,6 +4,7 @@ import { GetAllStudents } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import RespectButtons from "../common/popups/respectPopups/respect_buttons";
 import HistoryButton from "../common/popups/historyPopup/history_button";
+import { TbMoodSad } from "react-icons/tb";
 
 const Students = () => {
   const { search, currentStudent, sortedStudents, setStudents, setSortedStudents } = useAppContext();
@@ -69,7 +70,7 @@ const Students = () => {
         </div>
 
         <div className="flex flex-col gap-3">
-          {sortedStudents.length === 0 && <div className="text-center font-bold">Ничего не найдено!</div>}
+          {sortedStudents.length === 0 && <div className="text-center font-bold flex flex-row items-center justify-center gap-2 "><TbMoodSad /> Ничего не найдено!</div>}
           {sortedStudents.map((el) => {
             const show =
               search.length === 0 ||

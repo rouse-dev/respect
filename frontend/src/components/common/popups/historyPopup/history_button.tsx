@@ -14,7 +14,7 @@ const HistoryButton = ({ student }: HistoryButtonInterface) => {
     return (
         <>
         <button
-            className="text-left px-3 py-2 w-full sm:w-2/3 text-xl sm:text-lg hover:underline flex flex-col sm:flex-row justify-self-start gap-3"
+            className="text-left cursor-pointer px-3 py-2 w-full sm:w-2/3 text-xl sm:text-lg hover:underline flex flex-col sm:flex-row justify-self-start gap-3"
             onClick={() => {
                 setPopupActive(true);
                 setIsHistoryPopupOpen(true);

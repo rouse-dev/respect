@@ -129,7 +129,7 @@ const HistoryPopup = ({
               Репутация: {student.reputation}
             </p>
             <button
-              className="bg-(--respect-purple-dark) px-[13px] rounded-lg h-10 "
+              className="bg-(--respect-purple-dark) px-[13px] rounded-lg h-10 cursor-pointer"
               onClick={onClose}
             >
               <FaTimes />

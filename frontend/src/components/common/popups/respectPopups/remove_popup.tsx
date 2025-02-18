@@ -114,7 +114,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
               {allSubjects.map((el, i) => (
                 <button
                   type="button"
-                  className="px-3 py-2 text-left hover:backdrop-brightness-110 last:rounded-b-sm"
+                  className="px-3 py-2 cursor-pointer text-left hover:backdrop-brightness-110 last:rounded-b-sm"
                   key={i}
                   onClick={(_) => {
                     setCurrentSubject(el);
@@ -124,7 +124,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
                 </button>
               ))}
               <button
-                className="px-3 py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
+                className="px-3 py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm"
                 type="button"
                 onClick={() => {
                   setIsLessonNew(true);
@@ -146,7 +146,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           )}
 
           <input
-            className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
+            className="bg-(--respect-purple-deep) cursor-pointer outline-hidden rounded-lg px-3 py-1"
             type="date"
             defaultValue={date}
             max={new Date().toLocaleDateString().split('.').reverse().join('-')}
@@ -197,13 +197,13 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           />
 
           <button
-            className="bg-(--respect-purple-dark) p-3 rounded-lg mt-2"
+            className="bg-(--respect-purple-dark) cursor-pointer p-3 rounded-lg mt-2"
             type="submit"
           >
             Убавить
           </button>
           <button
-            className="bg-(--respect-purple-dark) p-3 rounded-lg"
+            className="bg-(--respect-purple-dark) cursor-pointer p-3 rounded-lg"
             type="button"
             onClick={onClose}
           >
