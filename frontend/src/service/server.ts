@@ -114,6 +114,7 @@ export const HistoryStudent = async (studentId: number) => {
   }
 };
 export const AddStudent = async (exported_students: StudentData[]) => {
+  console.log(exported_students)
   try {
     const response = await client.post("/api/students/many", {
       students: exported_students,

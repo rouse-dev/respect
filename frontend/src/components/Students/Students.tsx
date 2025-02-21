@@ -47,24 +47,24 @@ const Students = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-5 bg-(--respect-purple-deep) p-5 rounded-lg">
+      <div className="flex flex-col gap-5 bg-[--respect-purple-deep] p-5 rounded-lg">
         <div className="hidden sm:flex flex-row gap-5">
-          <p className="rounded-lg px-3 py-2 bg-(--respect-purple-dark) w-2/6">
+          <p className="rounded-lg px-3 py-2 bg-[--respect-purple-dark] w-2/6">
             ФИО
           </p>
-          <p className="rounded-lg px-3 py-2 bg-(--respect-purple-dark) w-1/6">
+          <p className="rounded-lg px-3 py-2 bg-[--respect-purple-dark] w-1/6">
             Группа
           </p>
-          <p className="rounded-lg px-3 py-2 bg-(--respect-purple-dark) w-3/6">
+          <p className="rounded-lg px-3 py-2 bg-[--respect-purple-dark] w-3/6">
             Респект
           </p>
         </div>
 
         <div className="flex sm:hidden flex-row gap-5">
-          <p className="rounded-lg px-2 py-1 bg-(--respect-purple-dark) w-2/3">
+          <p className="rounded-lg px-2 py-1 bg-[--respect-purple-dark] w-2/3">
             ФИО / Группа
           </p>
-          <p className="rounded-lg text-center px-2 py-1 bg-(--respect-purple-dark) w-1/3 overflow-hidden text-ellipsis">
+          <p className="rounded-lg text-center px-2 py-1 bg-[--respect-purple-dark] w-1/3 overflow-hidden text-ellipsis">
             Респект
           </p>
         </div>
@@ -79,7 +79,7 @@ const Students = () => {
               return (
                 <div
                   key={el.id}
-                  className={`flex flex-row bg-(--respect-purple) rounded-lg py-1`}
+                  className={`flex flex-row bg-[--respect-purple] rounded-lg py-1`}
                 >
                   <div className="flex flex-col sm:flex-row justify-between sm:gap-5 w-2/3 sm:w-1/2">
                     <HistoryButton student={el} />

@@ -95,17 +95,17 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
       {isLoading && <Preloader />}
       <div
         id="respect_remove_popup"
-        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-xs"
+        className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur"
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 bg-(--respect-purple) max-w-80 w-full p-5 m-5 rounded-lg"
+          className="flex flex-col gap-3 bg-[--respect-purple] max-w-80 w-full p-5 m-5 rounded-lg"
           style={{
             boxShadow: "inset 0px 0px 8px 2px var(--respect-purple-dark)",
           }}
         >
           <div
-            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-1 rounded-t-lg rounded-b-lg gap-5 bg-(--respect-purple-deep)"
+            className="relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-4 py-1 rounded-t-lg rounded-b-lg gap-5 bg-[--respect-purple-deep]"
             onClick={(e) => {
               const dropdown = e.currentTarget;
               dropdown.classList.toggle("rounded-b-lg");
@@ -124,7 +124,7 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
             <p className="hidden sm:block">|</p>
             {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
-            <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
+            <div className="hidden z-20 flex-col absolute left-0 top-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
               {allSubjects.map((el, i) => (
                 <button
                   type="button"
@@ -152,13 +152,13 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           {isLessonNew && (
             <input
               type="text"
-              className="bg-(--respect-purple-deep) outline-hidden rounded-lg px-3 py-1"
+              className="bg-[--respect-purple-deep] outline-hidden rounded-lg px-3 py-1"
               placeholder="Название предмета"
               onChange={(el) => setNewLesson(el.target.value)}
             />
           )}
           <div
-            className="cursor-pointer flex flex-row items-center gap-3 bg-(--respect-purple-deep) rounded-lg px-3 py-1"
+            className="cursor-pointer flex flex-row items-center gap-3 bg-[--respect-purple-deep] rounded-lg px-3 py-1"
             onClick={(e) => {
               const button = e.currentTarget;
               const input = button.querySelector(
@@ -174,11 +174,11 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
               id="propusk"
               required
             />
-            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-(--respect-purple-dark)"></div>
+            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-[--respect-purple-dark]"></div>
             <p>Пропуск (-100)</p>
           </div>
           <div
-            className="cursor-pointer flex flex-row items-center gap-3 bg-(--respect-purple-deep) rounded-lg px-3 py-1"
+            className="cursor-pointer flex flex-row items-center gap-3 bg-[--respect-purple-deep] rounded-lg px-3 py-1"
             onClick={(e) => {
               const button = e.currentTarget;
               const input = button.querySelector(
@@ -194,11 +194,11 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
               id="skip_para"
               required
             />
-            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-(--respect-purple-dark)"></div>
+            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-[--respect-purple-dark]"></div>
             <p>Прогул (-150)</p>
           </div>
           <div
-            className="cursor-pointer flex flex-row items-center gap-3 bg-(--respect-purple-deep) rounded-lg px-3 py-1"
+            className="cursor-pointer flex flex-row items-center gap-3 bg-[--respect-purple-deep] rounded-lg px-3 py-1"
             onClick={(e) => {
               const button = e.currentTarget;
               const input = button.querySelector(
@@ -214,10 +214,10 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
               id="dolg"
               required
             />
-            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-(--respect-purple-dark)"></div>
+            <div className="min-w-4 h-4 rounded-[100%] peer-checked:bg-white bg-[--respect-purple-dark]"></div>
             <p>Снятие долга (-50)</p>
             <input
-              className="block ml-auto -mr-2 pl-3 w-16 outline-hidden bg-(--respect-purple-dark) rounded-lg"
+              className="block ml-auto -mr-2 pl-3 w-16 outline-hidden bg-[--respect-purple-dark] rounded-lg"
               type="number"
               min="1"
               value={amount}
@@ -228,13 +228,13 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
           </div>
 
           <button
-            className="bg-(--respect-purple-dark) cursor-pointer p-3 rounded-lg mt-2"
+            className="bg-[--respect-purple-dark] cursor-pointer p-3 rounded-lg mt-2"
             type="submit"
           >
             Списать
           </button>
           <button
-            className="bg-(--respect-purple-dark) cursor-pointer p-3 rounded-lg"
+            className="bg-[--respect-purple-dark] cursor-pointer p-3 rounded-lg"
             type="button"
             onClick={onClose}
           >

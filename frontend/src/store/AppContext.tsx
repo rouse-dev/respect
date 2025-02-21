@@ -52,7 +52,7 @@ interface AppContextType {
   exportGroup: Group | null,
   setExportGroup: (group: Group | null) => void;
   selectedGroup: Group | null,
-  setSelectedGroup: (data: Group) => void;
+  setSelectedGroup: (data: Group | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);

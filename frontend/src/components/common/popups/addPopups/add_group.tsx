@@ -46,10 +46,10 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="w-[300px] h-[180px] bg-(--respect-purple-deep) flex flex-col items-center justify-center p-5 rounded-lg gap-3"
+          className="w-[300px] h-[180px] bg-[--respect-purple-deep] flex flex-col items-center justify-center p-5 rounded-lg gap-3"
         >
           <input
-            className="sm:max-w-xs w-full bg-(--respect-purple-add-inputs) rounded-lg py-2 pl-3 outline-hidden"
+            className="sm:max-w-xs w-full bg-[--respect-purple-add-inputs] rounded-lg py-2 pl-3 outline-hidden"
             placeholder="Имя группы"
             type="text"
             value={groupName}
@@ -59,14 +59,14 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
           <button 
             type="submit"
             disabled={isLoading}
-            className="h-[40px] bg-(--respect-purple-dark) w-full flex items-center justify-center rounded-lg cursor-pointer"
+            className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer"
           >
             Добавить
           </button>
           <button 
             type="reset"
             onClick={onClose}
-            className="h-[40px] bg-(--respect-purple-dark) w-full flex items-center justify-center rounded-lg cursor-pointer"
+            className="h-[40px] bg-[--respect-purple-dark] w-full flex items-center justify-center rounded-lg cursor-pointer"
           >
             Отмена
           </button>

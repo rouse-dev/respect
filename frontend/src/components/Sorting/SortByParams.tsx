@@ -65,7 +65,7 @@ const SortByParams = () => {
   return (
     <div className="flex flex-row gap-2 sm:max-w-lg w-full">
       <div
-        className="relative selection:bg-transparent w-full cursor-pointer flex flex-row justify-end items-center px-3 sm:px-5 py-2 rounded-t-lg rounded-b-lg gap-1 sm:gap-5 bg-(--respect-purple-deep)"
+        className="relative selection:bg-transparent w-full cursor-pointer flex flex-row justify-end items-center px-3 sm:px-5 py-2 rounded-t-lg rounded-b-lg gap-1 sm:gap-5 bg-[--respect-purple-deep]"
         onClick={(e) => {
           const dropdown = e.currentTarget;
           dropdown.classList.toggle("rounded-b-lg");
@@ -82,7 +82,7 @@ const SortByParams = () => {
         <p className="hidden sm:block">|</p>
         {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
-        <div className="hidden z-10 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-(--respect-purple-deep) bg-(--respect-purple)">
+        <div className="hidden z-10 flex-col absolute left-0 top-full w-full rounded-b-lg border-[6px] border-t-0 border-[--respect-purple-deep] bg-[--respect-purple]">
           {sortMethods.map((el, i) => (
             <button
               className="px-3 py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm text-left"
@@ -97,7 +97,7 @@ const SortByParams = () => {
         </div>
       </div>
       <button
-        className="px-4 py-2 rounded-lg gap-5 bg-(--respect-purple-deep) cursor-pointer hover:scale-98 hover:opacity-90"
+        className="px-4 py-2 rounded-lg gap-5 bg-[--respect-purple-deep] cursor-pointer hover:scale-98 hover:opacity-90"
         onClick={(_) => {
           setSortDirection(!sortDirection);
         }}

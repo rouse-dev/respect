@@ -27,7 +27,7 @@ const AvatarContainer = ({ useUserStore }: AvatarContainerInterface) => {
                 AvatarForm.set('avatar', file);
             }
         }} />
-        <button className="bg-(--respect-purple-dark) mb-2 px-3 py-2 rounded-lg" onClick={e => {
+        <button className="bg-[--respect-purple-dark] mb-2 px-3 py-2 rounded-lg" onClick={e => {
             const input: HTMLElement = e.currentTarget.parentElement!.querySelector('input[type=file]') as HTMLElement;
             input.click();
         }}>Загрузить файл</button>
