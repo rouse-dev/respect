@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { extname } from 'path';
 import { Response } from 'express';
+import { UpdateTeacherDto } from './dto/update-teacher.dto';
 
 @Injectable()
 export class TeachersService {
@@ -127,6 +128,21 @@ export class TeachersService {
     }
   }
 
+  // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
+  async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
+    try {
+      const updatedTeacher = await this.prisma.teacher.update({
+        where: { id: teacherId },
+        data: dto,
+      });
+
+      return updatedTeacher;
+    } catch (error) {
+      return new InternalServerErrorException(error);
+    }
+  }
+
+  // ВЫДАТЬ ИНФОРМАЦИЮ ОБ УЧИТЕЛЕ
   async me(userId: number) {
     try {
       const teacher = await this.prisma.teacher.findUnique({

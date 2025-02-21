@@ -72,7 +72,7 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
   if (!isOpen) return null;
   return (
     <>
-      <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-sm">
+      <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur">
         <form
           onSubmit={handleSubmit}
           className="w-[300px] bg-[--respect-purple-deep] flex flex-col items-center justify-center p-5 rounded-lg gap-3"

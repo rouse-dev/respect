@@ -26,6 +26,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { UpdateTeacherDto } from './dto/update-teacher.dto';
 
 @ApiTags('Учителя')
 @Controller('teachers')
@@ -116,17 +117,31 @@ export class TeachersController {
     return this.teachersService.changeAvatar(file, teacherId);
   }
 
-    // ВЫВОД ИНФОРМАЦИИ ВОШЕДШЕГО УЧИТЕЛЯ
-    @Get('me')
-    @UseGuards(AuthGuard('jwt'))
-    @ApiOperation({ summary: 'Вывод информации вошедшего учителя' })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Информация о учителе получена' })
-    @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
-    @ApiResponse({ status: 404, description: 'Учитель не найден' })
-    @ApiResponse({ status: 500, description: 'Ошибка сервера' })
-    async getMe(@Request() req) {
-      const userId = req.user.id; // Получаем ID из JWT
-      return this.teachersService.me(userId);
-    }
+  // ИЗМЕНЕНИЯ ДАННЫХ УЧИТЕЛЯ
+  @Patch('change')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Изменения данных учителя' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Данные учителя успешно обновлены' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+  @ApiResponse({ status: 404, description: 'Учитель не найден' })
+  @ApiResponse({ status: 500, description: 'Ошибка сервера' })
+  async updateTeach(@Request() req, @Body() dto: UpdateTeacherDto) {
+    const teacherId = req.user.id;
+    return this.teachersService.changeInfo(teacherId, dto)
+  }
+
+  // ВЫВОД ИНФОРМАЦИИ ВОШЕДШЕГО УЧИТЕЛЯ
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Вывод информации вошедшего учителя' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Информация о учителе получена' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+  @ApiResponse({ status: 404, description: 'Учитель не найден' })
+  @ApiResponse({ status: 500, description: 'Ошибка сервера' })
+  async getMe(@Request() req) {
+    const userId = req.user.id; // Получаем ID из JWT
+    return this.teachersService.me(userId);
+  }
 }

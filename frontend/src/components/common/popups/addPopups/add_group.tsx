@@ -40,7 +40,7 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-xs">
+    <div className="flex flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur">
       {isLoading ? (
         <Preloader/>
       ) : (

@@ -6,11 +6,11 @@ interface useUserStoreInterface {
 }
 
 interface AvatarContainerInterface {
-    useUserStore: useUserStoreInterface
+    useUserStore: useUserStoreInterface,
+    setAvatar: (file: File) => void
 }
 
-const AvatarContainer = ({ useUserStore }: AvatarContainerInterface) => {
-    const AvatarForm = new FormData();
+const AvatarContainer = ({ useUserStore, setAvatar }: AvatarContainerInterface) => {
     return (
         <>
         <img id="avatar_img" className="max-w-28 max-h-28 w-full h-28 aspect-square rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : `${import.meta.env.VITE_API_URL}/uploads/avatars/default.jpg`} />
@@ -24,7 +24,7 @@ const AvatarContainer = ({ useUserStore }: AvatarContainerInterface) => {
                     img.src = String(reader.result);
                 }
                 reader.readAsDataURL(file)
-                AvatarForm.set('avatar', file);
+                setAvatar(file);
             }
         }} />
         <button className="bg-[--respect-purple-dark] mb-2 px-3 py-2 rounded-lg" onClick={e => {

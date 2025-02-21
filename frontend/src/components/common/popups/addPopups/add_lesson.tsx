@@ -35,7 +35,7 @@ const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
     if(!isOpen) return null
     return(
         <>
-         <div className="flex  flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur-xs">
+         <div className="flex  flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur">
         <form
           action=""
           className="w-[300px] h-[180px] bg-[--respect-purple-deep] flex flex-col items-center justify-center p-5 rounded-lg gap-3"

@@ -7,6 +7,12 @@ interface LoginUserData {
   password: string;
 }
 
+interface TeacherChangeData {
+  name?: string
+  email?: string,
+  password?: string,
+}
+
 interface ChangeRespectData {
   studentId: number;
   date?: string;
@@ -45,10 +51,22 @@ export const LogoutTeach = async () => {
   }
 }
 
-export const ChangeAvatar = async (for_user: FormData) => {
+export const ChangeTeacherInfo = async (for_user: TeacherChangeData) => {
+  try {
+    const response = await client.patch("/api/teachers/change", for_user);
+    toast.success('Данные преподавателя изменены');
+    return { succes: true, data: response.data };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произошла ошибка",
+    };
+  }
+};
+
+export const ChangeTeacherAvatar = async (for_user: FormData) => {
   try {
     const response = await client.patch("/api/teachers/avatar", for_user);
-    
+    toast.success('Аватар преподавателя изменён');
     return { succes: true, data: response.data };
   } catch (error) {
     return {

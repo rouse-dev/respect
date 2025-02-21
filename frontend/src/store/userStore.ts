@@ -11,6 +11,7 @@ interface UserStoreInterface {
     auth: boolean,
     name: string,
     email: string,
+    password: string,
     avatar: string,
     LoginUser: (data: UserLoginInterface) => void,
     CheckAuth: () => void,
@@ -30,7 +31,8 @@ const TryGetUser = async () => {
         auth: Object.keys(response).length > 0,
         name: response.data ? response.data.name : '',
         email: response.data ? response.data.email : '',
-        avatar: response.data ? response.data.avata : ''
+        password: response.data ? response.data.password : '',
+        avatar: response.data ? response.data.avatar : ''
     };
 }
 
@@ -39,6 +41,7 @@ const useUserStore = create<UserStoreInterface>()((set) => {
         auth: false,
         name: '',
         email: '',
+        password: '',
         avatar: '',
         LoginUser: (data: UserLoginInterface) => {
             client.post('/api/teachers/login', data).then(_ => {
