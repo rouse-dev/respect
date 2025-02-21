@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import * as ExcelJS from 'exceljs';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -143,6 +144,31 @@ export class StudentsService {
         throw error;
       }
       throw new InternalServerErrorException('Ошибка при создании Excel-файла');
+    }
+  }
+
+  // ИЗМЕНИТЬ ДАННЫЕ СТУДЕНТА
+  async changeStud(id: number, dto: UpdateStudentDto) {
+    try {
+      const updatedStud = await this.prisma.student.update({
+        where: { id },
+        data: dto,
+      });
+      return updatedStud;
+    } catch (error) {
+      throw new InternalServerErrorException('Ошибка при изменении студента');
+    }
+  }
+
+  // УДАЛИТЬ СТУДЕНТА
+  async deleteStud(id: number) {
+    try {
+      const deletedStud = await this.prisma.student.delete({
+        where: { id }
+      })
+      return deletedStud
+    } catch (error) {
+      throw new InternalServerErrorException('Ошибка при удалении студента')
     }
   }
 

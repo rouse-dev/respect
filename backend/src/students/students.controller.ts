@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res, NotFoundException, InternalServerErrorException, Delete } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateManyStudentsDto, CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @ApiTags('Студенты')
 @ApiBearerAuth()
@@ -78,6 +79,28 @@ export class StudentsController {
       }
       throw new InternalServerErrorException('Ошибка при скачивании файла');
     }
+  }
+
+  // ИЗМЕНИТЬ ДАННЫЕ СТУДЕНТА
+  @Patch(':id')
+  @ApiOperation({ summary: 'Изменения данных студента' })
+  @ApiResponse({ status: 200, description: 'Данные студента успешно изменены' })
+  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async changeStudInfo(@Param('id') id: string, @Body() dto: UpdateStudentDto) {
+    return this.studentsService.changeStud(+id, dto)
+  }
+
+  // УДАЛИТЬ СТУДЕНТА
+  @Delete(':id')
+  @ApiOperation({ summary: 'Удаление студента' })
+  @ApiResponse({ status: 200, description: 'Студент успешно удален' })
+  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async delStud(@Param('id') id: string) {
+    return this.studentsService.deleteStud(+id)
   }
 
   // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
