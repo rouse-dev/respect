@@ -40,3 +40,6 @@ body {
 .progressClassName{
     background-color: var(--respect-purple-deep);
 }
+input {
+  outline:none;
+}

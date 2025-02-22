@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AvatarContainer from "./AvatarContainer";
 import { IoMdExit } from "react-icons/io";
 import { ImUndo2 } from "react-icons/im";
@@ -53,7 +53,7 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                         toast.error('Изменения отсутствуют!');
                     } else {
                         avatar && ChangeTeacherAvatar(AvatarForm).then(_ => {
-                            useUserStore.CheckAuth();
+                            useUserStore.CheckAuth();    
                         });
                         (Object.keys(Changed).length > 0) && ChangeTeacherInfo(Changed).then(_ => {
                             useUserStore.CheckAuth();

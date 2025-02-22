@@ -1,3 +1,4 @@
+import EditPanel from "../components/Edit/edit_panel";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Profile from "../pages/Profile";
@@ -27,4 +28,9 @@ export const AuthRoutes: RouteInterface[] = [
     path: "/profile",
     component: Profile,
   },
+  {
+    name: 'Панель управления',
+    path: "/edit",
+    component: EditPanel
+  }
 ];

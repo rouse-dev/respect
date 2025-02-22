@@ -17,7 +17,6 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
     async function getAllLessons() {
       try {
         const response = await getLessons();
-
         setAllSubjects(response);
       } catch (error) {
         console.error(error);

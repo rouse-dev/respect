@@ -131,6 +131,7 @@ export class TeachersService {
   // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
   async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
     try {
+      dto.password = dto.password && await bcrypt.hash(dto.password, 10)
       const updatedTeacher = await this.prisma.teacher.update({
         where: { id: teacherId },
         data: dto,
