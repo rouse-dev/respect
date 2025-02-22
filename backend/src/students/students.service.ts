@@ -16,6 +16,9 @@ export class StudentsService {
   // СОЗДАНИЕ СТУДЕНТА
   async create(createStudentDto: CreateStudentDto) {
     try {
+      if(createStudentDto.name.trim() === "" || createStudentDto.groupsId === null) {
+        throw new InternalServerErrorException('Заполните все строки!')
+      }
       return this.prisma.student.create({
         data: createStudentDto,
         include: {

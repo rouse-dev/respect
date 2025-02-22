@@ -1,17 +1,49 @@
 import { FaEdit, FaRegPlusSquare, FaTrashAlt } from "react-icons/fa";
-import { useAppContext } from "../../store/AppContext";
-import { useState } from "react";
+import { Group, useAppContext } from "../../store/AppContext";
+import { useEffect, useState } from "react";
 import GroupPopup from "../common/popups/addPopups/add_group";
+import { GetAllGroups } from "../../service/server";
+import Preloader from "../common/preloader/preloader";
 
 interface EditGroupsInterface {
   isOpen: boolean;
 }
 
 const EditGroups = ({ isOpen }: EditGroupsInterface) => {
-  const { groups,setPopupActive } = useAppContext();
+  const { groups,setPopupActive,setGroups } = useAppContext();
   const [search,setSearch] = useState('');
   const [isGroupPopup, setIsGroupPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [sortedGroups, setSortedGroups] = useState<Group[]>([...groups])
+
+  useEffect(() => {
+       try {
+         setLoading(true);
+         GetAllGroups().then((response) => {
+          setGroups(response.data);
+          setSortedGroups(response.data);
+         });
+       } catch (error) {
+         console.error(error);
+       } finally {
+         setLoading(false);
+       }
+     }, []);
+   
+     useEffect(() => {
+       search.length > 0
+         ? setSortedGroups(
+             [...groups].filter((group: Group) =>
+               group.name.toLowerCase().includes(search.toLowerCase())
+             )
+           )
+         : setSortedGroups([...groups]);
+     }, [search]);
+  
+  
   return (
+    <>
+    {loading && <Preloader />}
     <div
       className={`${
         isOpen ? "max-w-full px-3 sm:px-5" : "max-w-0 max-h-0"
@@ -34,12 +66,12 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
         <p className="hidden sm:block">Создать</p>
         <FaRegPlusSquare />
       </button>
-      {groups.map((group) => (
+      {sortedGroups.map((group) => (
         <div
         key={group.id}
           className={`${
             isOpen ? "scale-y-100" : "scale-y-0"
-          } transition-transform flex flex-col md:flex-row justify-between items-center gap-3 p-3 shadow-[inset_0px_0px_24px_var(--respect-purple-dark)] rounded-md text-xl`}
+          } transition-transform flex flex-col md:flex-row justify-between items-center gap-3 p-3 bg-[--respect-purple] rounded-md text-xl`}
         >
           <p className="py-2 sm:py-0">{group.name}</p>
           <div className="w-full md:w-fit flex flex-row gap-3">
@@ -60,6 +92,8 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
       }}
     />
     </div>
+    </>
+    
   );
 };
 

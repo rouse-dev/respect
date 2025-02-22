@@ -161,8 +161,10 @@ export const addLesson = async (name: string) => {
     const response = await client.post(`/api/lessons`, {
       name,
     });
+    toast.success('Предмет добавлен')
     return response.data;
   } catch (error) {
+    toast.error('Ошибка')
     return {
       error: error instanceof Error ? error.message : "Произшла ошибка",
     };

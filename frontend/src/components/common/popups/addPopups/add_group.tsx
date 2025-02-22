@@ -18,7 +18,6 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!groupName.trim()) return;
 
     try {
       setLoading(true);
@@ -54,7 +53,7 @@ const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
             type="text"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            required
+            
           />
           <button 
             type="submit"

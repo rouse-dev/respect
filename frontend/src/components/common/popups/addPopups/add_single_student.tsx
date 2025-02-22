@@ -43,10 +43,6 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
       setError("Выберите группу");
       return;
     }
-    if (!studentName.trim()) {
-      setError("Введите ФИО студента");
-      return;
-    }
     setIsLoading(true);
     setError(null);
 

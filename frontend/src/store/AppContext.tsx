@@ -13,6 +13,10 @@ export interface Group {
   name: string;
   students: Student[];
 }
+export interface LessonInterface{
+  id: number;
+  name: string;
+}
 
 export interface Subject {
   id: number,
@@ -53,6 +57,8 @@ interface AppContextType {
   setExportGroup: (group: Group | null) => void;
   selectedGroup: Group | null,
   setSelectedGroup: (data: Group | null) => void;
+  lessons: LessonInterface[] | [],
+  setLessons: (lesson: LessonInterface[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -61,6 +67,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
   const [search, setSearch] = useState("");
+  const [lessons,setLessons] = useState<LessonInterface[]>([])
   const [sortDirection, setSortDirection] = useState(true);
   const [currentSortMethod, setCurrentSortMethod] = useState("По фамилии");
   const [sortMethods] = useState(["По фамилии", "По группе", "По рейтингу"]);
@@ -74,6 +81,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AppContext.Provider
       value={{
+        lessons,
+        setLessons,
         currentGroup,
         setCurrentGroup,
         groups,

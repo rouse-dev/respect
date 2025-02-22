@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { addLesson } from "../../../../service/server";
-import { toast } from "react-toastify";
+import { LessonInterface, useAppContext } from "../../../../store/AppContext";
 
 interface AddLessonPopup{
     onClose:()=>void;
@@ -10,11 +10,14 @@ interface AddLessonPopup{
 const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
   const [loading, setLoading] = useState(false);
   const [newLesson, setLesson] = useState('');
+  const {lessons, setLessons} = useAppContext();
 
   const addLessonFunc = async () => {
     try {
       setLoading(true);
-      await addLesson(newLesson)
+      addLesson(newLesson).then((response: LessonInterface) => {
+        setLessons([...lessons, response]);
+      })
     } catch (error) {
       console.error(error)
     } finally {
@@ -24,20 +27,20 @@ const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
 
   const sender = () => {
     try {
-      toast.success('Предмет '+newLesson+' добавлен')
       addLessonFunc();
-      onClose();
+      (newLesson.length > 0) && onClose();
     } catch (error) {
       console.error(error)
     }
   }
   
     if(!isOpen) return null
+
     return(
         <>
          <div className="flex  flex-col justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur">
         <form
-          action=""
+          onSubmit={e => e.preventDefault()}
           className="w-[300px] h-[180px] bg-[--respect-purple-deep] flex flex-col items-center justify-center p-5 rounded-lg gap-3"
         >
           <input

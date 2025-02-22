@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
@@ -9,6 +9,9 @@ export class LessonsService {
 
   // СОЗДАНИЕ НОВОГО ПРЕДМЕТА
   async create(createLessonDto: CreateLessonDto) {
+    if(createLessonDto.name.trim() === "") {
+      throw new InternalServerErrorException('Пустое поле предмета!');
+    }
     return this.prisma.lessons.create({
       data: createLessonDto,
     });
