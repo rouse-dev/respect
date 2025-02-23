@@ -5,6 +5,7 @@ import StudentPopup from "./add_students";
 import { useAppContext } from "../../../../store/AppContext";
 import SingleStudentPopup from "./add_single_student";
 
+// Не используется на сайте
 const Add = () => {
   const [isGroupPopup, setIsGroupPopup] = useState(false);
   const [isLessonPopup, setIsLessonPopup] = useState(false);

@@ -78,9 +78,11 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
       if (result.succes) {
         toast.info("Долг списан");
         onClose();
-      } else {
-        toast.error("Не хватает репутации!")
-      }
+      } else if(currentSubject.id === 0){
+        toast.error("Выберите предмет")
+      } else(
+        toast.error("Не хватает репутации")
+      )
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);
     } finally {

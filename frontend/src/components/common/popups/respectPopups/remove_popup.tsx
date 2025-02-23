@@ -65,7 +65,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
         toast.success("Репутация снижена на " + amount);
         onClose();
       } else {
-        toast.error(result.error);
+        toast.error('Выберите предмет');
       }
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);

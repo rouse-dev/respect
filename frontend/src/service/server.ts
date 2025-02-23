@@ -13,6 +13,20 @@ interface TeacherChangeData {
   password?: string,
 }
 
+interface UpdateGroup{
+  id:number;
+  name:string;
+}
+
+interface UpdateStudent{
+  id:number;
+  name:string;
+}
+interface UpdateLesson{
+  id:number;
+  name:string;
+}
+
 interface ChangeRespectData {
   studentId: number;
   date?: string;
@@ -174,6 +188,69 @@ export const addLesson = async (name: string) => {
 export const exportHistoryExcel = async (studentId: number) => {
   try {
     const response = await client.get(`/api/students/${studentId}/history/excel`, { responseType: 'blob' })
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+export const deleteLesson = async (lessonId: number) => {
+  try {
+    const response = await client.delete(`/api/lessons/${lessonId}`)
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+export const deleteStudent = async (studentId: number) => {
+  try {
+    const response = await client.delete(`/api/students/${studentId}`)
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+export const deleteGroup = async (groupId: number) => {
+  try {
+    const response = await client.delete(`/api/groups/${groupId}`)
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+
+
+export const updateLesson = async (lesson: UpdateLesson) => {
+  try {
+    const response = await client.patch(`/api/lessons/${lesson.id}`,lesson)
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+
+export const updateStudent = async (student: UpdateStudent) => {
+  try {
+    const response = await client.patch(`/api/students/${student.id}`,student)
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+}
+export const updateGroup = async (group: UpdateGroup) => {
+  try {
+    const response = await client.patch(`/api/groups/${group.id}`, group)
     return response.data;
   } catch (error) {
     return {

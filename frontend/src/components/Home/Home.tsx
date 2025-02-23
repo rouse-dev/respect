@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Add from "../common/popups/addPopups/add_selector";
 import Group from "../Group/group";
 import { LiaListSolid } from "react-icons/lia";
 
@@ -18,7 +17,7 @@ const Home = ({ useUserStore }: HomeInterface) => {
   return (
       <div className="flex flex-col sm:flex-row gap-5 justify-between mb-6 sm:mb-12">
       <div className="flex justify-center items-center gap-3 order-2 sm:order-1">
-        {/* <Add /> */}
+        
         <Group />
         <Link to='/edit' className="order-2 flex gap-2 border-1 items-center bg-[--respect-purple-deep] px-3 rounded-lg py-[10px]"><LiaListSolid className="text-2xl" /></Link>
       </div>

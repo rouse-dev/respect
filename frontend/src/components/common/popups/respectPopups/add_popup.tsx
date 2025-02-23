@@ -60,7 +60,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
         toast.success("Репутация прибавлена на " + amount);
         onClose();
       } else {
-        toast.error(result.error);
+        toast.error('Выберите предмет');
       }
     } catch (error) {
       console.error("Ошибка при изменении репутации:", error);
