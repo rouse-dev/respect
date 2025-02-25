@@ -89,7 +89,7 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
           )
         )
       : setSortedStudents([...students]);
-  }, [search]);
+  }, [students, search]);
 
   useEffect(() => {
     try {
@@ -103,7 +103,7 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
     } finally {
       setLoading(false);
     }
-  }, [students, groups]);
+  }, [groups]);
 
   return (
     <>

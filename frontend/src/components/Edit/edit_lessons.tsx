@@ -71,21 +71,8 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
           )
         )
       : setSortedLessons([...lessons]);
-  }, [search]);
+  }, [search, lessons]);
 
-  useEffect(() => {
-    try {
-      setLoading(true);
-      getLessons().then((response) => {
-        setLessons(response);
-        setSortedLessons(response);
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [lessons]);
   return (
     <>
       {loading && <Preloader />}

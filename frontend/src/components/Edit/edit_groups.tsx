@@ -17,7 +17,7 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
   const [search, setSearch] = useState("");
   const [isGroupPopup, setIsGroupPopup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sortedGroups, setSortedGroups] = useState<Group[] | []>([...groups]);
+  const [sortedGroups, setSortedGroups] = useState<Group[]>([...groups]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
 
@@ -35,8 +35,12 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
   };
 
   const HandleDelete = async (groupId: number) => {
-      await deleteGroup(groupId);
-      setSortedGroups((prevSortedGroups) => prevSortedGroups.filter((group) => group.id !== groupId));
+      await deleteGroup(groupId).then(_ => {
+        GetAllGroups().then((response) => {
+          setGroups(response.data);
+          setSortedGroups(response.data.filter((group: Group) => group.id !== groupId));
+        });
+      });
   };
 
   useEffect(() => {
@@ -54,28 +58,13 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
   }, []);
 
   useEffect(() => {
-    search.length > 0
-      ? setSortedGroups(
-          [...groups].filter((group: Group) =>
-            group.name.toLowerCase().includes(search.toLowerCase())
-          )
-        )
-      : setSortedGroups([...groups]);
-  }, [search]);
-
-  useEffect(() => {
-    try {
-      setLoading(true);
-      GetAllGroups().then((response) => {
-        setGroups(response.data);
-        setSortedGroups(response.data);
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [groups]);
+    if (search.length > 0) {
+      setSortedGroups([...groups].filter((group: Group) =>
+        group.name.toLowerCase().includes(search.toLowerCase())))
+    } else {
+      setSortedGroups([...groups]);
+    } 
+  }, [search, groups]);
 
   return (
     <>
@@ -106,7 +95,7 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
           <FaRegPlusSquare />
         </button>
 
-        {sortedGroups.map((group) => (
+        {sortedGroups.map(group => (
           <div
             key={group.id}
             className={`${
