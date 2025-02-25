@@ -4,55 +4,67 @@ import {
   FaTrashAlt,
   FaUserPlus,
   FaSave,
+  FaAngleDown,
+  FaAngleUp,
 } from "react-icons/fa";
-import { Student, useAppContext } from "../../store/AppContext";
+import { Group, Student, useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import StudentPopup from "../common/popups/addPopups/add_students";
 import SingleStudentPopup from "../common/popups/addPopups/add_single_student";
-import { deleteStudent, GetAllStudents, updateStudent } from "../../service/server";
+import {
+  deleteStudent,
+  GetAllStudents,
+  updateStudent,
+} from "../../service/server";
 import Preloader from "../common/preloader/preloader";
-import { toast } from "react-toastify";
+import { TbCancel } from "react-icons/tb";
 
 interface EditStudentsInterface {
   isOpen: boolean;
 }
 
 const EditStudents = ({ isOpen }: EditStudentsInterface) => {
-  const { students, setPopupActive, setStudents } = useAppContext();
+  const { students, setPopupActive, setStudents, groups } = useAppContext();
   const [search, setSearch] = useState("");
   const [isStudentPopup, setIsStudentPopup] = useState(false);
   const [isSingleStudentPopup, setIsSingleStudentPopup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sortedStudents, setSortedStudents] = useState<Student[]>([...students]);
+  const [sortedStudents, setSortedStudents] = useState<Student[] | []>([...students]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
+  const [dropdown, setDropdown] = useState(false);
+  const [studentGroup, setStudentGroup] = useState<Group | null>();
 
-  const handleEdit = (id: number, currentName: string) => {
+  const handleEdit = (id: number, name: string, group: Group) => {
     setEditingId(id);
-    setNewName(currentName);
+    setNewName(name);
+    setStudentGroup(group);
   };
 
-  const handleSave = async (id: number) => {
-    try {
-      await updateStudent({ id, name: newName }); // Исправленный вызов
-      setStudents(students.map(student => student.id === id ? { ...student, name: newName } : student));
-      setSortedStudents(sortedStudents.map(student => student.id === id ? { ...student, name: newName } : student));
-      setEditingId(null);
-      toast.success('Имя студента успешно изменено');
-    } catch (error) {
-      toast.error('Произошла ошибка при изменении имени студента');
-    }
+  const handleSave = async (id: number, group: Group) => {
+    await updateStudent({ id, name: newName, groupsId: group.id }).then((res) => {
+      if (!res.error) {
+        setStudents(
+          students.map((student) =>
+            student.id === id ? { ...student, name: newName, groups: group, groupsId: group.id } : student
+          )
+        );
+        setSortedStudents(
+          sortedStudents.map((student) =>
+            student.id === id ? { ...student, name: newName, groups: group, groupsId: group.id } : student
+          )
+        );
+        setEditingId(null);
+      }
+    });
   };
 
   const HandleDelete = async (studentId: number) => {
-    try {
-      await deleteStudent(studentId);
-      setSortedStudents((prevSortedStudent) => prevSortedStudent.filter((student) => student.id !== studentId));
-      toast.success('Студент успешно удалён');
-    } catch (error) {
-      toast.error('Произошла ошибка');
-    }
+    await deleteStudent(studentId);
+    setSortedStudents((prevSortedStudent) =>
+      prevSortedStudent.filter((student) => student.id !== studentId)
+    );
   };
 
   useEffect(() => {
@@ -79,6 +91,20 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
       : setSortedStudents([...students]);
   }, [search]);
 
+  useEffect(() => {
+    try {
+      setLoading(true);
+      GetAllStudents().then((response) => {
+        setStudents(response.data);
+        setSortedStudents(response.data);
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [students, groups]);
+
   return (
     <>
       {loading && <Preloader />}
@@ -100,8 +126,8 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
         <div className="flex gap-3">
           <button
             onClick={() => {
-              setIsSingleStudentPopup(true);
               setPopupActive(true);
+              setIsSingleStudentPopup(true);
             }}
             className="flex flex-row justify-center items-center w-full gap-3 p-3 bg-[--respect-purple-dark] rounded-md transition-shadow hover:shadow-[0px_0px_5px_var(--respect-purple-light)]"
           >
@@ -110,10 +136,7 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
             <FaRegPlusSquare className="hidden sm:block" />
           </button>
           <button
-            onClick={() => {
-              setIsStudentPopup(true);
-              setPopupActive(true);
-            }}
+            onClick={() => setIsStudentPopup(true)}
             className="flex flex-row justify-center items-center w-full gap-3 p-3 bg-[--respect-purple-dark] rounded-md transition-shadow hover:shadow-[0px_0px_5px_var(--respect-purple-light)]"
           >
             <p className="hidden sm:block">Добавить нескольких</p>
@@ -127,7 +150,10 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
             key={index}
             className={`${
               isOpen ? "scale-y-100" : "scale-y-0"
-            } transition-transform flex flex-col md:flex-row items-center gap-3 md:gap-5 p-3 md:p-5 bg-[--respect-purple] rounded-md text-xl`}
+            } ${
+              editingId === student.id ? 'z-10' : 'z-0'
+            }
+            transition-transform flex flex-col md:flex-row items-center gap-3 md:gap-5 p-3 md:p-5 bg-[--respect-purple] rounded-md text-xl`}
           >
             {editingId === student.id ? (
               <input
@@ -141,23 +167,50 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
                 {student.name}
               </p>
             )}
-            <p className="w-full md:w-1/6 order-1 md:order-2 -mb-2 md:mb-0 text-sm md:text-xl text-center md:text-left">
+            {editingId === student.id ? <div className="z-10 order-1 md:order-2 relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-3 py-1 rounded-b-md rounded-t-md gap-3 bg-[--respect-purple-add-inputs]" onClick={e => {
+                const dropdown = e.currentTarget;
+                dropdown.classList.toggle('rounded-t-md');
+    
+                setDropdown(dropdown.querySelector("div")!.classList.contains("hidden"));
+                dropdown.querySelector('div')!.classList.contains('hidden')?
+                dropdown.querySelector('div')!.classList.replace('hidden', 'flex'):
+                dropdown.querySelector('div')!.classList.replace('flex', 'hidden');
+              }}>
+                <div className="hidden z-20 flex-col absolute left-0 bottom-full w-full max-h-64 overflow-y-scroll overflow-x-hidden rounded-t-md border-[6px] border-b-0 border-[--respect-purple-add-inputs] bg-[--respect-purple]">
+                    {groups.map((el, i) => 
+                        <button type="button" className="px-3 py-2 text-left hover:backdrop-brightness-110 last:rounded-b-sm" key={i} onClick={_ => {
+                          setStudentGroup(el);
+                        }}>{el.name}</button>
+                    )}
+                </div>
+                <p className="flex mr-auto">{studentGroup!.name}</p>
+                {dropdown ? <FaAngleDown /> : <FaAngleUp />}
+              </div> : <p className="w-full md:w-1/6 order-1 md:order-2 -mb-2 md:mb-0 text-sm md:text-xl text-center md:text-left">
               {student.groups.name}
-            </p>
+            </p>}
             <p className="w-full md:w-1/6 order-3 py-3 md:py-0 md:mr-auto text-center md:text-left">
               {student.reputation}
             </p>
             <div className="order-4 w-full md:w-fit flex flex-row justify-self-end gap-3 sm:gap-5">
               {editingId === student.id ? (
-                <button
-                  onClick={() => handleSave(student.id)}
-                  className="w-full md:w-fit p-3 rounded-md bg-green-500 hover:bg-green-600"
-                >
-                  <FaSave className="mx-auto" />
-                </button>
+                ((student.name === newName) && (student.groups.name === studentGroup!.name)) ? (
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="w-full md:w-fit p-3 rounded-md bg-amber-600 hover:bg-amber-500"
+                  >
+                    <TbCancel className="mx-auto text-xl" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleSave(student.id, studentGroup!)}
+                    className="w-full md:w-fit p-3 rounded-md bg-green-500 hover:bg-green-600"
+                  >
+                    <FaSave className="mx-auto" />
+                  </button>
+                )
               ) : (
                 <button
-                  onClick={() => handleEdit(student.id, student.name)}
+                  onClick={() => handleEdit(student.id, student.name, student.groups)}
                   className="w-full md:w-fit p-3 rounded-md bg-amber-600 hover:bg-amber-500"
                 >
                   <FaEdit className="mx-auto" />
@@ -174,17 +227,11 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
         ))}
         <StudentPopup
           isOpen={isStudentPopup}
-          onClose={() => {
-            setIsStudentPopup(false);
-            setPopupActive(false);
-          }}
+          onClose={() => setIsStudentPopup(false)}
         />
         <SingleStudentPopup
           isOpen={isSingleStudentPopup}
-          onClose={() => {
-            setIsSingleStudentPopup(false);
-            setPopupActive(false);
-          }}
+          onClose={() => setIsSingleStudentPopup(false)}
         />
       </div>
     </>

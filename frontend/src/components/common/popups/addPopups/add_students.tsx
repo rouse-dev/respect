@@ -23,7 +23,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [data, setData] = useState<StudentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { students, setStudents, selectedGroup, setSelectedGroup, exportGroup, setExportGroup } = useAppContext();
+  const {setPopupActive, students, setStudents, selectedGroup, setSelectedGroup, exportGroup, setExportGroup} = useAppContext();
   const [dropdown, setDropdown] = useState(false);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
       setIsLoading(false);
     };
     isOpen ? fetchGroups() : setExportGroup(null);
+    setPopupActive(isOpen);
   }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {

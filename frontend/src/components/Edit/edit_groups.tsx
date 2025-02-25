@@ -5,6 +5,8 @@ import GroupPopup from "../common/popups/addPopups/add_group";
 import { deleteGroup, GetAllGroups, updateGroup } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
+import { TbCancel } from "react-icons/tb";
+
 
 interface EditGroupsInterface {
   isOpen: boolean;
@@ -15,7 +17,7 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
   const [search, setSearch] = useState("");
   const [isGroupPopup, setIsGroupPopup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sortedGroups, setSortedGroups] = useState<Group[]>([...groups]);
+  const [sortedGroups, setSortedGroups] = useState<Group[] | []>([...groups]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
 
@@ -24,26 +26,17 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
     setNewName(currentName);
   };
 
-  const handleSave = async (id: number) => {
-    try {
+  const handleSave = async (id: number,name: string) => {
+    if(newName === name) return toast.error('Имена совпадают!');
       await updateGroup({ id, name: newName }); 
       setGroups(groups.map(group => group.id === id ? { ...group, name: newName } : group));
       setSortedGroups(sortedGroups.map(group => group.id === id ? { ...group, name: newName } : group));
       setEditingId(null);
-      toast.success('Название группы успешно изменено');
-    } catch (error) {
-      toast.error('Произошла ошибка при изменении названия группы');
-    }
   };
 
   const HandleDelete = async (groupId: number) => {
-    try {
       await deleteGroup(groupId);
       setSortedGroups((prevSortedGroups) => prevSortedGroups.filter((group) => group.id !== groupId));
-      toast.success('Группа успешно удалена');
-    } catch (error) {
-      toast.error('Произошла ошибка');
-    }
   };
 
   useEffect(() => {
@@ -69,6 +62,20 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
         )
       : setSortedGroups([...groups]);
   }, [search]);
+
+  useEffect(() => {
+    try {
+      setLoading(true);
+      GetAllGroups().then((response) => {
+        setGroups(response.data);
+        setSortedGroups(response.data);
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [groups]);
 
   return (
     <>
@@ -118,12 +125,18 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
             )}
             <div className="w-full md:w-fit flex flex-row gap-3">
               {editingId === group.id ? (
-                <button
-                  onClick={() => handleSave(group.id)}
+                (group.name === newName ? <button
+                  onClick={() => setEditingId(null)}
+                  className="w-full md:w-fit p-3 rounded-md bg-amber-600 hover:bg-amber-500"
+                >
+                  <TbCancel className="mx-auto text-xl" />
+                </button> : <button
+                  onClick={() => handleSave(group.id,group.name)}
                   className="w-full md:w-fit p-3 rounded-md bg-green-500 hover:bg-green-600"
                 >
                   <FaSave className="mx-auto" />
-                </button>
+                </button>)
+                
               ) : (
                 <button
                   onClick={() => handleEdit(group.id, group.name)}

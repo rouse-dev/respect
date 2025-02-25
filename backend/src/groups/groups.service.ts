@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -50,6 +50,9 @@ export class GroupsService {
   // ОБНОВИТЬ ГРУППУ ПО АЙДИ
   async updateGroup(id: number, dto: UpdateGroupDto) {
     try {
+      if(dto.name.trim() === "") {
+        throw new NotFoundException("Поле пустое")
+      }
       return this.prisma.groups.update({
         where: { id },
         data: {

@@ -15,7 +15,7 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
   const [studentName, setStudentName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { students, setStudents, selectedGroup, setSelectedGroup } = useAppContext();
+  const { students, setStudents, selectedGroup, setSelectedGroup, setPopupActive } = useAppContext();
   const [dropdown, setDropdown] = useState(false);
  
   useEffect(() => {
@@ -29,9 +29,8 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
       }
       setIsLoading(false);
     };
-    if (isOpen) {
-      fetchGroups();
-    }
+    isOpen &&fetchGroups();
+    setPopupActive(isOpen);
   }, [isOpen]);
   const handleGroupSelect = (group: Group) => {
     setSelectedGroup(group);

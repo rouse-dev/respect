@@ -5,6 +5,7 @@ import { LessonInterface, useAppContext } from "../../store/AppContext";
 import LessonPopup from "../common/popups/addPopups/add_lesson";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
+import { TbCancel } from "react-icons/tb";
 
 interface EditLessonsInterface {
   isOpen: boolean;
@@ -15,7 +16,7 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
 
   const [search, setSearch] = useState("");
   const [isLessonPopup, setIsLessonPopup] = useState(false);
-  const [sortedLessons, setSortedLessons] = useState<LessonInterface[]>([...lessons]);
+  const [sortedLessons, setSortedLessons] = useState<LessonInterface[] | []>([...lessons]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
@@ -25,26 +26,27 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
     setNewName(currentName);
   };
 
-  const handleSave = async (id: number) => {
-    try {
-      await updateLesson({ id, name: newName }); 
-      setLessons(lessons.map(lesson => lesson.id === id ? { ...lesson, name: newName } : lesson));
-      setSortedLessons(sortedLessons.map(lesson => lesson.id === id ? { ...lesson, name: newName } : lesson));
-      setEditingId(null);
-      toast.success('Название группы успешно изменено');
-    } catch (error) {
-      toast.error('Произошла ошибка при изменении названия группы');
-    }
+  const handleSave = async (id: number, name: string) => {
+    if (newName === name) return toast.error("Имена совпадают!");
+    await updateLesson({ id, name: newName });
+    setLessons(
+      lessons.map((lesson) =>
+        lesson.id === id ? { ...lesson, name: newName } : lesson
+      )
+    );
+    setSortedLessons(
+      sortedLessons.map((lesson) =>
+        lesson.id === id ? { ...lesson, name: newName } : lesson
+      )
+    );
+    setEditingId(null);
   };
 
   const HandleDelete = async (lessonId: number) => {
-    try {
-      await deleteLesson(lessonId);
-      setSortedLessons((prevSortedLessons) => prevSortedLessons.filter((lesson) => lesson.id !== lessonId));
-      toast.success('Предмет успешно удален');
-    } catch (error) {
-      toast.error('Произошла ошибка');
-    }
+    await deleteLesson(lessonId);
+    setSortedLessons((prevSortedLessons) =>
+      prevSortedLessons.filter((lesson) => lesson.id !== lessonId)
+    );
   };
 
   useEffect(() => {
@@ -70,6 +72,20 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
         )
       : setSortedLessons([...lessons]);
   }, [search]);
+
+  useEffect(() => {
+    try {
+      setLoading(true);
+      getLessons().then((response) => {
+        setLessons(response);
+        setSortedLessons(response);
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [lessons]);
   return (
     <>
       {loading && <Preloader />}
@@ -118,12 +134,21 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
             )}
             <div className="w-full md:w-fit flex flex-row gap-3">
               {editingId === subject.id ? (
-                <button
-                  onClick={() => handleSave(subject.id)}
-                  className="w-full md:w-fit p-3 rounded-md bg-green-500 hover:bg-green-600"
-                >
-                  <FaSave className="mx-auto" />
-                </button>
+                subject.name === newName ? (
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="w-full md:w-fit p-3 rounded-md bg-amber-600 hover:bg-amber-500"
+                  >
+                    <TbCancel className="mx-auto text-xl" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleSave(subject.id, subject.name)}
+                    className="w-full md:w-fit p-3 rounded-md bg-green-500 hover:bg-green-600"
+                  >
+                    <FaSave className="mx-auto" />
+                  </button>
+                )
               ) : (
                 <button
                   onClick={() => handleEdit(subject.id, subject.name)}

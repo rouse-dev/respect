@@ -40,7 +40,7 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" defaultValue={useUserStore.email} required onChange={e => setChanges(prev => ({...prev, email: e.target.value}))} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Пароль" type="password" required onChange={e => setChanges(prev => ({...prev, password: e.target.value}))} />
 
-                <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg" onClick={_ => {
+                <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg transition-colors disabled:text-gray-400" disabled={(changes.name === useUserStore.name) && (changes.email === useUserStore.email) && (changes.password === useUserStore.password)} onClick={_ => {
                     const AvatarForm = new FormData();
                     avatar && AvatarForm.append('avatar', avatar);
 
@@ -48,7 +48,6 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                     (changes.name != useUserStore.name && changes.name.length > 0) && Object.assign(Changed, {name: changes.name});
                     (changes.email != useUserStore.email && changes.email.length > 0) && Object.assign(Changed, {email: changes.email});
                     (changes.password != useUserStore.password && changes.password.length > 0) && Object.assign(Changed, {password: changes.password});
-
                     if (!avatar && Object.keys(Changed).length === 0) {
                         toast.error('Изменения отсутствуют!');
                     } else {

@@ -25,8 +25,8 @@ export class LessonsService {
   // ОБНОВЛЕНИЕ ПРЕДМЕТА
   async update(id: number, updateLessonDto: UpdateLessonDto) {
     const lesson = await this.prisma.lessons.findUnique({ where: { id } });
-    if (!lesson) {
-      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    if (!lesson || updateLessonDto.name.trim() === "") {
+      throw new NotFoundException(`Lesson with ID ${id} or lesson name not found`);
     }
     return this.prisma.lessons.update({
       where: { id },

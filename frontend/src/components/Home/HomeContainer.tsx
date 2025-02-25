@@ -1,12 +1,13 @@
 import { useEffect } from "react";
-import { useAppContext } from "../../store/AppContext";
 import Home from "./Home";
 import useUserStore from "../../store/userStore";
+import { useAppContext } from "../../store/AppContext";
 
 const HomeContainer = () => {
   const { popupActive } = useAppContext();
   useEffect(() => {
-    document.body.style.overflow = popupActive ? "hidden" : "";
+    console.log(popupActive)
+    document.body.style.setProperty('overflow', popupActive ? "hidden" : "");
   }, [popupActive]);
 
   return (

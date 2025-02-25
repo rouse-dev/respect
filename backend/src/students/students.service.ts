@@ -16,8 +16,11 @@ export class StudentsService {
   // СОЗДАНИЕ СТУДЕНТА
   async create(createStudentDto: CreateStudentDto) {
     try {
-      if(createStudentDto.name.trim() === "" || createStudentDto.groupsId === null) {
-        throw new InternalServerErrorException('Заполните все строки!')
+      if (
+        createStudentDto.name.trim() === '' ||
+        createStudentDto.groupsId === null
+      ) {
+        throw new InternalServerErrorException('Заполните все строки!');
       }
       return this.prisma.student.create({
         data: createStudentDto,
@@ -36,14 +39,16 @@ export class StudentsService {
   ): Promise<StudentResponseDto[]> {
     try {
       const createdStudents = await Promise.all(
-        students.map((student) =>
-          this.prisma.student.create({
-            data: student,
-            include: {
-              groups: true, // Включаем данные о группе
-            },
-          }),
-        ),
+        students.map((student) => {
+          if (student.name.trim() !== '' && student.groupsId) {
+            return this.prisma.student.create({
+              data: student,
+              include: {
+                groups: true, // Включаем данные о группе
+              },
+            });
+          }
+        }),
       );
       return createdStudents;
     } catch (error) {
@@ -90,7 +95,7 @@ export class StudentsService {
         reason: record.reason,
         createdAt: record.createdAt,
         lesson: record.lesson ? record.lesson.name : null,
-        class: record.class ? record.class : "",
+        class: record.class ? record.class : '',
       }));
 
       return formattedHistory;
@@ -107,18 +112,26 @@ export class StudentsService {
   ): Promise<ExcelJS.Buffer> {
     try {
       const history = await this.getReputationHistory(studentId);
-      const studentName = await this.prisma.student.findUnique({ where: { id: +studentId } });
+      const studentName = await this.prisma.student.findUnique({
+        where: { id: +studentId },
+      });
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('История репутации');
-  
+
       worksheet.addRow([studentName.name]);
       worksheet.mergeCells('A1:E1');
-  
+
       const mergedCell = worksheet.getCell('A1');
       mergedCell.font = { bold: true, size: 14 };
       mergedCell.alignment = { horizontal: 'center' };
 
-      worksheet.addRow(['Предмет', 'Пара', 'Изменение репутации', 'Дата изменения', 'Причина' ]);
+      worksheet.addRow([
+        'Предмет',
+        'Пара',
+        'Изменение репутации',
+        'Дата изменения',
+        'Причина',
+      ]);
       worksheet.columns = [
         { key: 'lesson', width: 20 },
         { key: 'class', width: 20 },
@@ -127,19 +140,20 @@ export class StudentsService {
         { key: 'reason', width: 30 },
       ];
       history.forEach((record) => {
-        const createdAt = typeof record.createdAt === 'string' 
-          ? new Date(record.createdAt) 
-          : record.createdAt;
-  
+        const createdAt =
+          typeof record.createdAt === 'string'
+            ? new Date(record.createdAt)
+            : record.createdAt;
+
         worksheet.addRow({
           change: record.change ?? '',
           reason: record.reason ?? '',
           createdAt: createdAt ? createdAt.toLocaleString() : '',
           lesson: record.lesson ?? '',
-          class: record.class ?? ''
+          class: record.class ?? '',
         });
       });
-  
+
       return await workbook.xlsx.writeBuffer();
     } catch (error) {
       console.error('Ошибка при создании Excel-файла:', error);
@@ -153,6 +167,9 @@ export class StudentsService {
   // ИЗМЕНИТЬ ДАННЫЕ СТУДЕНТА
   async changeStud(id: number, dto: UpdateStudentDto) {
     try {
+      if(dto.name.trim() === "") {
+        throw new NotFoundException("Строка пуста")
+      }
       const updatedStud = await this.prisma.student.update({
         where: { id },
         data: dto,
@@ -167,11 +184,11 @@ export class StudentsService {
   async deleteStud(id: number) {
     try {
       const deletedStud = await this.prisma.student.delete({
-        where: { id }
-      })
-      return deletedStud
+        where: { id },
+      });
+      return deletedStud;
     } catch (error) {
-      throw new InternalServerErrorException('Ошибка при удалении студента')
+      throw new InternalServerErrorException('Ошибка при удалении студента');
     }
   }
 
@@ -184,24 +201,24 @@ export class StudentsService {
     isPunish?: boolean,
     newLesson?: string,
     correctDate?: string,
-    correctClass?: number
+    correctClass?: number,
   ) {
     try {
       // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
       const student = await this.prisma.student.findUnique({
         where: { id: studentId },
       });
-  
+
       if (!student) {
         throw new NotFoundException('Студент не найден');
       }
-  
+
       // ЕСЛИ ПЕРЕДАН lessonId, ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ ПРЕДМЕТ
       if (lessonId !== -1) {
         const lesson = await this.prisma.lessons.findUnique({
           where: { id: lessonId },
         });
-  
+
         if (!lesson) {
           throw new NotFoundException('Предмет не найден');
         }
@@ -209,12 +226,12 @@ export class StudentsService {
         if (!newLesson) {
           throw new BadRequestException('Необходимо указать новый предмет');
         }
-  
+
         // Проверяем, существует ли уже предмет с таким именем
         const existingLesson = await this.prisma.lessons.findFirst({
           where: { name: newLesson },
         });
-  
+
         if (existingLesson) {
           lessonId = existingLesson.id;
         } else {
@@ -226,12 +243,12 @@ export class StudentsService {
           lessonId = newLessonRecord.id;
         }
       }
-  
+
       // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
       if (!isPunish && change < 0 && student.reputation + change < 0) {
         throw new BadRequestException('Не хватает репутации!');
       }
-  
+
       const updatedStudent = await this.prisma.student.update({
         where: { id: studentId },
         data: {
@@ -240,7 +257,7 @@ export class StudentsService {
           },
         },
       });
-  
+
       // ДОБАВЛЯЕМ ЗАПИСЬ В ИСТОРИЮ РЕПУТАЦИЙ
       await this.prisma.historyRep.create({
         data: {
@@ -252,11 +269,13 @@ export class StudentsService {
           createdAt: correctDate ? new Date(correctDate) : new Date(),
         },
       });
-  
+
       return updatedStudent;
     } catch (error) {
       console.error('Ошибка при обновлении репутации:', error);
-      throw new InternalServerErrorException('Произошла ошибка при обновлении репутации');
+      throw new InternalServerErrorException(
+        'Произошла ошибка при обновлении репутации',
+      );
     }
   }
 }
