@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppContext } from "../../store/AppContext";
 
 const SortByTop = () => {
-    const {setSortedStudents, currentGroup, students, search, currentSortMethod, sortDirection} = useAppContext();
-    const [sortTop, setSortTop] = useState(0);
+    const {currentGroup, students, search, currentSortMethod, sortDirection, sortTop, setSortTop, sortedStudents, setSortedStudents} = useAppContext();
 
     useEffect(() => {
         let result = [...students];
@@ -53,7 +52,7 @@ const SortByTop = () => {
             }
             setSortedStudents(result);
         }
-      }, [sortTop, search, students, currentGroup, currentSortMethod, sortDirection]);
+      }, [sortTop, search, students, currentGroup, currentSortMethod, sortDirection, sortedStudents]);
     return (
         <div className="flex flex-row items-center gap-2 bg-[--respect-purple-deep] rounded-md pl-3 pr-2">
             <p className="whitespace-nowrap">Топ - </p>
