@@ -131,7 +131,6 @@ export class TeachersService {
   // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
   async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
     try {
-      console.log(dto)
       if(dto.password && dto.password.length >= 8) {
         dto.password = dto.password && await bcrypt.hash(dto.password, 10)
       } else if(dto.password && dto.password.length >= 8) {

@@ -7,7 +7,6 @@ const SortByParams = () => {
   const {
     currentSortMethod,
     setCurrentSortMethod,
-    sortMethods,
     sortDirection,
     setSortDirection,
     students,
@@ -16,6 +15,7 @@ const SortByParams = () => {
     setSortedStudents,
   } = useAppContext();
 
+  const sortMethods = ["По фамилии", "По группе", "По рейтингу"];
   const [dropdown, setDropdown] = useState(false);
 
   useEffect(() => {

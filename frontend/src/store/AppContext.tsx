@@ -44,7 +44,6 @@ interface AppContextType {
   setSortDirection: (direction: boolean) => void;
   currentSortMethod: string;
   setCurrentSortMethod: (method: string) => void;
-  sortMethods: string[];
   currentStudent: Student | null;
   setCurrentStudent: (student: Student | null) => void;
   students: Student[];
@@ -70,7 +69,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [lessons,setLessons] = useState<LessonInterface[]>([])
   const [sortDirection, setSortDirection] = useState(true);
   const [currentSortMethod, setCurrentSortMethod] = useState("По фамилии");
-  const [sortMethods] = useState(["По фамилии", "По группе", "По рейтингу"]);
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [sortedStudents, setSortedStudents] = useState<Student[]>([]);
@@ -93,7 +91,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setSortDirection,
         currentSortMethod,
         setCurrentSortMethod,
-        sortMethods,
         currentStudent,
         setCurrentStudent,
         students,

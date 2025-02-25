@@ -167,7 +167,7 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
                 {student.name}
               </p>
             )}
-            {editingId === student.id ? <div className="z-10 order-1 md:order-2 relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-3 py-1 rounded-b-md rounded-t-md gap-3 bg-[--respect-purple-add-inputs]" onClick={e => {
+            {editingId === student.id ? <div className="w-full md:w-1/6 z-10 order-1 md:order-2 relative cursor-pointer selection:bg-transparent flex flex-row justify-end items-center px-3 py-1 rounded-b-md rounded-t-md gap-3 bg-[--respect-purple-add-inputs]" onClick={e => {
                 const dropdown = e.currentTarget;
                 dropdown.classList.toggle('rounded-t-md');
     

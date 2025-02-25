@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { AppProvider } from "./store/AppContext";
+import { useAppContext } from "./store/AppContext";
 import { AuthRoutes, GuestRoutes } from "./config/routes";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
@@ -9,13 +9,18 @@ import { useEffect } from "react";
 const App = () => {
   const {auth} = useUserStore();
   const navigate = useNavigate();
-  
+  const { popupActive } = useAppContext();
+
+  useEffect(() => {
+    document.body.style.setProperty('overflow', popupActive ? "hidden" : "");
+  }, [popupActive]);
+
   useEffect(() => {
     !auth && AuthRoutes.find(el => el.path === window.location.pathname) && navigate('/login');
     auth && GuestRoutes.find(el => el.path === window.location.pathname) && navigate('/');
   }, [auth, window.location.pathname]);
   return (
-    <AppProvider>
+    <>
       <Routes>
       {!auth && <Route path="*" element={<Navigate to="/login" replace />} />}
         {auth
@@ -40,7 +45,7 @@ const App = () => {
         toastClassName={"toastClassName"}
         progressClassName={"progressClassName"}
         style={{boxShadow:'0px 0px 20px var(--respect-purple-dark)'}}/>
-    </AppProvider>
+    </>
   );
 };
 
