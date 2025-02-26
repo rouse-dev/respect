@@ -40,7 +40,7 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" defaultValue={useUserStore.email} required onChange={e => setChanges(prev => ({...prev, email: e.target.value}))} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Пароль" type="password" required onChange={e => setChanges(prev => ({...prev, password: e.target.value}))} />
 
-                <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg transition-colors disabled:text-gray-400" disabled={(changes.name === useUserStore.name) && (changes.email === useUserStore.email) && (changes.password === useUserStore.password)} onClick={_ => {
+                <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg transition-colors disabled:text-gray-400" disabled={(changes.name === useUserStore.name) && (changes.email === useUserStore.email) && (changes.password === useUserStore.password) && (avatar === null) } onClick={_ => {
                     const AvatarForm = new FormData();
                     avatar && AvatarForm.append('avatar', avatar);
 

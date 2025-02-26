@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { GetAllGroups, AddStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { Group, StudentData, useAppContext } from "../../../../store/AppContext";
@@ -25,6 +25,9 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [error, setError] = useState<string | null>(null);
   const {setPopupActive, students, setStudents, selectedGroup, setSelectedGroup, exportGroup, setExportGroup} = useAppContext();
   const [dropdown, setDropdown] = useState(false);
+
+  const hintRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -83,20 +86,25 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
         <div className="w-full">
           <div className="hidden md:flex ml-auto -mb-7  flex-row items-center justify-center w-8 h-8 bg-[--respect-purple-dark] rounded-[100%] cursor-help"
           onMouseEnter={_ => {
-            const hint = document.getElementById('hint_image');
-            hint!.classList.replace('hidden', 'flex');
+            if(hintRef.current){
+               hintRef.current.classList.replace('hidden', 'flex');
+            }
+           
           }}
           onMouseLeave={_ => {
-            const hint = document.getElementById('hint_image');
-            hint!.classList.replace('flex', 'hidden');
+            if(hintRef.current){
+              hintRef.current.classList.replace('flex', 'hidden');
+            }
+            
           }}
           onMouseMove={e => {
-            const hint = document.getElementById('hint_image');
-            hint!.style.left = e.clientX + 15 + 'px';
-            hint!.style.top = e.clientY + 15 + 'px';
+            if(hintRef.current){
+              hintRef.current.style.left = e.clientX + 15 + 'px';
+              hintRef.current.style.top = e.clientY + 15 + 'px';
+            }        
           }}
           >?</div>
-          <div id="hint_image" className="absolute hidden rounded-md max-w-64 flex-col items-center justify-center gap-1 p-4 bg-[--respect-purple-deep] shadow-[0px_0px_50px_var(--respect-purple-dark)]">
+          <div ref={hintRef} className="absolute hidden rounded-md max-w-64 flex-col items-center justify-center gap-1 p-4 bg-[--respect-purple-deep] shadow-[0px_0px_50px_var(--respect-purple-dark)]">
             <p>Пример файла:</p>
             <img className="rounded-b-md w-full" src={hint} />
           </div>

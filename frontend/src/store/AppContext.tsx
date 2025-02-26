@@ -1,4 +1,4 @@
-import  { createContext, useContext, useState, ReactNode } from "react";
+import  { createContext, useContext, useState, ReactNode, useRef } from "react";
 
 export interface Student {
   id: number;
@@ -60,6 +60,7 @@ interface AppContextType {
   setSelectedGroup: (data: Group | null) => void;
   lessons: LessonInterface[] | [],
   setLessons: (lesson: LessonInterface[]) => void;
+  popupElementRef: React.RefObject<HTMLDivElement>
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -78,6 +79,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [popupActive, setPopupActive] = useState(false);
   const [exportGroup, setExportGroup] = useState<Group | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const popupElementRef = useRef<HTMLDivElement>(null)
 
   return (
     <AppContext.Provider
@@ -107,7 +109,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         exportGroup,
         setExportGroup,
         selectedGroup,
-        setSelectedGroup
+        setSelectedGroup,
+        popupElementRef
       }}
     >
       {children}

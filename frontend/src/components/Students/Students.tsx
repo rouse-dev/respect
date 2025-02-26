@@ -7,7 +7,7 @@ import HistoryButton from "../common/popups/historyPopup/history_button";
 import { TbMoodSad } from "react-icons/tb";
 
 const Students = () => {
-  const { search, currentStudent, sortedStudents, setStudents, setSortedStudents } = useAppContext();
+  const { search, currentStudent, sortedStudents, setStudents, setSortedStudents,popupElementRef } = useAppContext();
   const [isLoading, setLoading] = useState(false);
 
   const fetchStudents = async () => {
@@ -30,13 +30,14 @@ const Students = () => {
   }, []);
 
   useEffect(() => {
-    const popupElement = document.getElementById("respect_history_popup");
+    
+   
 
-    if (popupElement) {
+    if (popupElementRef.current) {
       if (!currentStudent || Object.keys(currentStudent).length === 0) {
-        popupElement.classList.replace("flex", "hidden");
+        popupElementRef.current.classList.replace("flex", "hidden");
       } else {
-        popupElement.classList.replace("hidden", "flex");
+        popupElementRef.current.classList.replace("hidden", "flex");
       }
     }
   }, [currentStudent]);

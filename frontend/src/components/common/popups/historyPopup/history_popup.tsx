@@ -25,9 +25,9 @@ interface HistoryItem {
 const HistoryPopup = ({
   student,
   onClose,
-  isOpen,
+  isOpen
 }: HistoryPopupProps) => {
-  const { setPopupActive } = useAppContext();
+  const { setPopupActive,popupElementRef } = useAppContext();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [_, setSortedHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
@@ -112,7 +112,7 @@ const HistoryPopup = ({
     <>
       {isLoading && <Preloader />}
       <div
-        id="respect_history_popup"
+      ref={popupElementRef}
         className="flex justify-center items-center w-full h-[100vh] fixed top-0 left-0 z-50 backdrop-blur"
       >
         <div

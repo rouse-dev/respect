@@ -1,3 +1,5 @@
+import { useRef } from "react"
+
 interface useUserStoreInterface {
     auth: boolean,
     name: string,
@@ -11,17 +13,19 @@ interface AvatarContainerInterface {
 }
 
 const AvatarContainer = ({ useUserStore, setAvatar }: AvatarContainerInterface) => {
+    const imgRef = useRef<HTMLImageElement>(null)
     return (
         <>
-        <img id="avatar_img" className="max-w-28 max-h-28 w-full h-28 aspect-square rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : `${import.meta.env.VITE_API_URL}/uploads/avatars/default.jpg`} />
-        <input className="hidden" type="file" id="avatar_file" accept="image/*" onChange={e => {
+        <img  ref={imgRef} className="max-w-28 max-h-28 w-full h-28 aspect-square rounded-[100%]" src={useUserStore.avatar ? `${import.meta.env.VITE_API_URL}/${useUserStore.avatar}` : `${import.meta.env.VITE_API_URL}/uploads/avatars/default.jpg`} />
+        <input className="hidden" type="file"  accept="image/*" onChange={e => {
             const file = e.target.files![0];
             const reader = new FileReader();
-            const img: HTMLImageElement = (document.getElementById('avatar_img')! as HTMLImageElement);
-
             if (file) {
                 reader.onload = () => {
-                    img.src = String(reader.result);
+                    if(imgRef.current){
+                        imgRef.current.src = String(reader.result);
+                    }
+                    
                 }
                 reader.readAsDataURL(file)
                 setAvatar(file);
