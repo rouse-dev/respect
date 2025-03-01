@@ -38,7 +38,9 @@ const EditGroups = ({ isOpen }: EditGroupsInterface) => {
       await deleteGroup(groupId).then(_ => {
         GetAllGroups().then((response) => {
           setGroups(response.data);
-          setSortedGroups(response.data.filter((group: Group) => group.id !== groupId));
+          setSortedGroups(response.data.filter(
+            (group: Group) => group.name.toLowerCase().includes(search.toLowerCase())
+          ));
         });
       });
   };

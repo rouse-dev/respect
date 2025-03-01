@@ -7,7 +7,7 @@ import {
   FaAngleDown,
   FaAngleUp,
 } from "react-icons/fa";
-import { Group, Student, useAppContext } from "../../store/AppContext";
+import { Group, Student, StudentData, useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import StudentPopup from "../common/popups/addPopups/add_students";
@@ -61,10 +61,14 @@ const EditStudents = ({ isOpen }: EditStudentsInterface) => {
   };
 
   const HandleDelete = async (studentId: number) => {
-    await deleteStudent(studentId);
-    setSortedStudents((prevSortedStudent) =>
-      prevSortedStudent.filter((student) => student.id !== studentId)
-    );
+    await deleteStudent(studentId).then(_ => {
+      GetAllStudents().then(response => {
+        setStudents(response.data);
+        setSortedStudents(response.data.filter((student: StudentData) => 
+          student.name.toLowerCase().includes(search.toLowerCase())
+        ));
+      })
+    });
   };
 
   useEffect(() => {

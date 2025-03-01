@@ -16,7 +16,7 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
 
   const [search, setSearch] = useState("");
   const [isLessonPopup, setIsLessonPopup] = useState(false);
-  const [sortedLessons, setSortedLessons] = useState<LessonInterface[] | []>([...lessons]);
+  const [sortedLessons, setSortedLessons] = useState<LessonInterface[]>([...lessons]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
@@ -43,10 +43,14 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
   };
 
   const HandleDelete = async (lessonId: number) => {
-    await deleteLesson(lessonId);
-    setSortedLessons((prevSortedLessons) =>
-      prevSortedLessons.filter((lesson) => lesson.id !== lessonId)
-    );
+    await deleteLesson(lessonId).then(_ => {
+      getLessons().then(response => {
+        setLessons(response);
+        setSortedLessons(response.data.filter(
+          (lesson: LessonInterface) => lesson.name.toLowerCase().includes(search.toLowerCase())
+        ));
+      })
+    });
   };
 
   useEffect(() => {
