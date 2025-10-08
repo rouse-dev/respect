@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import AvatarContainer from "./AvatarContainer";
 import { IoMdExit } from "react-icons/io";
 import { ImUndo2 } from "react-icons/im";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChangeTeacherAvatar, ChangeTeacherInfo } from "../../service/server";
 import { toast } from "react-toastify";
 
@@ -11,6 +11,7 @@ interface useUserStoreInterface {
     name: string,
     email: string,
     password: string,
+    oldPassword: string,
     avatar: string,
     CheckAuth: () => void
 }
@@ -24,8 +25,11 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
         name: useUserStore.name,
         email: useUserStore.email,
         password: useUserStore.password,
+        oldPassword: useUserStore.oldPassword
     });
     const [avatar, setAvatar] = useState<File | null>(null);
+    const passRef = useRef<HTMLInputElement | null>(null);
+    const oldPassRef = useRef<HTMLInputElement | null>(null);
 
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
@@ -35,16 +39,16 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
             </div>
             <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
                 <AvatarContainer useUserStore={useUserStore} setAvatar={setAvatar} />
-
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Имя" type="text" defaultValue={useUserStore.name} required onChange={e => setChanges(prev => ({...prev, name: e.target.value}))} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" defaultValue={useUserStore.email} required onChange={e => setChanges(prev => ({...prev, email: e.target.value}))} />
-                <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Пароль" type="password" required onChange={e => setChanges(prev => ({...prev, password: e.target.value}))} />
+                <input ref={oldPassRef} className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Текущий пароль" type="password" required onChange={e => setChanges(prev => ({...prev, oldPassword: e.target.value}))} />
+                <input ref={passRef} className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Новый пароль" type="password" required onChange={e => setChanges(prev => ({...prev, password: e.target.value}))} />
 
                 <button className="bg-[--respect-purple-dark] w-full mt-2 px-2 py-4 rounded-lg transition-colors disabled:text-gray-400" disabled={(changes.name === useUserStore.name) && (changes.email === useUserStore.email) && (changes.password === useUserStore.password) && (avatar === null) } onClick={_ => {
                     const AvatarForm = new FormData();
                     avatar && AvatarForm.append('avatar', avatar);
 
-                    const Changed = {};
+                    const Changed = {oldPassword: changes.oldPassword};
                     (changes.name != useUserStore.name && changes.name.length > 0) && Object.assign(Changed, {name: changes.name});
                     (changes.email != useUserStore.email && changes.email.length > 0) && Object.assign(Changed, {email: changes.email});
                     (changes.password != useUserStore.password && changes.password.length > 0) && Object.assign(Changed, {password: changes.password});
@@ -52,10 +56,16 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                         toast.error('Изменения отсутствуют!');
                     } else {
                         avatar && ChangeTeacherAvatar(AvatarForm).then(_ => {
-                            useUserStore.CheckAuth();    
+                            useUserStore.CheckAuth();
+                            if (!passRef.current || !oldPassRef.current) return;
+                            passRef.current.value = '';
+                            oldPassRef.current.value = '';
                         });
                         (Object.keys(Changed).length > 0) && ChangeTeacherInfo(Changed).then(_ => {
                             useUserStore.CheckAuth();
+                            if (!passRef.current || !oldPassRef.current) return;
+                            passRef.current.value = '';
+                            oldPassRef.current.value = '';
                         });
                     }
                 }}>Сохранить изменения</button>

@@ -5,6 +5,9 @@ export class UpdateTeacherDto {
   @ApiProperty({ example: 'teacher@example.com', description: 'Новый email учителя' })
   email?: string;
 
+  @ApiProperty({ example: 'password321', description: 'Текущий пароль учителя' })
+  oldPassword?: string;
+
   @ApiProperty({ example: 'password123', description: 'Новый пароль учителя' })
   password?: string;
 

@@ -156,7 +156,7 @@ const HistoryPopup = ({
                 <div
                   key={index}
                   className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-2  gap-2 p-3 mr-3 w-full rounded-lg  bg-[--respect-purple-dark] ${
-                    item.change > 0 ? "border-green-500" : item.class ? "border-red-500" : "border-[#7B68EE]"
+                    item.change > 0 ? "border-green-500" : "border-red-500"
                   }`}
                 >
                   <div className="flex flex-col gap-1">
@@ -168,7 +168,7 @@ const HistoryPopup = ({
                   </div>
                   <p
                     className={`font-bold ${
-                      item.change > 0 ? "text-[#7fad75]" : item.class ? "text-red-400" : "text-[#E6E6FA]"
+                      item.change > 0 ? "text-[#7fad75]" : "text-red-400"
                     }`}
                   >
                     {item.change > 0 ? "+" : ""}

@@ -83,7 +83,7 @@ export class TeachersService {
         maxAge: 2592000000,
       });
 
-      return {  }; //accessToken, teacher
+      return {}; //accessToken, teacher
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -131,20 +131,51 @@ export class TeachersService {
   // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
   async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
     try {
-      if(dto.password && dto.password.length >= 8) {
-        dto.password = dto.password && await bcrypt.hash(dto.password, 10)
-      } else if(dto.password && dto.password.length >= 8) {
-        throw new InternalServerErrorException("Пароль от 8 символов")
+      let updatedDto = { ...dto };
+      if (dto.password) {
+        if (!dto.oldPassword) {
+          throw new InternalServerErrorException(
+            'Требуется старый пароль для смены пароля.',
+          );
+        }
+        const teacher = await this.prisma.teacher.findFirst({
+          where: { id: teacherId },
+          select: { password: true },
+        });
+        if (!teacher) {
+          throw new InternalServerErrorException('Преподаватель не найден.');
+        }
+        const isPasswordValid = await bcrypt.compare(
+          dto.oldPassword,
+          teacher.password,
+        );
+        if (!isPasswordValid) {
+          throw new InternalServerErrorException(
+            'Текущий пароль введен неверно!',
+          );
+        }
+        if (dto.password.length < 8) {
+          throw new InternalServerErrorException(
+            'Пароль должен быть не менее 8 символов.',
+          );
+        }
+        updatedDto.password = await bcrypt.hash(dto.password, 10);
       }
-      
+      delete updatedDto.oldPassword;
+
       const updatedTeacher = await this.prisma.teacher.update({
         where: { id: teacherId },
-        data: dto,
+        data: updatedDto,
       });
 
       return updatedTeacher;
     } catch (error) {
-      return new InternalServerErrorException(error);
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Произошла ошибка при обновлении данных.',
+      );
     }
   }
 

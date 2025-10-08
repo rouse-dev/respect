@@ -38,6 +38,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
   const [isLoading, setIsLoading] = useState(false);
   const [isLessonNew, setIsLessonNew] = useState(false);
+  const [newLesson, setNewLesson] = useState("");
   const [dropdown, setDropdown] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,15 +50,15 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
 
     setIsLoading(true);
     try {
+      const fullReason = `${currentSubject.name}, Пара ${lesson}, ${date}: ${reason}`;
       const result = await ChangeRespect({
         date:date,
-        class: lesson,
         studentId: student.id,
         change: -amount,
-        reason: reason,
-        isPunish: true,
+        reason: fullReason,
         lessonId: +currentSubject.id,
-        newLesson: currentSubject.name,
+        isPunish: true,
+        newLesson: newLesson,
       });
 
       if (result.succes) {
@@ -105,7 +106,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
                     .classList.replace("flex", "hidden");
             }}
           >
-            <p className="flex mr-auto">{isLessonNew ? '- новый предмет -' : (currentSubject.name || "Предмет")}</p>
+            <p className="flex mr-auto">{currentSubject.name || "Предмет"}</p>
             <p className="hidden sm:block">|</p>
             {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
@@ -127,7 +128,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
                 type="button"
                 onClick={() => {
                   setIsLessonNew(true);
-                  
+                  setCurrentSubject({ id: -1, name: "- новый предмет -" });
                 }}
               >
                 - новый предмет -
@@ -140,9 +141,7 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
               type="text"
               className="bg-[--respect-purple-deep] outline-hidden rounded-lg px-3 py-1"
               placeholder="Название предмета"
-              onChange={(el) => {
-                setCurrentSubject({ id: -1, name: el.target.value });
-              }}
+              onChange={(el) => setNewLesson(el.target.value)}
             />
           )}
 

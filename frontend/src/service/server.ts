@@ -11,6 +11,7 @@ interface TeacherChangeData {
   name?: string | null
   email?: string | null,
   password?: string | null,
+  oldPassword: string
 }
 
 interface UpdateGroup{
@@ -38,6 +39,7 @@ interface ChangeRespectData {
   isPunish?: boolean;
   newLesson?: string;
 }
+
 
 export const LoginTeach = async (for_user: LoginUserData) => {
   try {
@@ -72,8 +74,9 @@ export const ChangeTeacherInfo = async (for_user: TeacherChangeData) => {
     const response = await client.patch("/api/teachers/change", for_user);
     toast.success('Данные преподавателя изменены');
     return { succes: true, data: response.data };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
+    toast.error(error.response.data.message)
     return {
       error: error instanceof Error ? error.message : "Произошла ошибка",
     };

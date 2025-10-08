@@ -34,10 +34,10 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
   const [lesson, setLesson] = useState(Number);
   const [isLoading, setIsLoading] = useState(false);
   const [isLessonNew, setIsLessonNew] = useState(false);
+  const [newLesson, setNewLesson] = useState("");
   const [dropdown, setDropdown] = useState(false);
 
   const handleSubmit = async (e: any) => {
-    console.log(currentSubject)
     e.preventDefault();
     if (!currentSubject) {
       toast.info("Пожалуйста, выберите предмет");
@@ -53,7 +53,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
         change: amount,
         reason: reason,
         lessonId: +currentSubject.id,
-        newLesson: currentSubject.name,
+        newLesson: newLesson,
       });
 
       if (result.succes) {
@@ -101,7 +101,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
                     .classList.replace("flex", "hidden");
             }}
           >
-            <p className="flex mr-auto">{isLessonNew ? '- новый предмет -' : (currentSubject.name || "Предмет")}</p>
+            <p className="flex mr-auto">{currentSubject.name || "Предмет"}</p>
             <p className="hidden sm:block">|</p>
             {dropdown ? <FaAngleDown /> : <FaAngleUp />}
 
@@ -114,6 +114,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
                   onClick={(_) => {
                     setCurrentSubject(el);
                     setIsLessonNew(false);
+                    setNewLesson("");
                   }}
                 >
                   {el.name}
@@ -124,6 +125,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
                 type="button"
                 onClick={() => {
                   setIsLessonNew(true);
+                  setCurrentSubject({ id: -1, name: "- новый предмет -" });
                 }}
               >
                 - новый предмет -
@@ -135,7 +137,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
             <input
               type="text"
               className="bg-[--respect-purple-deep] outline-hidden rounded-lg px-3 py-1"
-              onChange={(el) => setCurrentSubject({ id: -1, name: el.target.value })}
+              onChange={(el) => setNewLesson(el.target.value)}
               placeholder="Название предмета"
             />
           )}
