@@ -1,147 +1,211 @@
 import {
   Controller,
-  Post,
-  Body,
-  HttpCode,
-  UseInterceptors,
-  UploadedFile,
-  UseGuards,
-  Request,
-  Patch,
-  Res,
   Get,
+  Param,
+  Patch,
+  Body,
+  Res,
+  InternalServerErrorException,
   NotFoundException,
+  Request,
+  Post,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
-import { RegisterTeacherDto } from './dto/register-teacher.dto';
-import { LoginTeacherDto } from './dto/login-teacher.dto';
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { TeacherOnly } from '../auth/decorators/teacher.decorator';
+import { ProcessDebtRequestDto } from './dto/process-debt-request.dto';
+import { UpdateReputationDto } from './dto/update-reputation.dto';
 
 @ApiTags('Учителя')
+@ApiBearerAuth()
 @Controller('teachers')
+@TeacherOnly() // ВСЕ РОУТЫ ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ
 export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}
 
-  // РЕГИСТРАЦИЯ УЧИТЕЛЯ
-  @Post('register')
-  @ApiOperation({ summary: 'Регистрация учителя' })
-  @ApiBody({ type: RegisterTeacherDto })
-  @ApiResponse({ status: 201, description: 'Учитель успешно зарегистрирован' })
-  @ApiResponse({
-    status: 409,
-    description: 'Учитель с таким email уже существует',
-  })
+  // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  @Get('students')
+  @ApiOperation({ summary: 'Получение всех студентов (только для учителей)' })
+  @ApiResponse({ status: 200, description: 'Список студентов' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async register(@Body() registerTeacherDto: RegisterTeacherDto) {
-    return this.teachersService.register(
-      registerTeacherDto.email,
-      registerTeacherDto.password,
-      registerTeacherDto.name,
-    );
+  getAllStudents() {
+    return this.teachersService.getAllStudents();
   }
 
-  // ЛОГИРОВАНИЕ УЧИТЕЛЯ
-  @Post('login')
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Логирование учителя' })
-  @ApiBody({ type: LoginTeacherDto })
+  // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  @Get('students/:id/history')
+  @ApiOperation({
+    summary: 'Получить историю репутации студента (только для учителей)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Успешный вход, возвращает JWT-токен',
+    description: 'История репутации успешно получена',
   })
-  @ApiResponse({ status: 401, description: 'Неверный email или пароль' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async login(
-    @Body() loginTeacherDto: LoginTeacherDto,
-    @Res({ passthrough: true }) response: Response,
+  async getStudentReputationHistory(@Param('id') id: string) {
+    return this.teachersService.getStudentReputationHistory(+id);
+  }
+
+  // ПОЛУЧИТЬ EXCEL ФАЙЛ С ИСТОРИЕЙ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  @Get('students/:id/history/excel')
+  @ApiOperation({
+    summary:
+      'Получить excel файл с историей репутации студента (только для учителей)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Excel файл с историей репутации успешно получен',
+  })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async downloadStudentReputationHistoryExcel(
+    @Param('id') studentId: number,
+    @Res() res: Response,
   ) {
-    return this.teachersService.login(
-      loginTeacherDto.email,
-      loginTeacherDto.password,
-      response,
+    try {
+      const buffer =
+        await this.teachersService.generateStudentReputationHistoryExcel(
+          studentId,
+        );
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="reputation_history_${studentId}.xlsx"`,
+      );
+      res.send(buffer);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Ошибка при скачивании файла');
+    }
+  }
+
+  // ДОБАВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТУ
+  @Post('students/:id/reputation/add')
+  @ApiOperation({ summary: 'Добавление репутации студенту' })
+  @ApiResponse({ status: 200, description: 'Репутация успешно добавлена' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async addReputation(
+    @Param('id') studentId: string,
+    @Request() req,
+    @Body() updateReputationDto: UpdateReputationDto,
+  ) {
+    const teacherId = req.user.id;
+    return this.teachersService.addReputation(
+      +studentId,
+      teacherId,
+      updateReputationDto,
     );
   }
 
-  // ВЫХОД ИЗ АККАУНТА УЧИТЕЛЯ
-  @Post('logout')
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Выход из аккаунта учителя' })
-  @ApiResponse({
-    status: 200,
-    description: 'Успешный выход, cookie с токеном удален',
-  })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async logout(@Res({ passthrough: true }) response: Response) {
-    return this.teachersService.logout(response);
-  }
-
-  // ИЗМЕНЕНИЕ АВАТАРКИ УЧИТЕЛЯ
-  @Patch('avatar')
-  @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileInterceptor('avatar'))
-  @ApiOperation({ summary: 'Изменение аватарки учителя' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Загрузите новый аватар',
-    schema: {
-      type: 'object',
-      properties: {
-        avatar: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiBearerAuth() // Указываем, что требуется JWT-токен
-  @ApiResponse({ status: 200, description: 'Аватар успешно изменен' }) // Укажите тип возвращаемого объекта
+  // УБАВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
+  @Post('students/:id/reputation/remove')
+  @ApiOperation({ summary: 'Убавление репутации студента' })
+  @ApiResponse({ status: 200, description: 'Репутация успешно списана' })
   @ApiResponse({
     status: 400,
-    description: 'Некорректный запрос или файл не предоставлен',
+    description: 'Недостаточно репутации для списания',
   })
-  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req) {
+  async removeReputation(
+    @Param('id') studentId: string,
+    @Request() req,
+    @Body() updateReputationDto: UpdateReputationDto,
+  ) {
     const teacherId = req.user.id;
-    return this.teachersService.changeAvatar(file, teacherId);
+    return this.teachersService.removeReputation(
+      +studentId,
+      teacherId,
+      updateReputationDto,
+    );
   }
 
-  // ИЗМЕНЕНИЯ ДАННЫХ УЧИТЕЛЯ
-  @Patch('change')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Изменения данных учителя' })
-  @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Данные учителя успешно обновлены' })
-  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
-  @ApiResponse({ status: 404, description: 'Учитель не найден' })
-  @ApiResponse({ status: 500, description: 'Ошибка сервера' })
-  async updateTeach(@Request() req, @Body() dto: UpdateTeacherDto) {
+  // ПОЛУЧЕНИЕ ВСЕХ ЗАЯВОК ДЛЯ УЧИТЕЛЯ
+  @Get('debt-requests')
+  @ApiOperation({ summary: 'Получение всех заявок на списание' })
+  @ApiResponse({ status: 200, description: 'Список заявок получен' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async getDebtRequests(@Request() req) {
     const teacherId = req.user.id;
-    return this.teachersService.changeInfo(teacherId, dto)
+    return this.teachersService.getTeacherDebtRequests(teacherId);
   }
 
-  // ВЫВОД ИНФОРМАЦИИ ВОШЕДШЕГО УЧИТЕЛЯ
-  @Get('me')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Вывод информации вошедшего учителя' })
-  @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Информация о учителе получена' })
-  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
-  @ApiResponse({ status: 404, description: 'Учитель не найден' })
-  @ApiResponse({ status: 500, description: 'Ошибка сервера' })
-  async getMe(@Request() req) {
-    const userId = req.user.id; // Получаем ID из JWT
-    return this.teachersService.me(userId);
+  // ПОЛУЧЕНИЕ ДЕТАЛЬНОЙ ИНФОРМАЦИИ О ЗАЯВКЕ
+  @Get('debt-requests/:id')
+  @ApiOperation({ summary: 'Получение детальной информации о заявке' })
+  @ApiResponse({ status: 200, description: 'Информация о заявке получена' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Заявка не найдена' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async getDebtRequestDetails(@Param('id') id: string, @Request() req) {
+    const teacherId = req.user.id;
+    return this.teachersService.getDebtRequestDetails(+id, teacherId);
+  }
+
+  // ПРИНЯТИЕ ЗАЯВКИ
+  @Patch('debt-requests/:id/accept')
+  @ApiOperation({ summary: 'Принятие заявки на списание' })
+  @ApiResponse({
+    status: 200,
+    description: 'Заявка принята, репутация списана',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Недостаточно репутации или заявка уже обработана',
+  })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Заявка не найдена' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async acceptDebtRequest(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() processDto: ProcessDebtRequestDto,
+  ) {
+    const teacherId = req.user.id;
+    return this.teachersService.acceptDebtRequest(
+      +id,
+      teacherId,
+      processDto.comment,
+    );
+  }
+
+  // ОТКЛОНЕНИЕ ЗАЯВКИ
+  @Patch('debt-requests/:id/reject')
+  @ApiOperation({ summary: 'Отклонение заявки на списание' })
+  @ApiResponse({ status: 200, description: 'Заявка отклонена' })
+  @ApiResponse({ status: 400, description: 'Заявка уже обработана' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Заявка не найдена' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async rejectDebtRequest(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() processDto: ProcessDebtRequestDto,
+  ) {
+    const teacherId = req.user.id;
+    return this.teachersService.rejectDebtRequest(
+      +id,
+      teacherId,
+      processDto.comment,
+    );
   }
 }

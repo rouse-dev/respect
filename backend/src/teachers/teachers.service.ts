@@ -1,201 +1,350 @@
 import {
   Injectable,
-  ConflictException,
-  UnauthorizedException,
   InternalServerErrorException,
   NotFoundException,
-  Res,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { extname } from 'path';
-import { Response } from 'express';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as ExcelJS from 'exceljs';
+import { Student } from '../entities/student.entity';
+import { HistoryRep } from '../entities/history-rep.entity';
+import { DebtRequest, RequestStatus } from '../entities/debt-request.entity';
+import { UpdateReputationDto } from './dto/update-reputation.dto';
 
 @Injectable()
 export class TeachersService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
+    @InjectRepository(Student)
+    private studentsRepository: Repository<Student>,
+    @InjectRepository(HistoryRep)
+    private historyRepsRepository: Repository<HistoryRep>,
+    @InjectRepository(DebtRequest)
+    private debtRequestsRepository: Repository<DebtRequest>,
   ) {}
 
-  // РЕГИСТРАЦИЯ УЧИТЕЛЯ
-  async register(email: string, password: string, name?: string) {
+  // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  async getAllStudents(): Promise<Student[]> {
     try {
-      const existingTeacher = await this.prisma.teacher.findUnique({
-        where: { email },
+      return await this.studentsRepository.find({
+        relations: ['groups'],
       });
-
-      if (existingTeacher) {
-        throw new ConflictException('Учитель с таким email уже существует');
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const teacher = await this.prisma.teacher.create({
-        data: {
-          email,
-          password: hashedPassword,
-          name,
-        },
-      });
-
-      return { id: teacher.id, email: teacher.email, name: teacher.name };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  // ЛОГИРОВАНИЕ УЧИТЕЛЯ
-  async login(
-    email: string,
-    password: string,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  async getStudentReputationHistory(studentId: number) {
     try {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { email },
+      const student = await this.studentsRepository.findOne({
+        where: { id: studentId },
+        relations: ['historyReps', 'historyReps.lesson'],
       });
 
-      if (!teacher) {
-        throw new UnauthorizedException('Неверный email или пароль');
+      if (!student) {
+        throw new NotFoundException('Студент не найден');
       }
 
-      const isPasswordValid = await bcrypt.compare(password, teacher.password);
+      const formattedHistory = student.historyReps.map((record) => ({
+        id: record.id,
+        change: record.change,
+        reason: record.reason,
+        createdAt: record.createdAt,
+        lesson: record.lesson ? record.lesson.name : null,
+        class: record.class ? record.class : '',
+      }));
 
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Неверный email или пароль');
-      }
-
-      const payload = { email: teacher.email, sub: teacher.id };
-      const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
-      });
-
-      response.cookie('jwt', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 2592000000,
-      });
-
-      return {}; //accessToken, teacher
+      return formattedHistory;
     } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // ВЫХОД ИЗ АККАУНТА
-  async logout(@Res({ passthrough: true }) response: Response) {
-    try {
-      response.clearCookie('jwt', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      });
-      return { message: 'Вы вышли с аккаунта!' };
-    } catch (error) {
-      return new InternalServerErrorException(error);
-    }
-  }
-
-  // ЗАМЕНА АВАТАРКИ УЧИТЕЛЯ
-  async changeAvatar(file: Express.Multer.File, teacherId: number) {
-    try {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const ext = extname(file.originalname);
-      const filename = `uploads/avatars/${uniqueSuffix}${ext}`;
-
-      // СОХРАНЕНИЕ ФАЙЛА НА ДИСК
-      const fs = require('fs');
-      const path = require('path');
-      const uploadPath = path.join(__dirname, '..', '..', filename);
-
-      fs.writeFileSync(uploadPath, file.buffer);
-
-      const updatedTeacher = await this.prisma.teacher.update({
-        where: { id: teacherId },
-        data: { avatar: filename },
-      });
-
-      return updatedTeacher;
-    } catch (error) {
-      return new InternalServerErrorException(error);
-    }
-  }
-
-  // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
-  async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
-    try {
-      let updatedDto = { ...dto };
-      if (dto.password) {
-        if (!dto.oldPassword) {
-          throw new InternalServerErrorException(
-            'Требуется старый пароль для смены пароля.',
-          );
-        }
-        const teacher = await this.prisma.teacher.findFirst({
-          where: { id: teacherId },
-          select: { password: true },
-        });
-        if (!teacher) {
-          throw new InternalServerErrorException('Преподаватель не найден.');
-        }
-        const isPasswordValid = await bcrypt.compare(
-          dto.oldPassword,
-          teacher.password,
-        );
-        if (!isPasswordValid) {
-          throw new InternalServerErrorException(
-            'Текущий пароль введен неверно!',
-          );
-        }
-        if (dto.password.length < 8) {
-          throw new InternalServerErrorException(
-            'Пароль должен быть не менее 8 символов.',
-          );
-        }
-        updatedDto.password = await bcrypt.hash(dto.password, 10);
-      }
-      delete updatedDto.oldPassword;
-
-      const updatedTeacher = await this.prisma.teacher.update({
-        where: { id: teacherId },
-        data: updatedDto,
-      });
-
-      return updatedTeacher;
-    } catch (error) {
-      if (error instanceof InternalServerErrorException) {
-        throw error;
-      }
       throw new InternalServerErrorException(
-        'Произошла ошибка при обновлении данных.',
+        'Ошибка при получении истории репутации',
       );
     }
   }
 
-  // ВЫДАТЬ ИНФОРМАЦИЮ ОБ УЧИТЕЛЕ
-  async me(userId: number) {
+  // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  async generateStudentReputationHistoryExcel(
+    studentId: number,
+  ): Promise<ExcelJS.Buffer> {
     try {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { id: userId },
+      const history = await this.getStudentReputationHistory(studentId);
+      const student = await this.studentsRepository.findOne({
+        where: { id: studentId },
       });
 
-      if (!teacher) {
-        throw new NotFoundException('Учитель не найден');
+      if (!student) {
+        throw new NotFoundException('Студент не найден');
       }
-      // Не возвращаем пароль
-      const { password, ...result } = teacher;
-      return result;
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('История репутации');
+
+      worksheet.addRow([student.name]);
+      worksheet.mergeCells('A1:E1');
+
+      const mergedCell = worksheet.getCell('A1');
+      mergedCell.font = { bold: true, size: 14 };
+      mergedCell.alignment = { horizontal: 'center' };
+
+      worksheet.addRow([
+        'Предмет',
+        'Пара',
+        'Изменение репутации',
+        'Дата изменения',
+        'Причина',
+      ]);
+
+      worksheet.columns = [
+        { key: 'lesson', width: 20 },
+        { key: 'class', width: 20 },
+        { key: 'change', width: 25 },
+        { key: 'createdAt', width: 20 },
+        { key: 'reason', width: 30 },
+      ];
+
+      history.forEach((record) => {
+        const createdAt =
+          typeof record.createdAt === 'string'
+            ? new Date(record.createdAt)
+            : record.createdAt;
+
+        worksheet.addRow({
+          change: record.change ?? '',
+          reason: record.reason ?? '',
+          createdAt: createdAt ? createdAt.toLocaleString() : '',
+          lesson: record.lesson ?? '',
+          class: record.class ?? '',
+        });
+      });
+
+      return await workbook.xlsx.writeBuffer();
     } catch (error) {
+      console.error('Ошибка при создании Excel-файла:', error);
       if (error instanceof NotFoundException) {
         throw error;
       }
+      throw new InternalServerErrorException('Ошибка при создании Excel-файла');
+    }
+  }
+
+  // ДОБАВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТУ
+  async addReputation(
+    studentId: number,
+    teacherId: number,
+    updateReputationDto: UpdateReputationDto,
+  ) {
+    try {
+      const student = await this.studentsRepository.findOne({
+        where: { id: studentId },
+      });
+
+      if (!student) {
+        throw new NotFoundException('Студент не найден');
+      }
+
+      // Добавляем репутацию
+      student.reputation += updateReputationDto.points;
+      await this.studentsRepository.save(student);
+
+      // Создаем запись в истории репутации
+      const historyRep = this.historyRepsRepository.create({
+        studentId,
+        change: updateReputationDto.points, // Положительное изменение
+        reason: updateReputationDto.reason || 'Начисление репутации учителем',
+        lessonId: updateReputationDto.lessonId,
+        class: updateReputationDto.class,
+      });
+
+      await this.historyRepsRepository.save(historyRep);
+
+      return {
+        student: {
+          id: student.id,
+          name: student.name,
+          reputation: student.reputation,
+        },
+        change: updateReputationDto.points,
+        message: 'Репутация успешно добавлена',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // УБАВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
+  async removeReputation(
+    studentId: number,
+    teacherId: number,
+    updateReputationDto: UpdateReputationDto,
+  ) {
+    try {
+      const student = await this.studentsRepository.findOne({
+        where: { id: studentId },
+      });
+
+      if (!student) {
+        throw new NotFoundException('Студент не найден');
+      }
+
+      // Проверяем достаточно ли репутации для списания
+      if (student.reputation < updateReputationDto.points) {
+        throw new BadRequestException(
+          'У студента недостаточно репутации для списания',
+        );
+      }
+
+      // Убавляем репутацию
+      student.reputation -= updateReputationDto.points;
+      await this.studentsRepository.save(student);
+
+      // Создаем запись в истории репутации
+      const historyRep = this.historyRepsRepository.create({
+        studentId,
+        change: -updateReputationDto.points, // Отрицательное изменение
+        reason: updateReputationDto.reason || 'Списание репутации учителем',
+        lessonId: updateReputationDto.lessonId,
+        class: updateReputationDto.class,
+      });
+
+      await this.historyRepsRepository.save(historyRep);
+
+      return {
+        student: {
+          id: student.id,
+          name: student.name,
+          reputation: student.reputation,
+        },
+        change: -updateReputationDto.points,
+        message: 'Репутация успешно списана',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ПОЛУЧЕНИЕ ВСЕХ ЗАЯВОК ДЛЯ УЧИТЕЛЯ
+  async getTeacherDebtRequests(teacherId: number) {
+    try {
+      return await this.debtRequestsRepository.find({
+        where: { teacherId },
+        relations: ['student', 'student.groups', 'lesson'],
+        order: { createdAt: 'DESC' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ПОЛУЧЕНИЕ ДЕТАЛЬНОЙ ИНФОРМАЦИИ О ЗАЯВКЕ
+  async getDebtRequestDetails(requestId: number, teacherId: number) {
+    try {
+      const debtRequest = await this.debtRequestsRepository.findOne({
+        where: { id: requestId, teacherId },
+        relations: ['student', 'student.groups', 'lesson'],
+      });
+
+      if (!debtRequest) {
+        throw new NotFoundException('Заявка не найдена');
+      }
+
+      return debtRequest;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ПРИНЯТИЕ ЗАЯВКИ
+  async acceptDebtRequest(
+    requestId: number,
+    teacherId: number,
+    comment?: string,
+  ) {
+    try {
+      const debtRequest = await this.debtRequestsRepository.findOne({
+        where: { id: requestId },
+        relations: ['student', 'teacher', 'lesson'],
+      });
+
+      if (!debtRequest) {
+        throw new NotFoundException('Заявка не найдена');
+      }
+
+      // Проверяем что заявка принадлежит учителю
+      if (debtRequest.teacherId !== teacherId) {
+        throw new ForbiddenException('Вы не можете обрабатывать эту заявку');
+      }
+
+      // Проверяем что заявка еще на рассмотрении
+      if (debtRequest.status !== RequestStatus.PENDING) {
+        throw new BadRequestException('Заявка уже обработана');
+      }
+
+      const student = debtRequest.student;
+
+      // Проверяем достаточно ли репутации
+      if (student.reputation < debtRequest.points) {
+        throw new BadRequestException('У студента недостаточно репутации');
+      }
+
+      // Списываем репутацию
+      student.reputation -= debtRequest.points;
+      await this.studentsRepository.save(student);
+
+      // Создаем запись в истории репутации
+      const historyRep = this.historyRepsRepository.create({
+        studentId: debtRequest.studentId,
+        change: -debtRequest.points, // Отрицательное изменение
+        reason: `Списание по заявке: ${debtRequest.description || 'без описания'}`,
+        lessonId: debtRequest.lessonId,
+        class: null,
+      });
+
+      await this.historyRepsRepository.save(historyRep);
+
+      // Обновляем статус заявки
+      debtRequest.status = RequestStatus.APPROVED;
+      debtRequest.teacherComment = comment || 'Заявка одобрена';
+
+      return await this.debtRequestsRepository.save(debtRequest);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ОТКЛОНЕНИЕ ЗАЯВКИ
+  async rejectDebtRequest(
+    requestId: number,
+    teacherId: number,
+    comment?: string,
+  ) {
+    try {
+      const debtRequest = await this.debtRequestsRepository.findOne({
+        where: { id: requestId },
+        relations: ['student', 'teacher', 'lesson'],
+      });
+
+      if (!debtRequest) {
+        throw new NotFoundException('Заявка не найдена');
+      }
+
+      // Проверяем что заявка принадлежит учителю
+      if (debtRequest.teacherId !== teacherId) {
+        throw new ForbiddenException('Вы не можете обрабатывать эту заявку');
+      }
+
+      // Проверяем что заявка еще на рассмотрении
+      if (debtRequest.status !== RequestStatus.PENDING) {
+        throw new BadRequestException('Заявка уже обработана');
+      }
+
+      // Обновляем статус заявки
+      debtRequest.status = RequestStatus.REJECTED;
+      debtRequest.teacherComment = comment || 'Заявка отклонена';
+
+      return await this.debtRequestsRepository.save(debtRequest);
+    } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }

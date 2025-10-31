@@ -1,281 +1,135 @@
 import {
-  BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
-import * as ExcelJS from 'exceljs';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { DebtRequest, RequestStatus } from '../entities/debt-request.entity';
+import { Student } from '../entities/student.entity';
+import { Lesson } from '../entities/lesson.entity';
+import { User } from '../entities/user.entity';
+import { CreateDebtRequestDto } from './dto/create-debt-request.dto';
 
 @Injectable()
 export class StudentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(DebtRequest)
+    private debtRequestRepository: Repository<DebtRequest>,
+    @InjectRepository(Student)
+    private studentRepository: Repository<Student>,
+    @InjectRepository(Lesson)
+    private lessonRepository: Repository<Lesson>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
-  // СОЗДАНИЕ СТУДЕНТА
-  async create(createStudentDto: CreateStudentDto) {
-    try {
-      if (
-        createStudentDto.name.trim() === '' ||
-        createStudentDto.groupsId === null
-      ) {
-        throw new InternalServerErrorException('Заполните все строки!');
-      }
-      return this.prisma.student.create({
-        data: createStudentDto,
-        include: {
-          groups: true,
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
-  async createMany(
-    students: CreateStudentDto[],
-  ): Promise<StudentResponseDto[]> {
-    try {
-      const createdStudents = await Promise.all(
-        students.map((student) => {
-          if (student.name.trim() !== '' && student.groupsId) {
-            return this.prisma.student.create({
-              data: student,
-              include: {
-                groups: true, // Включаем данные о группе
-              },
-            });
-          }
-        }),
-      );
-      return createdStudents;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
-  async findAll() {
-    try {
-      return this.prisma.student.findMany({
-        include: {
-          groups: true,
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
-  async getReputationHistory(studentId: number) {
-    try {
-      // ИЩЕМ СТУДЕНТА С ИСТОРИЕЙ РЕПУТАЦИИ И НАЗВАНИЕМ ПРЕДМЕТА
-      const student = await this.prisma.student.findUnique({
-        where: { id: +studentId },
-        include: {
-          historyReps: {
-            include: {
-              lesson: true,
-            },
-          },
-        },
-      });
-
-      if (!student) {
-        throw new NotFoundException('Студент не найден');
-      }
-
-      // ФОРМАТИРУЕМ ОТВЕТ, ЧТОБЫ ВКЛЮЧИТЬ НАЗВАНИЕ ПРЕДМЕТА
-      const formattedHistory = student.historyReps.map((record) => ({
-        id: record.id,
-        change: record.change,
-        reason: record.reason,
-        createdAt: record.createdAt,
-        lesson: record.lesson ? record.lesson.name : null,
-        class: record.class ? record.class : '',
-      }));
-
-      return formattedHistory;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Ошибка при получении истории репутации',
-      );
-    }
-  }
-
-  // ПОЛУЧЕНИЕ EXCEL ФАЙЛА ДЛЯ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТ
-  async generateReputationHistoryExcel(
+  // СОЗДАНИЕ ЗАЯВКИ НА СПИСАНИЕ ДОЛГА
+  async createDebtRequest(
     studentId: number,
-  ): Promise<ExcelJS.Buffer> {
-    try {
-      const history = await this.getReputationHistory(studentId);
-      const studentName = await this.prisma.student.findUnique({
-        where: { id: +studentId },
-      });
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('История репутации');
-
-      worksheet.addRow([studentName.name]);
-      worksheet.mergeCells('A1:E1');
-
-      const mergedCell = worksheet.getCell('A1');
-      mergedCell.font = { bold: true, size: 14 };
-      mergedCell.alignment = { horizontal: 'center' };
-
-      worksheet.addRow([
-        'Предмет',
-        'Пара',
-        'Изменение репутации',
-        'Дата изменения',
-        'Причина',
-      ]);
-      worksheet.columns = [
-        { key: 'lesson', width: 20 },
-        { key: 'class', width: 20 },
-        { key: 'change', width: 25 },
-        { key: 'createdAt', width: 20 },
-        { key: 'reason', width: 30 },
-      ];
-      history.forEach((record) => {
-        const createdAt =
-          typeof record.createdAt === 'string'
-            ? new Date(record.createdAt)
-            : record.createdAt;
-
-        worksheet.addRow({
-          change: record.change ?? '',
-          reason: record.reason ?? '',
-          createdAt: createdAt ? createdAt.toLocaleString() : '',
-          lesson: record.lesson ?? '',
-          class: record.class ?? '',
-        });
-      });
-
-      return await workbook.xlsx.writeBuffer();
-    } catch (error) {
-      console.error('Ошибка при создании Excel-файла:', error);
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Ошибка при создании Excel-файла');
-    }
-  }
-
-  // ИЗМЕНИТЬ ДАННЫЕ СТУДЕНТА
-  async changeStud(id: number, dto: UpdateStudentDto) {
-    try {
-      if(dto.name.trim() === "") {
-        throw new NotFoundException("Строка пуста")
-      }
-      const updatedStud = await this.prisma.student.update({
-        where: { id },
-        data: dto,
-      });
-      return updatedStud;
-    } catch (error) {
-      throw new InternalServerErrorException('Ошибка при изменении студента');
-    }
-  }
-
-  // УДАЛИТЬ СТУДЕНТА
-  async deleteStud(id: number) {
-    try {
-      const deletedStud = await this.prisma.student.delete({
-        where: { id },
-      });
-      return deletedStud;
-    } catch (error) {
-      throw new InternalServerErrorException('Ошибка при удалении студента');
-    }
-  }
-
-  // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
-  async updateReputation(
-    studentId: number,
-    change: number,
-    reason?: string,
-    lessonId?: number,
-    isPunish?: boolean,
-    newLesson?: string,
-    correctDate?: string,
-    correctClass?: number,
+    createDebtRequestDto: CreateDebtRequestDto,
   ) {
-    try {
-      // ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ СТУДЕНТ
-      const student = await this.prisma.student.findUnique({
-        where: { id: studentId },
-      });
+    // Проверяем существование студента
+    const student = await this.studentRepository.findOne({
+      where: { id: studentId },
+    });
 
-      if (!student) {
-        throw new NotFoundException('Студент не найден');
-      }
-
-      // ЕСЛИ ПЕРЕДАН lessonId, ПРОВЕРЯЕМ, СУЩЕСТВУЕТ ЛИ ПРЕДМЕТ
-      if (lessonId !== -1) {
-        const lesson = await this.prisma.lessons.findUnique({
-          where: { id: lessonId },
-        });
-
-        if (!lesson) {
-          throw new NotFoundException('Предмет не найден');
-        }
-      } else {
-        if (!newLesson) {
-          throw new BadRequestException('Необходимо указать новый предмет');
-        }
-
-        // Проверяем, существует ли уже предмет с таким именем
-        const existingLesson = await this.prisma.lessons.findFirst({
-          where: { name: newLesson },
-        });
-
-        if (existingLesson) {
-          lessonId = existingLesson.id;
-        } else {
-          const newLessonRecord = await this.prisma.lessons.create({
-            data: {
-              name: newLesson,
-            },
-          });
-          lessonId = newLessonRecord.id;
-        }
-      }
-
-      // ОБНОВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
-      if (!isPunish && change < 0 && student.reputation + change < 0) {
-        throw new BadRequestException('Не хватает репутации!');
-      }
-
-      const updatedStudent = await this.prisma.student.update({
-        where: { id: studentId },
-        data: {
-          reputation: {
-            increment: change, // УВЕЛИЧИВАЕМ ИЛИ УМЕНЬШАЕМ РЕПУТАЦИЮ
-          },
-        },
-      });
-
-      // ДОБАВЛЯЕМ ЗАПИСЬ В ИСТОРИЮ РЕПУТАЦИЙ
-      await this.prisma.historyRep.create({
-        data: {
-          studentId,
-          change,
-          reason,
-          lessonId,
-          class: correctClass,
-          createdAt: correctDate ? new Date(correctDate) : new Date(),
-        },
-      });
-
-      return updatedStudent;
-    } catch (error) {
-      console.error('Ошибка при обновлении репутации:', error);
-      throw new InternalServerErrorException(
-        'Произошла ошибка при обновлении репутации',
-      );
+    if (!student) {
+      throw new NotFoundException('Студент не найден');
     }
+
+    // Проверяем существование предмета
+    const lesson = await this.lessonRepository.findOne({
+      where: { id: createDebtRequestDto.lessonId },
+    });
+
+    if (!lesson) {
+      throw new NotFoundException('Предмет не найден');
+    }
+
+    // Проверяем, что у студента достаточно репутации
+    if (student.reputation < createDebtRequestDto.points) {
+      throw new BadRequestException('Недостаточно репутации для списания');
+    }
+
+    // Создаем заявку
+    const debtRequest = this.debtRequestRepository.create({
+      studentId,
+      lessonId: createDebtRequestDto.lessonId,
+      points: createDebtRequestDto.points,
+      description: createDebtRequestDto.description,
+      status: RequestStatus.PENDING,
+    });
+
+    return await this.debtRequestRepository.save(debtRequest);
+  }
+
+  // ПОЛУЧЕНИЕ ИСТОРИИ ЗАЯВОК СТУДЕНТА
+  async getDebtRequestsHistory(studentId: number) {
+    // Проверяем существование студента
+    const student = await this.studentRepository.findOne({
+      where: { id: studentId },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Студент не найден');
+    }
+
+    const debtRequests = await this.debtRequestRepository.find({
+      where: { studentId },
+      relations: ['lesson', 'teacher'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return debtRequests.map(request => ({
+      id: request.id,
+      lesson: request.lesson ? request.lesson.name : 'Неизвестный предмет',
+      points: request.points,
+      status: request.status,
+      description: request.description,
+      teacherComment: request.teacherComment,
+      createdAt: request.createdAt,
+      teacher: request.teacher ? request.teacher.name : null,
+    }));
+  }
+
+  // ПОЛУЧЕНИЕ ДЕТАЛЬНОЙ ИНФОРМАЦИИ О ЗАЯВКЕ
+  async getDebtRequestById(studentId: number, requestId: number) {
+    const debtRequest = await this.debtRequestRepository.findOne({
+      where: { id: requestId },
+      relations: ['lesson', 'teacher', 'student'],
+    });
+
+    if (!debtRequest) {
+      throw new NotFoundException('Заявка не найдена');
+    }
+
+    // Проверяем, что заявка принадлежит студенту
+    if (debtRequest.studentId !== studentId) {
+      throw new ForbiddenException('Нет доступа к этой заявке');
+    }
+
+    return {
+      id: debtRequest.id,
+      lesson: debtRequest.lesson ? {
+        id: debtRequest.lesson.id,
+        name: debtRequest.lesson.name,
+      } : null,
+      points: debtRequest.points,
+      status: debtRequest.status,
+      description: debtRequest.description,
+      teacherComment: debtRequest.teacherComment,
+      createdAt: debtRequest.createdAt,
+      teacher: debtRequest.teacher ? {
+        id: debtRequest.teacher.id,
+        name: debtRequest.teacher.name,
+      } : null,
+      student: {
+        id: debtRequest.student.id,
+        name: debtRequest.student.name,
+        reputation: debtRequest.student.reputation,
+      },
+    };
   }
 }
