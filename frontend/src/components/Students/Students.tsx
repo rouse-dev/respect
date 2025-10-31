@@ -7,10 +7,9 @@ import { TbMoodSad } from "react-icons/tb";
 import useFilterStore from "../../store/filterStore";
 import useStudentStore from "../../store/studentStore";
 import usePopupStore from "../../store/popupStore";
-import { Student } from "../../interfaces/student";
 
 const Students = () => {
-  const { currentStudent, sortedStudents, setStudents, setSortedStudents } = useStudentStore();
+  const { currentStudent, sortedStudents, setStudents } = useStudentStore();
   const { popupElementRef } = usePopupStore();
   const { search } = useFilterStore();
   const [isLoading, setLoading] = useState(false);
@@ -20,8 +19,7 @@ const Students = () => {
       setLoading(true);
       const response = await GetAllStudents();
       if (response.succes && response.data) {
-        setStudents(response.data)
-        setSortedStudents((response.data as Student[]).sort((a, b) => a.name.localeCompare(b.name, "ru")));
+        setStudents(response.data);
       }
     } catch (error) {
       console.error(error);

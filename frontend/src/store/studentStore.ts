@@ -12,11 +12,14 @@ interface IStudentStore {
 
 const useStudentStore = create<IStudentStore>((set) => ({
     currentStudent: null,
-    setCurrentStudent: (state: Student | null) => {set(() => ({currentStudent: state}))},
+    setCurrentStudent: (state: Student | null) => set(() => ({currentStudent: state})),
     students: [],
-    setStudents: (state: Student[]) => {set(() => ({students: state}))},
+    setStudents: (state: Student[]) => set(() => ({students: state})),
     sortedStudents: [],
-    setSortedStudents: (state: Student[]) => {set(() => ({sortedStudents: state}))},
+    setSortedStudents: (state: Student[]) => {
+        console.log('setSortedStudents')
+        set(() => ({sortedStudents: state}))
+    },
 }));
 
 export default useStudentStore;

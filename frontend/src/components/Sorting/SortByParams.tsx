@@ -1,70 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
-import useStudentStore from "../../store/studentStore";
-import useGroupStore from "../../store/groupStore";
 import useFilterStore from "../../store/filterStore";
 
 const SortByParams = () => {
   const {
-    search,
+    sortMethods,
     currentSortMethod,
     setCurrentSortMethod,
     sortDirection,
     setSortDirection,
   } = useFilterStore();
-  const { currentGroup } = useGroupStore();
-  const { students, setSortedStudents } = useStudentStore();
 
-  const sortMethods = ["По фамилии", "По группе", "По рейтингу"];
   const [dropdown, setDropdown] = useState(false);
-
-  useEffect(() => {
-    let result = structuredClone(students);
-
-    if (currentGroup) {
-      result = result.filter((el) => el.groups.name === currentGroup.name);
-    }
-    if (search.length > 0) {
-      result = result.filter((el) =>
-        el.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    switch (currentSortMethod) {
-      case "По фамилии": {
-        result.sort((a, b) => {
-          const compareResult = a.name.localeCompare(b.name, "ru");
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      case "По группе": {
-        result.sort((a, b) => {
-          const compareResult = a.groups.name.localeCompare(
-            b.groups.name,
-            "ru",
-            { numeric: true }
-          );
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      case "По рейтингу": {
-        result.sort((a, b) => {
-          const compareResult = a.reputation - b.reputation;
-          return sortDirection ? compareResult : -compareResult;
-        });
-        break;
-      }
-      default:
-        break;
-    }
-
-    console.log('PENIIIIIIÏs')
-
-    setSortedStudents(result);
-  }, [search, students, currentGroup, currentSortMethod, sortDirection]);
 
   return (
     <div className="flex flex-row gap-2 sm:max-w-lg w-full">
@@ -91,9 +39,7 @@ const SortByParams = () => {
             <button
               className="px-3 py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm text-left"
               key={i}
-              onClick={(_) => {
-                setCurrentSortMethod(el);
-              }}
+              onClick={() => currentSortMethod !== el && setCurrentSortMethod(el)}
             >
               {el}
             </button>
@@ -102,7 +48,7 @@ const SortByParams = () => {
       </div>
       <button
         className="px-4 py-2 rounded-lg gap-5 bg-[--respect-purple-deep] cursor-pointer hover:scale-98 hover:opacity-90"
-        onClick={(_) => {
+        onClick={() => {
           setSortDirection(!sortDirection);
         }}
       >
