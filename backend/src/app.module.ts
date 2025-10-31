@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TeachersModule } from './teachers/teachers.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StudentsModule } from './students/students.module';
-import { GroupsModule } from './groups/groups.module';
 import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { LessonsModule } from './lessons/lessons.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeachersModule } from './teachers/teachers.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -34,11 +33,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
       inject: [ConfigService],
     }),
-    TeachersModule,
     StudentsModule,
-    GroupsModule,
-    LessonsModule,
     AuthModule,
+    TeachersModule,
+    AdminModule,
   ],
   controllers: []
 })

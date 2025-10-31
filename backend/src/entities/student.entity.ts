@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Group } from './group.entity';
 import { HistoryRep } from './history-rep.entity';
+import { DebtRequest } from './debt-request.entity';
 
 @Entity('students')
 export class Student {
@@ -31,6 +32,9 @@ export class Student {
 
   @OneToMany(() => HistoryRep, historyRep => historyRep.student)
   historyReps: HistoryRep[];
+
+  @OneToMany(() => DebtRequest, debtRequest => debtRequest.student)
+  debtRequests: DebtRequest[];
 
   @CreateDateColumn()
   createdAt: Date;

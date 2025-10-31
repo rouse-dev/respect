@@ -1,125 +1,97 @@
-import { Controller, Get, Post, Body, Param, Patch, UseGuards, Res, NotFoundException, InternalServerErrorException, Delete } from '@nestjs/common';
-import { StudentsService } from './students.service';
-import { CreateManyStudentsDto, CreateStudentDto, StudentResponseDto } from './dto/create-student.dto';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Request,
+  UseGuards,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { StudentsService } from './students.service';
+import { CreateDebtRequestDto } from './dto/create-debt-request.dto';
 
 @ApiTags('Студенты')
 @ApiBearerAuth()
 @Controller('students')
-@UseGuards(AuthGuard('jwt')) // JWT ЗАЩИТА ДЛЯ ВСЕХ РОУТОВ СТУДЕНТОВ
+@UseGuards(AuthGuard('jwt'))
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
-  // СОЗДАНИЕ СТУДЕНТА
-  @Post()
-  @ApiOperation({ summary: 'Создание студента' })
-  @ApiBody({ type: CreateStudentDto })
-  @ApiResponse({ status: 201, description: 'Студент успешно создан' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentsService.create(createStudentDto);
-  }
-
-  // СОЗДАНИЕ МНОЖЕСТВА СТУДЕНТОВ
-  @Post('many')
-  @ApiOperation({ summary: 'Создание множества студентов' })
-  @ApiBody({ type: CreateManyStudentsDto })
-  @ApiResponse({ status: 201, description: 'Студенты успешно созданы', type: [StudentResponseDto] })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async createMany(@Body() createManyStudentsDto: CreateManyStudentsDto) {
-    return this.studentsService.createMany(createManyStudentsDto.students);;
-  }
-
-  // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ
-  @Get()
-  @ApiOperation({ summary: 'Получение всех студентов' })
-  @ApiResponse({ status: 200, description: 'Список студентов' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  findAll() {
-    return this.studentsService.findAll();
-  }
-
-  // ПОЛУЧЕНИЕ ИСТОРИЮ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
-  @Get(':id/history')
-  @ApiOperation({ summary: 'Получить историю репутации студента' })
-  @ApiResponse({ status: 200, description: 'История репутации успешно получена' })
-  @ApiResponse({ status: 404, description: 'Студент не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async getReputationHistory(@Param('id') id: string) {
-    return this.studentsService.getReputationHistory(+id);
-  }
-
-  // ПОЛУЧИТЬ EXCEL ФАЙЛ С ИСТОРИЕЙ РЕПУТАЦИИ СТУДЕНТА ПО ЕГО АЙДИ (ПЕРЕДАЕТСЯ ЧЕРЕЗ ПАРАМЕТР)
-  @Get(':id/history/excel')
-  @ApiOperation({ summary: 'Получить excel файл с историей репутации студента' })
-  @ApiResponse({ status: 200, description: 'Excel файл с историей репутации успешно получен' })
-  @ApiResponse({ status: 404, description: 'Студент не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async downloadReputationHistoryExcel(@Param('id') studentId: number, @Res() res: Response) {
-    try {
-      const buffer = await this.studentsService.generateReputationHistoryExcel(studentId);
-      res.setHeader(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      );
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="reputation_history_${studentId}.xlsx"`,
-      );
-      res.send(buffer);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Ошибка при скачивании файла');
-    }
-  }
-
-  // ИЗМЕНИТЬ ДАННЫЕ СТУДЕНТА
-  @Patch(':id')
-  @ApiOperation({ summary: 'Изменения данных студента' })
-  @ApiResponse({ status: 200, description: 'Данные студента успешно изменены' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 404, description: 'Студент не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async changeStudInfo(@Param('id') id: string, @Body() dto: UpdateStudentDto) {
-    return this.studentsService.changeStud(+id, dto)
-  }
-
-  // УДАЛИТЬ СТУДЕНТА
-  @Delete(':id')
-  @ApiOperation({ summary: 'Удаление студента' })
-  @ApiResponse({ status: 200, description: 'Студент успешно удален' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 404, description: 'Студент не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  async delStud(@Param('id') id: string) {
-    return this.studentsService.deleteStud(+id)
-  }
-
-  // ДОБАВИТЬ / УБАВИТЬ РЕПУТАЦИЮ СТУДЕНТА
-  @Patch(':id/reputation')
-  @ApiOperation({ summary: 'Изменение репутации студента' })
-  @ApiResponse({ status: 200, description: 'Репутация успешно изменена' })
-  @ApiResponse({ status: 401, description: 'Требуется авторизация' })
-  @ApiResponse({ status: 404, description: 'Студент не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
-  updateReputation(
-    @Param('id') id: string,
-    @Body('change') change: number,
-    @Body('reason') reason?: string,
-    @Body('lessonId') lessonId?: number,
-    @Body('isPunish') isPunish?: boolean,
-    @Body('newLesson') newLesson?: string,
-    @Body('date') correctDate?: string,
-    @Body('class') correctClass?: number,
+  @Post('debt-requests')
+  @ApiOperation({ summary: 'Отправить заявку на списание долга' })
+  @ApiBody({ type: CreateDebtRequestDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Заявка на списание успешно отправлена' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Неверные данные запроса' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Предмет не найден' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Недостаточно прав' 
+  })
+  async createDebtRequest(
+    @Request() req,
+    @Body() createDebtRequestDto: CreateDebtRequestDto,
   ) {
-    return this.studentsService.updateReputation(+id, change, reason, lessonId, isPunish, newLesson, correctDate, correctClass);
+    const studentId = req.user.id;
+    return this.studentsService.createDebtRequest(
+      studentId,
+      createDebtRequestDto,
+    );
+  }
+
+  @Get('debt-requests')
+  @ApiOperation({ summary: 'Получить историю своих заявок на списание' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'История заявок успешно получена' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Недостаточно прав' 
+  })
+  async getDebtRequestsHistory(@Request() req) {
+    const studentId = req.user.id;
+    return this.studentsService.getDebtRequestsHistory(studentId);
+  }
+
+  @Get('debt-requests/:id')
+  @ApiOperation({ summary: 'Получить детальную информацию о заявке по ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID заявки' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Информация о заявке успешно получена' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Заявка не найдена' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Недостаточно прав для просмотра этой заявки' 
+  })
+  async getDebtRequestById(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const studentId = req.user.id;
+    return this.studentsService.getDebtRequestById(studentId, id);
   }
 }

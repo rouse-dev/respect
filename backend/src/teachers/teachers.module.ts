@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeachersService } from './teachers.service';
 import { TeachersController } from './teachers.controller';
-import { User } from '../entities/user.entity';
-import { AuthModule } from '../auth/auth.module';
+import { DebtRequest } from '../entities/debt-request.entity';
+import { Student } from '../entities/student.entity';
+import { HistoryRep } from '../entities/history-rep.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    AuthModule,
+    TypeOrmModule.forFeature([DebtRequest, Student, HistoryRep]),
   ],
   controllers: [TeachersController],
   providers: [TeachersService],
