@@ -5,6 +5,7 @@ import { ImUndo2 } from "react-icons/im";
 import { useRef, useState } from "react";
 import { ChangeTeacherAvatar, ChangeTeacherInfo } from "../../service/server";
 import { toast } from "react-toastify";
+import { DebtHistoryContainer } from "./DebtHistory/DebtHistoryContainer";
 
 interface useUserStoreInterface {
     auth: boolean,
@@ -37,7 +38,8 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                 <button className="hidden sm:flex flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep] cursor-pointer" onClick={handleLogout}>Выход <IoMdExit /></button>
                 <Link className="flex flex-row items-center justify-center gap-2 w-full text-center sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/'>На главную <ImUndo2 /></Link>
             </div>
-            <div className="flex flex-col items-center gap-3 w-full sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
+            <div className="flex justify-between w-full">
+                <div className="flex flex-col items-center gap-3 w-[35%] sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
                 <AvatarContainer useUserStore={useUserStore} setAvatar={setAvatar} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Имя" type="text" defaultValue={useUserStore.name} required onChange={e => setChanges(prev => ({...prev, name: e.target.value}))} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" defaultValue={useUserStore.email} required onChange={e => setChanges(prev => ({...prev, email: e.target.value}))} />
@@ -69,8 +71,13 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                         });
                     }
                 }}>Сохранить изменения</button>
+                </div>
+                <DebtHistoryContainer/>
             </div>
-            <button className="flex sm:hidden flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep] cursor-pointer" onClick={handleLogout}>Выход <IoMdExit /></button>
+           
+           
+            <button className="flex sm:hidden flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep] cursor-pointer" onClick={handleLogout}>Выход <IoMdExit /></button> 
+           
         </div>
     )
 }
