@@ -15,10 +15,10 @@ interface IFilterStore {
 const useFilterStore = create<IFilterStore>((set) => ({
     search: '',
     setSearch: (state: string) => {set(() => ({search: state}))},
-    sortDirection: false,
+    sortDirection: true,
     setSortDirection: (state: boolean) => {set(() => ({sortDirection: state}))},
     sortMethods: ["По фамилии", "По группе", "По рейтингу"],
-    currentSortMethod: "По рейтингу",
+    currentSortMethod: "По фамилии",
     setCurrentSortMethod: (state: string) => {set(() => ({currentSortMethod: state}))},
     sortTop: 0,
     setSortTop: (state: number) => {set(() => ({sortTop: state}))},

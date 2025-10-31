@@ -23,7 +23,7 @@ const HistoryButton = ({ student }: HistoryButtonInterface) => {
                 setIsHistoryPopupOpen(true);
             }}
         >
-            {(sortedStudents.sort((a, b) => b.reputation - a.reputation)[0].id === student.id) && <FaCrown className="text-yellow-400 mr-auto sm:mr-0 self-center"/>}
+            {(structuredClone(sortedStudents).sort((a, b) => b.reputation - a.reputation)[0].id === student.id) && <FaCrown className="text-yellow-400 mr-auto sm:mr-0 self-center"/>}
             {student.name}
         </button>
         <HistoryPopup
