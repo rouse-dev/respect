@@ -2,8 +2,8 @@ import { useState } from "react";
 import GroupPopup from "./add_group";
 import LessonPopup from "./add_lesson";
 import StudentPopup from "./add_students";
-import { useAppContext } from "../../../../store/AppContext";
 import SingleStudentPopup from "./add_single_student";
+import usePopupStore from "../../../../store/popupStore";
 
 // Не используется на сайте
 const Add = () => {
@@ -12,7 +12,7 @@ const Add = () => {
   const [isStudentPopup, setIsStudentPopup] = useState(false);
   const [isSingleStudentPopup, setIsSingleStudentPopup] = useState(false);
 
-  const {setPopupActive} = useAppContext();
+  const {setPopupActive} = usePopupStore();
 
   return (
     <>

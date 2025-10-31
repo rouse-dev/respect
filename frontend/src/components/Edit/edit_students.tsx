@@ -7,7 +7,6 @@ import {
   FaAngleDown,
   FaAngleUp,
 } from "react-icons/fa";
-import { Group, Student, StudentData, useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import StudentPopup from "../common/popups/addPopups/add_students";
@@ -19,13 +18,20 @@ import {
 } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { TbCancel } from "react-icons/tb";
+import { Student, StudentData } from "../../interfaces/student";
+import { Group } from "../../interfaces/group";
+import useStudentStore from "../../store/studentStore";
+import useGroupStore from "../../store/groupStore";
+import usePopupStore from "../../store/popupStore";
 
 interface EditStudentsInterface {
   isOpen: boolean;
 }
 
 const EditStudents = ({ isOpen }: EditStudentsInterface) => {
-  const { students, setPopupActive, setStudents, groups } = useAppContext();
+  const { setPopupActive } = usePopupStore();
+  const { students, setStudents } = useStudentStore();
+  const { groups } = useGroupStore();
   const [search, setSearch] = useState("");
   const [isStudentPopup, setIsStudentPopup] = useState(false);
   const [isSingleStudentPopup, setIsSingleStudentPopup] = useState(false);

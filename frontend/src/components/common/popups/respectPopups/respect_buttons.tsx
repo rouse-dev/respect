@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Student, useAppContext } from "../../../../store/AppContext";
 import AddPopup from "./add_popup";
 import DiscardPopup from "./discard_popup";
 import RemovePopup from "./remove_popup";
 import { FaCheck, FaMinus, FaPlus } from "react-icons/fa";
+import usePopupStore from "../../../../store/popupStore";
+import { Student } from "../../../../interfaces/student";
 
 interface RespectButtonsInterface {
     student: Student,
@@ -11,7 +12,7 @@ interface RespectButtonsInterface {
 }
 
 const RespectButtons = ({ student, fetchStudents }: RespectButtonsInterface) => {
-    const {setPopupActive} = useAppContext();
+    const {setPopupActive} = usePopupStore();
 
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
     const [isRemovePopupOpen, setIsRemovePopupOpen] = useState(false);

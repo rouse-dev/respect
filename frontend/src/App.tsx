@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useAppContext } from "./store/AppContext";
 import { AuthRoutes, GuestRoutes } from "./config/routes";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import useUserStore from "./store/userStore";
 import { useEffect } from "react";
+import usePopupStore from "./store/popupStore";
 
 const App = () => {
   const {auth} = useUserStore();
   const navigate = useNavigate();
-  const { popupActive } = useAppContext();
+  const { popupActive } = usePopupStore();
 
   useEffect(() => {
     document.body.style.setProperty('overflow', popupActive ? "hidden" : "");
@@ -19,6 +19,7 @@ const App = () => {
     !auth && AuthRoutes.find(el => el.path === window.location.pathname) && navigate('/login');
     auth && GuestRoutes.find(el => el.path === window.location.pathname) && navigate('/');
   }, [auth, window.location.pathname]);
+
   return (
     <>
       <Routes>

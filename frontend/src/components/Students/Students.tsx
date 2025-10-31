@@ -1,13 +1,18 @@
-import { useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import { GetAllStudents } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import RespectButtons from "../common/popups/respectPopups/respect_buttons";
 import HistoryButton from "../common/popups/historyPopup/history_button";
 import { TbMoodSad } from "react-icons/tb";
+import useFilterStore from "../../store/filterStore";
+import useStudentStore from "../../store/studentStore";
+import usePopupStore from "../../store/popupStore";
+import { Student } from "../../interfaces/student";
 
 const Students = () => {
-  const { search, currentStudent, sortedStudents, setStudents, setSortedStudents,popupElementRef } = useAppContext();
+  const { currentStudent, sortedStudents, setStudents, setSortedStudents } = useStudentStore();
+  const { popupElementRef } = usePopupStore();
+  const { search } = useFilterStore();
   const [isLoading, setLoading] = useState(false);
 
   const fetchStudents = async () => {
@@ -16,7 +21,7 @@ const Students = () => {
       const response = await GetAllStudents();
       if (response.succes && response.data) {
         setStudents(response.data)
-        setSortedStudents(response.data);
+        setSortedStudents((response.data as Student[]).sort((a, b) => a.name.localeCompare(b.name, "ru")));
       }
     } catch (error) {
       console.error(error);
@@ -30,8 +35,7 @@ const Students = () => {
   }, []);
 
   useEffect(() => {
-    
-   
+    if (!popupElementRef) return;
 
     if (popupElementRef.current) {
       if (!currentStudent || Object.keys(currentStudent).length === 0) {

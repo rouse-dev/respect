@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaRegPlusSquare, FaTrashAlt, FaSave } from "react-icons/fa";
 import { deleteLesson, getLessons, updateLesson } from "../../service/server";
-import { LessonInterface, useAppContext } from "../../store/AppContext";
 import LessonPopup from "../common/popups/addPopups/add_lesson";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
 import { TbCancel } from "react-icons/tb";
+import usePopupStore from "../../store/popupStore";
+import useSubjectStore from "../../store/subjectStore";
+import { Subject } from "../../interfaces/subject";
 
 interface EditLessonsInterface {
   isOpen: boolean;
 }
 
 const EditLessons = ({ isOpen }: EditLessonsInterface) => {
-  const { setPopupActive, lessons, setLessons } = useAppContext();
+  const { setPopupActive } = usePopupStore();
+  const { subjects, setSubjects } = useSubjectStore();
 
   const [search, setSearch] = useState("");
   const [isLessonPopup, setIsLessonPopup] = useState(false);
-  const [sortedLessons, setSortedLessons] = useState<LessonInterface[]>([...lessons]);
+  const [sortedLessons, setSortedLessons] = useState<Subject[]>([...subjects]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
@@ -29,14 +32,14 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
   const handleSave = async (id: number, name: string) => {
     if (newName === name) return toast.error("Имена совпадают!");
     await updateLesson({ id, name: newName });
-    setLessons(
-      lessons.map((lesson) =>
-        lesson.id === id ? { ...lesson, name: newName } : lesson
+    setSubjects(
+      subjects.map((subject) =>
+        subject.id === id ? { ...subject, name: newName } : subject
       )
     );
     setSortedLessons(
-      sortedLessons.map((lesson) =>
-        lesson.id === id ? { ...lesson, name: newName } : lesson
+      sortedLessons.map((subject) =>
+        subject.id === id ? { ...subject, name: newName } : subject
       )
     );
     setEditingId(null);
@@ -45,9 +48,9 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
   const HandleDelete = async (lessonId: number) => {
     await deleteLesson(lessonId).then(_ => {
       getLessons().then(response => {
-        setLessons(response);
+        setSubjects(response);
         setSortedLessons(response.data.filter(
-          (lesson: LessonInterface) => lesson.name.toLowerCase().includes(search.toLowerCase())
+          (subject: Subject) => subject.name.toLowerCase().includes(search.toLowerCase())
         ));
       })
     });
@@ -57,7 +60,7 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
     try {
       setLoading(true);
       getLessons().then((response) => {
-        setLessons(response);
+        setSubjects(response);
         setSortedLessons(response);
       });
     } catch (error) {
@@ -70,12 +73,12 @@ const EditLessons = ({ isOpen }: EditLessonsInterface) => {
   useEffect(() => {
     search.length > 0
       ? setSortedLessons(
-          [...lessons].filter((lesson: LessonInterface) =>
-            lesson.name.toLowerCase().includes(search.toLowerCase())
+          [...subjects].filter((subject: Subject) =>
+            subject.name.toLowerCase().includes(search.toLowerCase())
           )
         )
-      : setSortedLessons([...lessons]);
-  }, [search, lessons]);
+      : setSortedLessons([...subjects]);
+  }, [search, subjects]);
 
   return (
     <>

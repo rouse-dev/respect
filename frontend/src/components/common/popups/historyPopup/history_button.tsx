@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { Student, useAppContext } from "../../../../store/AppContext";
 import HistoryPopup from "./history_popup";
 import { FaCrown } from "react-icons/fa";
+import { Student } from "../../../../interfaces/student";
+import useStudentStore from "../../../../store/studentStore";
+import usePopupStore from "../../../../store/popupStore";
 
 interface HistoryButtonInterface {
     student: Student
 }
 
 const HistoryButton = ({ student }: HistoryButtonInterface) => {
-    const {setPopupActive, sortedStudents} = useAppContext();
+    const {setPopupActive} = usePopupStore();
+    const { sortedStudents } = useStudentStore();
     const [isHistoryPopupOpen, setIsHistoryPopupOpen] = useState(false);
 
     return (

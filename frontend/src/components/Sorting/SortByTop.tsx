@@ -1,11 +1,15 @@
 import { useEffect } from "react";
-import { useAppContext } from "../../store/AppContext";
+import useStudentStore from "../../store/studentStore";
+import useGroupStore from "../../store/groupStore";
+import useFilterStore from "../../store/filterStore";
 
 const SortByTop = () => {
-    const {currentGroup, students, search, currentSortMethod, sortDirection, sortTop, setSortTop, setSortedStudents} = useAppContext();
+    const { search, currentSortMethod, sortDirection, sortTop, setSortTop } = useFilterStore();
+    const { students, setSortedStudents } = useStudentStore();
+    const { currentGroup } = useGroupStore();
 
     useEffect(() => {
-        let result = [...students];
+        let result = structuredClone(students);
 
         if (currentGroup) {
             result = result.filter((el) => el.groups.name === currentGroup.name);
@@ -15,42 +19,28 @@ const SortByTop = () => {
                 el.name.toLowerCase().includes(search.toLowerCase())
             );
         }
-
         if (sortTop > 0) {
-            result.sort((a, b) => b.reputation - a.reputation);
-        
-            setSortedStudents(result.slice(0, sortTop));
+
+          result.sort((a, b) => b.reputation - a.reputation);
+          setSortedStudents(result.slice(0, sortTop));
+
         } else {
-            switch (currentSortMethod) {
-                case "По фамилии": {
-                  result.sort((a, b) => {
-                    const compareResult = a.name.localeCompare(b.name, "ru");
-                    return sortDirection ? compareResult : -compareResult;
-                  });
-                  break;
-                }
-                case "По группе": {
-                  result.sort((a, b) => {
-                    const compareResult = a.groups.name.localeCompare(
-                      b.groups.name,
-                      "ru",
-                      { numeric: true }
-                    );
-                    return sortDirection ? compareResult : -compareResult;
-                  });
-                  break;
-                }
-                case "По рейтингу": {
-                  result.sort((a, b) => {
-                    const compareResult = a.reputation - b.reputation;
-                    return sortDirection ? compareResult : -compareResult;
-                  });
-                  break;
-                }
-                default:
-                    break;
+
+          switch (currentSortMethod) {
+            case "По фамилии": {
+              result.sort((a, b) => a.name.localeCompare(b.name, "ru"));
+              break;
             }
-            setSortedStudents(result);
+            case "По группе": {
+              result.sort((a, b) => a.groups.name.localeCompare(b.groups.name, "ru", { numeric: true }));
+              break;
+            }
+            case "По рейтингу": {
+              result.sort((a, b) => a.reputation - b.reputation);
+              break;
+            }
+          }
+          setSortedStudents(sortDirection ? result : result.reverse());
         }
       }, [sortTop, search, students, currentGroup, currentSortMethod, sortDirection]);
     return (

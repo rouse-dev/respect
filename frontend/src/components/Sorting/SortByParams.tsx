@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../../store/AppContext";
 import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import useStudentStore from "../../store/studentStore";
+import useGroupStore from "../../store/groupStore";
+import useFilterStore from "../../store/filterStore";
 
 const SortByParams = () => {
   const {
+    search,
     currentSortMethod,
     setCurrentSortMethod,
     sortDirection,
     setSortDirection,
-    students,
-    currentGroup,
-    search,
-    setSortedStudents,
-  } = useAppContext();
+  } = useFilterStore();
+  const { currentGroup } = useGroupStore();
+  const { students, setSortedStudents } = useStudentStore();
 
   const sortMethods = ["По фамилии", "По группе", "По рейтингу"];
   const [dropdown, setDropdown] = useState(false);
 
   useEffect(() => {
-    let result = [...students];
+    let result = structuredClone(students);
+
     if (currentGroup) {
       result = result.filter((el) => el.groups.name === currentGroup.name);
     }
@@ -58,6 +60,8 @@ const SortByParams = () => {
       default:
         break;
     }
+
+    console.log('PENIIIIIIÏs')
 
     setSortedStudents(result);
   }, [search, students, currentGroup, currentSortMethod, sortDirection]);

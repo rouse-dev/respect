@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { GetAllGroups, AddStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
-import { Group, useAppContext } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
+import useStudentStore from "../../../../store/studentStore";
+import useGroupStore from "../../../../store/groupStore";
+import usePopupStore from "../../../../store/popupStore";
+import { Group } from "../../../../interfaces/group";
 
 interface SingleStudentPopupInterface {
   onClose: () => void;
@@ -15,7 +18,9 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
   const [studentName, setStudentName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { students, setStudents, selectedGroup, setSelectedGroup, setPopupActive } = useAppContext();
+  const { selectedGroup, setSelectedGroup } = useGroupStore();
+  const { students, setStudents } = useStudentStore();
+  const { setPopupActive } = usePopupStore();
   const [dropdown, setDropdown] = useState(false);
  
   useEffect(() => {

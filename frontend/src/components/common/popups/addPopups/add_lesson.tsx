@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addLesson } from "../../../../service/server";
-import { LessonInterface, useAppContext } from "../../../../store/AppContext";
+import { Subject } from "../../../../interfaces/subject";
+import useSubjectStore from "../../../../store/subjectStore";
 
 interface AddLessonPopup{
     onClose:()=>void;
@@ -10,13 +11,13 @@ interface AddLessonPopup{
 const LessonPopup = ({ isOpen, onClose }:AddLessonPopup)=>{
   const [loading, setLoading] = useState(false);
   const [newLesson, setLesson] = useState('');
-  const {lessons, setLessons} = useAppContext();
+  const {subjects, setSubjects} = useSubjectStore();
 
   const addLessonFunc = async () => {
     try {
       setLoading(true);
-      addLesson(newLesson).then((response: LessonInterface) => {
-        setLessons([...lessons, response]);
+      addLesson(newLesson).then((response: Subject) => {
+        setSubjects([...subjects, response]);
       })
     } catch (error) {
       console.error(error)

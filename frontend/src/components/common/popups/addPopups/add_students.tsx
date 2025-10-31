@@ -1,12 +1,16 @@
 import { useState, useEffect,useRef } from "react";
 import { GetAllGroups, AddStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
-import { Group, StudentData, useAppContext } from "../../../../store/AppContext";
 import ExcelReader from "../../utils/excelReader";
 import { toast } from "react-toastify";
 
 import hint from '../../../../assets/media/hint.png';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { Group } from "../../../../interfaces/group";
+import { StudentData } from "../../../../interfaces/student";
+import useStudentStore from "../../../../store/studentStore";
+import useGroupStore from "../../../../store/groupStore";
+import usePopupStore from "../../../../store/popupStore";
 
 interface AddStudentPopup {
   onClose: () => void;
@@ -23,7 +27,9 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [data, setData] = useState<StudentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {setPopupActive, students, setStudents, selectedGroup, setSelectedGroup, exportGroup, setExportGroup} = useAppContext();
+  const { students, setStudents } = useStudentStore();
+  const { selectedGroup, setSelectedGroup, exportGroup, setExportGroup } = useGroupStore();
+  const { setPopupActive } = usePopupStore();
   const [dropdown, setDropdown] = useState(false);
 
   const hintRef = useRef<HTMLDivElement>(null);

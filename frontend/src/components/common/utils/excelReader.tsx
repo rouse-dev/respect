@@ -1,11 +1,12 @@
 import * as XLSX from 'xlsx';
 import { useCallback, useState } from 'react';
-import { ExcelReaderProps, useAppContext } from '../../../store/AppContext';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
+import { ExcelReaderProps } from '../../../interfaces/excel_reader';
+import useGroupStore from '../../../store/groupStore';
 
 const ExcelReader = ({ setData }: ExcelReaderProps) => {
-  const { selectedGroup } = useAppContext();
+  const { selectedGroup } = useGroupStore();
   const [fileLoaded, setFileLoaded] = useState(false);
 
   const handleFile = (file: File) => {

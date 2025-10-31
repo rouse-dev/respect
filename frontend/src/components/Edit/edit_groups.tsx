@@ -1,19 +1,17 @@
 import { FaEdit, FaRegPlusSquare, FaTrashAlt, FaSave } from "react-icons/fa";
-import { Group, useAppContext } from "../../store/AppContext";
 import { useEffect, useState } from "react";
 import GroupPopup from "../common/popups/addPopups/add_group";
 import { deleteGroup, GetAllGroups, updateGroup } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
 import { TbCancel } from "react-icons/tb";
+import { Group } from "../../interfaces/group";
+import useGroupStore from "../../store/groupStore";
+import usePopupStore from "../../store/popupStore";
 
-
-interface EditGroupsInterface {
-  isOpen: boolean;
-}
-
-const EditGroups = ({ isOpen }: EditGroupsInterface) => {
-  const { groups, setPopupActive, setGroups } = useAppContext();
+const EditGroups = ({isOpen}: {isOpen: Boolean}) => {
+  const { setPopupActive } = usePopupStore();
+  const { groups, setGroups } = useGroupStore();
   const [search, setSearch] = useState("");
   const [isGroupPopup, setIsGroupPopup] = useState(false);
   const [loading, setLoading] = useState(false);

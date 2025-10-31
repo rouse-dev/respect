@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { ChangeRespect, getLessons } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
-import { Student, Subject } from "../../../../store/AppContext";
 import { toast } from "react-toastify";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { Student } from "../../../../interfaces/student";
+import { Subject } from "../../../../interfaces/subject";
 
 interface RemovePopupProps {
   student: Student;

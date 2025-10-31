@@ -1,6 +1,6 @@
-import { StudentData } from "../store/AppContext";
 import { toast } from "react-toastify";
 import client from "./client";
+import { StudentData } from "../interfaces/student";
 
 interface LoginUserData {
   email: string;

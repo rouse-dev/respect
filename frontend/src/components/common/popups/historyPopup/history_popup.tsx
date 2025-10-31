@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { HistoryStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
-import { Student, useAppContext } from "../../../../store/AppContext";
 import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
 import Filter from "./Filter";
 import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
+import { Student } from "../../../../interfaces/student";
+import usePopupStore from "../../../../store/popupStore";
 
 interface HistoryPopupProps {
   student: Student
@@ -27,7 +28,7 @@ const HistoryPopup = ({
   onClose,
   isOpen
 }: HistoryPopupProps) => {
-  const { setPopupActive,popupElementRef } = useAppContext();
+  const { setPopupActive,popupElementRef } = usePopupStore();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [_, setSortedHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);

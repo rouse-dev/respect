@@ -1,7 +1,7 @@
-import { useAppContext } from "../../store/AppContext";
+import useFilterStore from "../../store/filterStore";
 
 const SortBySearch = () => {
-  const { search, setSearch } = useAppContext();
+  const { search, setSearch } = useFilterStore();
 
   return (
     <input

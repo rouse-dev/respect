@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../../store/AppContext";
 import { GetAllGroups } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import useGroupStore from "../../store/groupStore";
+import useStudentStore from "../../store/studentStore";
 
 const Group = () => {
-  const { currentGroup, setCurrentGroup, groups, setGroups, setSortedStudents, students } = useAppContext();
+  const { currentGroup, setCurrentGroup, groups, setGroups } = useGroupStore();
+  const { setSortedStudents, students } = useStudentStore();
   const [isLoading, setLoading] = useState(false);
   const [dropdown, setDropdown] = useState(false);
 

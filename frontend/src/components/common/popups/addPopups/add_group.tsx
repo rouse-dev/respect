@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { CreateGroup, GetAllGroups } from "../../../../service/server";
-import { useAppContext } from "../../../../store/AppContext";
 import Preloader from "../../preloader/preloader";
 import { toast } from "react-toastify";
+import useGroupStore from "../../../../store/groupStore";
 
 interface AddGroupPopup {
   onClose: () => void;
@@ -12,7 +12,7 @@ interface AddGroupPopup {
 const GroupPopup = ({ onClose, isOpen }: AddGroupPopup) => {
   if (!isOpen) return null;
 
-  const { setGroups } = useAppContext();
+  const { setGroups } = useGroupStore();
   const [isLoading, setLoading] = useState(false);
   const [groupName, setGroupName] = useState("");
 
