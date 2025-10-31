@@ -1,111 +1,31 @@
 import {
   Injectable,
-  ConflictException,
-  UnauthorizedException,
   InternalServerErrorException,
   NotFoundException,
-  Res,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { extname } from 'path';
-import { Response } from 'express';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { User } from '../entities/user.entity';
+import { UpdateUserDto } from './dto/update-teacher.dto';
 
 @Injectable()
 export class TeachersService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
-  // РЕГИСТРАЦИЯ УЧИТЕЛЯ
-  async register(email: string, password: string, name?: string) {
+  // ЗАМЕНА АВАТАРКИ ПОЛЬЗОВАТЕЛЯ
+  async changeAvatar(file: Express.Multer.File, userId: number) {
     try {
-      const existingTeacher = await this.prisma.teacher.findUnique({
-        where: { email },
-      });
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
 
-      if (existingTeacher) {
-        throw new ConflictException('Учитель с таким email уже существует');
+      if (!user) {
+        throw new NotFoundException('Пользователь не найден');
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const teacher = await this.prisma.teacher.create({
-        data: {
-          email,
-          password: hashedPassword,
-          name,
-        },
-      });
-
-      return { id: teacher.id, email: teacher.email, name: teacher.name };
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // ЛОГИРОВАНИЕ УЧИТЕЛЯ
-  async login(
-    email: string,
-    password: string,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    try {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { email },
-      });
-
-      if (!teacher) {
-        throw new UnauthorizedException('Неверный email или пароль');
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, teacher.password);
-
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Неверный email или пароль');
-      }
-
-      const payload = { email: teacher.email, sub: teacher.id };
-      const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
-      });
-
-      response.cookie('jwt', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 2592000000,
-      });
-
-      return {}; //accessToken, teacher
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // ВЫХОД ИЗ АККАУНТА
-  async logout(@Res({ passthrough: true }) response: Response) {
-    try {
-      response.clearCookie('jwt', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      });
-      return { message: 'Вы вышли с аккаунта!' };
-    } catch (error) {
-      return new InternalServerErrorException(error);
-    }
-  }
-
-  // ЗАМЕНА АВАТАРКИ УЧИТЕЛЯ
-  async changeAvatar(file: Express.Multer.File, teacherId: number) {
-    try {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const ext = extname(file.originalname);
       const filename = `uploads/avatars/${uniqueSuffix}${ext}`;
@@ -117,80 +37,70 @@ export class TeachersService {
 
       fs.writeFileSync(uploadPath, file.buffer);
 
-      const updatedTeacher = await this.prisma.teacher.update({
-        where: { id: teacherId },
-        data: { avatar: filename },
-      });
+      user.avatar = filename;
+      await this.usersRepository.save(user);
 
-      return updatedTeacher;
+      return user;
     } catch (error) {
       return new InternalServerErrorException(error);
     }
   }
 
-  // ИЗМЕНЕНИЕ ДАННЫХ УЧИТЕЛЯ
-  async changeInfo(teacherId: number, dto: UpdateTeacherDto) {
+  // ИЗМЕНЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ
+  async changeInfo(userId: number, dto: UpdateUserDto) {
     try {
-      let updatedDto = { ...dto };
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+      if (!user) {
+        throw new NotFoundException('Пользователь не найден');
+      }
+
+      let updateData: any = { ...dto };
+
       if (dto.password) {
         if (!dto.oldPassword) {
-          throw new InternalServerErrorException(
-            'Требуется старый пароль для смены пароля.',
-          );
+          throw new InternalServerErrorException('Требуется старый пароль для смены пароля.');
         }
-        const teacher = await this.prisma.teacher.findFirst({
-          where: { id: teacherId },
-          select: { password: true },
-        });
-        if (!teacher) {
-          throw new InternalServerErrorException('Преподаватель не найден.');
-        }
-        const isPasswordValid = await bcrypt.compare(
-          dto.oldPassword,
-          teacher.password,
-        );
+
+        const isPasswordValid = await bcrypt.compare(dto.oldPassword, user.password);
+        
         if (!isPasswordValid) {
-          throw new InternalServerErrorException(
-            'Текущий пароль введен неверно!',
-          );
+          throw new InternalServerErrorException('Текущий пароль введен неверно!');
         }
+
         if (dto.password.length < 8) {
-          throw new InternalServerErrorException(
-            'Пароль должен быть не менее 8 символов.',
-          );
+          throw new InternalServerErrorException('Пароль должен быть не менее 8 символов.');
         }
-        updatedDto.password = await bcrypt.hash(dto.password, 10);
+
+        updateData.password = await bcrypt.hash(dto.password, 10);
       }
-      delete updatedDto.oldPassword;
 
-      const updatedTeacher = await this.prisma.teacher.update({
-        where: { id: teacherId },
-        data: updatedDto,
-      });
+      delete updateData.oldPassword;
 
-      return updatedTeacher;
+      // Обновляем пользователя
+      await this.usersRepository.update(userId, updateData);
+      const updatedUser = await this.usersRepository.findOne({ where: { id: userId } });
+
+      return updatedUser;
     } catch (error) {
       if (error instanceof InternalServerErrorException) {
         throw error;
       }
-      throw new InternalServerErrorException(
-        'Произошла ошибка при обновлении данных.',
-      );
+      throw new InternalServerErrorException('Произошла ошибка при обновлении данных.');
     }
   }
 
-  // ВЫДАТЬ ИНФОРМАЦИЮ ОБ УЧИТЕЛЕ
+  // ВЫДАТЬ ИНФОРМАЦИЮ О ПОЛЬЗОВАТЕЛЕ
   async me(userId: number) {
     try {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { id: userId },
-      });
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
 
-      if (!teacher) {
-        throw new NotFoundException('Учитель не найден');
+      if (!user) {
+        throw new NotFoundException('Пользователь не найден');
       }
+
       // Не возвращаем пароль
-      const { password, ...result } = teacher;
+      const { password, ...result } = user;
       return result;
     } catch (error) {
       if (error instanceof NotFoundException) {

@@ -2,19 +2,21 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
 import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
-    private prisma: PrismaService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          // Извлекаем токен из куки
           return request.cookies?.jwt || null;
         },
       ]),
@@ -23,17 +25,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { email: string }) {
+  async validate(payload: { email: string; sub: number }) {
     try {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { email: payload.email },
-      });
+      const user = await this.usersRepository.findOne({ where: { email: payload.email } });
 
-      if (!teacher) {
+      if (!user) {
         throw new UnauthorizedException('Вы не зарегистрированы!');
       }
 
-      return teacher;
+      return user;
     } catch (error) {
       throw new UnauthorizedException('Вы не зарегистрированы!');
     }

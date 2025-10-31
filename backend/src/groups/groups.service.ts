@@ -1,20 +1,25 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Group } from '../entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Injectable()
 export class GroupsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Group)
+    private groupsRepository: Repository<Group>,
+  ) {}
 
   // СОЗДАНИЕ ГРУППЫ
   async createGroup(dto: CreateGroupDto) {
     try {
-      return this.prisma.groups.create({
-        data: {
-          name: dto.name,
-        },
+      const group = this.groupsRepository.create({
+        name: dto.name,
       });
+
+      return await this.groupsRepository.save(group);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -23,10 +28,8 @@ export class GroupsService {
   // ВЫДАТЬ ВСЕ ГРУППЫ
   async getAllGroups() {
     try {
-      return this.prisma.groups.findMany({
-        include: {
-          students: true,
-        },
+      return await this.groupsRepository.find({
+        relations: ['students'],
       });
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -36,12 +39,16 @@ export class GroupsService {
   // НАЙТИ ГРУППУ ПО АЙДИ
   async getGroupById(id: number) {
     try {
-      return this.prisma.groups.findUnique({
+      const group = await this.groupsRepository.findOne({
         where: { id },
-        include: {
-          students: true,
-        },
+        relations: ['students'],
       });
+
+      if (!group) {
+        throw new NotFoundException('Группа не найдена');
+      }
+
+      return group;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -50,15 +57,18 @@ export class GroupsService {
   // ОБНОВИТЬ ГРУППУ ПО АЙДИ
   async updateGroup(id: number, dto: UpdateGroupDto) {
     try {
-      if(dto.name.trim() === "") {
-        throw new NotFoundException("Поле пустое")
+      if (dto.name.trim() === "") {
+        throw new NotFoundException("Поле пустое");
       }
-      return this.prisma.groups.update({
-        where: { id },
-        data: {
-          name: dto.name,
-        },
-      });
+
+      const group = await this.groupsRepository.findOne({ where: { id } });
+      
+      if (!group) {
+        throw new NotFoundException('Группа не найдена');
+      }
+
+      group.name = dto.name;
+      return await this.groupsRepository.save(group);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -67,9 +77,13 @@ export class GroupsService {
   // УДАЛИТЬ ГРУППУ ПО АЙДИ
   async deleteGroup(id: number) {
     try {
-      return this.prisma.groups.delete({
-        where: { id },
-      });
+      const group = await this.groupsRepository.findOne({ where: { id } });
+      
+      if (!group) {
+        throw new NotFoundException('Группа не найдена');
+      }
+
+      return await this.groupsRepository.remove(group);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
