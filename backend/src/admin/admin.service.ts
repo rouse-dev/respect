@@ -51,6 +51,7 @@ export class AdminService {
         );
       }
 
+      // Проверяем существование пользователя
       const existingUser = await this.usersRepository.findOne({
         where: { email: registerUserDto.email },
       });
@@ -61,23 +62,117 @@ export class AdminService {
         );
       }
 
+      // Если указаны предметы, проверяем их существование
+      let lessons: Lesson[] = [];
+      if (registerUserDto.lessonsIds && registerUserDto.lessonsIds.length > 0) {
+        lessons = await this.lessonsRepository.findByIds(
+          registerUserDto.lessonsIds,
+        );
+
+        // Проверяем что все предметы найдены
+        if (lessons.length !== registerUserDto.lessonsIds.length) {
+          const foundIds = lessons.map((lesson) => lesson.id);
+          const notFoundIds = registerUserDto.lessonsIds.filter(
+            (id) => !foundIds.includes(id),
+          );
+          throw new NotFoundException(
+            `Предметы с ID: ${notFoundIds.join(', ')} не найдены`,
+          );
+        }
+      }
+
       const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
 
+      // Создаем пользователя
       const user = this.usersRepository.create({
         email: registerUserDto.email,
         password: hashedPassword,
         name: registerUserDto.name,
         role: registerUserDto.role || UserRole.TEACHER,
+        lessons: lessons, // Добавляем связь с предметами
       });
 
       await this.usersRepository.save(user);
 
+      // Загружаем пользователя с отношениями для возврата
+      const savedUser = await this.usersRepository.findOne({
+        where: { id: user.id },
+        relations: ['lessons'],
+      });
+
       // Не возвращаем пароль
-      const { password, ...result } = user;
+      const { password, ...result } = savedUser;
       return result;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof ConflictException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error.message);
     }
+  }
+
+  // МЕТОД ДЛЯ ДОБАВЛЕНИЯ ПРЕДМЕТА ДЛЯ УЧИТЕЛЯ
+  async addLessonsToUser(userId: number, lessonsIds: number[]) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['lessons'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    // Проверяем что пользователь - учитель
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException('Только учителя могут иметь предметы');
+    }
+
+    const lessons = await this.lessonsRepository.findByIds(lessonsIds);
+
+    // Проверяем что все предметы найдены
+    if (lessons.length !== lessonsIds.length) {
+      const foundIds = lessons.map((lesson) => lesson.id);
+      const notFoundIds = lessonsIds.filter((id) => !foundIds.includes(id));
+      throw new NotFoundException(
+        `Предметы с ID: ${notFoundIds.join(', ')} не найдены`,
+      );
+    }
+
+    // Добавляем предметы (объединяем существующие с новыми)
+    user.lessons = [...new Set([...user.lessons, ...lessons])];
+    await this.usersRepository.save(user);
+
+    return this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['lessons'],
+    });
+  }
+
+  // МЕТОД ДЛЯ УДАЛЕНИЯ ПРЕДМЕТОВ У УЧИТЕЛЯ
+  async removeLessonsFromUser(userId: number, lessonsIds: number[]) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['lessons'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    // Фильтруем предметы, оставляем только те, которые не в списке на удаление
+    user.lessons = user.lessons.filter(
+      (lesson) => !lessonsIds.includes(lesson.id),
+    );
+    await this.usersRepository.save(user);
+
+    return this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['lessons'],
+    });
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ (ТОЛЬКО ДЛЯ АДМИНОВ)

@@ -29,15 +29,14 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { UserLessonsDto } from './dto/user-lessons.dto';
 
 @ApiTags('Администраторы')
 @ApiBearerAuth()
 @Controller('admin')
 @AdminOnly() // ВСЕ РОУТЫ ТОЛЬКО ДЛЯ АДМИНОВ
 export class AdminController {
-  constructor(
-    private readonly adminService: AdminService
-  ) {}
+  constructor(private readonly adminService: AdminService) {}
 
   // ========== ПОЛЬЗОВАТЕЛИ ==========
 
@@ -70,6 +69,50 @@ export class AdminController {
   async getAllUsers(@Request() req) {
     const adminId = req.user.id;
     return this.adminService.getAllUsers(adminId);
+  }
+
+  @Post('users/:id/lessons')
+  @ApiOperation({
+    summary: 'Добавление предметов учителю (только для админов)',
+    description:
+      'Добавляет указанные предметы к учителю. Если предметы уже есть у учителя, они не будут продублированы.',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID пользователя (учителя)' })
+  @ApiBody({ type: UserLessonsDto, description: 'Массив ID предметов для добавления' })
+  @ApiResponse({ status: 200, description: 'Предметы успешно добавлены учителю' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав или пользователь не является учителем' })
+  @ApiResponse({ status: 404, description: 'Пользователь или предметы не найдены' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async addLessonsToUser(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() userLessonsDto: UserLessonsDto,
+  ) {
+    const userId = req.user.id;
+    return this.adminService.addLessonsToUser(
+      userId,
+      userLessonsDto.lessonsIds,
+    );
+  }
+
+  @Delete('users/:id/lessons')
+  @ApiOperation({ summary: 'Удаление предметов у учителя (только для админов)', description: 'Удаляет указанные предметы у учителя. Если каких-то предметов нет у учителя, они просто игнорируются.' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID пользователя (учителя)' })
+  @ApiBody({ type: UserLessonsDto, description: 'Массив ID предметов для удаления' })
+  @ApiResponse({ status: 200, description: 'Предметы успешно удалены у учителя' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async removeLessonsFromUser(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() userLessonsDto: UserLessonsDto,
+  ) {
+    const userId = req.user.id;
+    return this.adminService.removeLessonsFromUser(
+      userId,
+      userLessonsDto.lessonsIds,
+    );
   }
 
   @Get('users/:id')
@@ -231,7 +274,10 @@ export class AdminController {
   @Get('groups/:id')
   @ApiOperation({ summary: 'Получение группы по ID (только для админов)' })
   @ApiParam({ name: 'id', type: 'number', description: 'Айди группы' })
-  @ApiResponse({ status: 200, description: 'Информация о группе успешно получена.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Информация о группе успешно получена.',
+  })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Группа не найдена.' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера.' })
@@ -244,11 +290,18 @@ export class AdminController {
   @ApiBody({ type: UpdateGroupDto })
   @ApiOperation({ summary: 'Обновление группы (только для админов)' })
   @ApiParam({ name: 'id', type: 'number', description: 'Идентификатор группы' })
-  @ApiResponse({ status: 200, description: 'Информация о группе успешно обновлена.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Информация о группе успешно обновлена.',
+  })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Группа не найдена.' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера.' })
-  updateGroup(@Request() req, @Param('id') id: string, @Body() dto: UpdateGroupDto) {
+  updateGroup(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() dto: UpdateGroupDto,
+  ) {
     const adminId = req.user.id;
     return this.adminService.updateGroup(+id, dto);
   }
@@ -268,7 +321,9 @@ export class AdminController {
   // ========== ПРЕДМЕТЫ ==========
 
   @Post('lessons')
-  @ApiOperation({ summary: 'Создать новый учебный предмет (только для админов)' })
+  @ApiOperation({
+    summary: 'Создать новый учебный предмет (только для админов)',
+  })
   @ApiResponse({ status: 201, description: 'Предмет успешно создан' })
   @ApiResponse({ status: 400, description: 'Неверные данные' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
@@ -278,7 +333,9 @@ export class AdminController {
   }
 
   @Get('lessons')
-  @ApiOperation({ summary: 'Выдача всех учебных предметов (только для админов)' })
+  @ApiOperation({
+    summary: 'Выдача всех учебных предметов (только для админов)',
+  })
   @ApiResponse({ status: 201, description: 'Предметы успешно выданы' })
   @ApiResponse({ status: 400, description: 'Ошибка при выдаче предметов' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
@@ -288,7 +345,9 @@ export class AdminController {
   }
 
   @Patch('lessons/:id')
-  @ApiOperation({ summary: 'Обновить учебный предмет по ID (только для админов)' })
+  @ApiOperation({
+    summary: 'Обновить учебный предмет по ID (только для админов)',
+  })
   @ApiResponse({ status: 200, description: 'Предмет успешно обновлен' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Предмет не найден' })
@@ -306,7 +365,9 @@ export class AdminController {
   }
 
   @Delete('lessons/:id')
-  @ApiOperation({ summary: 'Удалить учебный предмет по ID (только для админов)' })
+  @ApiOperation({
+    summary: 'Удалить учебный предмет по ID (только для админов)',
+  })
   @ApiResponse({ status: 200, description: 'Предмет успешно удален' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Предмет не найден' })

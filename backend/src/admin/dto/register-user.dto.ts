@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength, IsOptional, IsEnum } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsEnum, IsArray, IsNumber } from 'class-validator';
 import { UserRole } from '../../entities/user.entity';
 
 export class RegisterUserDto {
@@ -26,4 +26,15 @@ export class RegisterUserDto {
   @IsEnum(UserRole)
   @IsOptional()
   role?: UserRole;
+
+  @ApiProperty({ 
+    type: [Number], 
+    example: [1, 2, 3], 
+    description: 'ID предметов, которые ведет учитель',
+    required: false 
+  })
+  @IsArray({ message: 'lessonsIds должен быть массивом' })
+  @IsNumber({}, { each: true, message: 'Каждый элемент lessonsIds должен быть числом' })
+  @IsOptional()
+  lessonsIds?: number[];
 }

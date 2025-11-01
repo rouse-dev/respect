@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { DebtRequest } from './debt-request.entity';
+import { Lesson } from './lesson.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
   TEACHER = 'teacher',
-  STUDENT = 'student'
+  STUDENT = 'student',
 }
 
 @Entity('users')
@@ -24,10 +32,16 @@ export class User {
   @Column({ default: 'uploads/avatars/default.jpg' })
   avatar: string;
 
+  @OneToMany(() => DebtRequest, (debtRequest) => debtRequest.teacher)
+  debtRequests: DebtRequest[];
+
+  @OneToMany(() => Lesson, (lesson) => lesson.teacher)
+  lessons: Lesson[];
+
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.TEACHER
+    default: UserRole.TEACHER,
   })
   role: UserRole;
 
@@ -36,7 +50,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => DebtRequest, debtRequest => debtRequest.teacher)
-  debtRequests: DebtRequest[];
 }
