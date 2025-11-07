@@ -1,12 +1,13 @@
-import Home from "./Home";
-import useUserStore from "../../store/userStore";
 
-const HomeContainer = () => {
+import useUserStore from "../../store/userStore";
+import Journal from "./Journal";
+
+const JournalContainer = () => {
   return (
-    <Home
+    <Journal
       useUserStore={useUserStore()}
     />
   );
 };
 
-export default HomeContainer;
+export default JournalContainer;

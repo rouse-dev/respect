@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { CreateGroup, GetAllGroups } from "../../../../service/server";
+import { CreateGroup } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { toast } from "react-toastify";
 import useGroupStore from "../../../../store/groupStore";
+import { GetAllGroups } from "../../../../service/teacher";
 
 interface AddGroupPopup {
   onClose: () => void;

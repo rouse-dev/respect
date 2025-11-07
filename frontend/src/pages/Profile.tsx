@@ -1,6 +1,7 @@
+import { FC } from "react";
 import ProfileContainer from "../components/Profile/ProfileContainer";
 
-const Profile = () => {
+const Profile: FC = () => {
     return (
         <ProfileContainer />
     )

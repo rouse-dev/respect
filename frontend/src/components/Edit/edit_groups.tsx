@@ -1,13 +1,14 @@
 import { FaEdit, FaRegPlusSquare, FaTrashAlt, FaSave } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import GroupPopup from "../common/popups/addPopups/add_group";
-import { deleteGroup, GetAllGroups, updateGroup } from "../../service/server";
+import { deleteGroup, updateGroup } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
 import { TbCancel } from "react-icons/tb";
 import { Group } from "../../interfaces/group";
 import useGroupStore from "../../store/groupStore";
 import usePopupStore from "../../store/popupStore";
+import { GetAllGroups } from "../../service/admin";
 
 const EditGroups = ({isOpen}: {isOpen: Boolean}) => {
   const { setPopupActive } = usePopupStore();

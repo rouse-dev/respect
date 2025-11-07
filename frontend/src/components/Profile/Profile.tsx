@@ -3,30 +3,22 @@ import AvatarContainer from "./AvatarContainer";
 import { IoMdExit } from "react-icons/io";
 import { ImUndo2 } from "react-icons/im";
 import { useRef, useState } from "react";
-import { ChangeTeacherAvatar, ChangeTeacherInfo } from "../../service/server";
 import { toast } from "react-toastify";
 import { DebtHistoryContainer } from "./DebtHistory/DebtHistoryContainer";
+import { ChangeTeacherAvatar, ChangeTeacherInfo } from "../../service/auth";
+import { UserStoreInterface } from "../../store/userStore";
 
-interface useUserStoreInterface {
-    auth: boolean,
-    name: string,
-    email: string,
-    password: string,
-    oldPassword: string,
-    avatar: string,
-    CheckAuth: () => void
-}
 interface ProfileInterface {
     handleLogout: () => void,
-    useUserStore: useUserStoreInterface
+    useUserStore: UserStoreInterface
 }
 
 const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
     const [changes, setChanges] = useState({
         name: useUserStore.name,
         email: useUserStore.email,
-        password: useUserStore.password,
-        oldPassword: useUserStore.oldPassword
+        password: '',
+        oldPassword: ''
     });
     const [avatar, setAvatar] = useState<File | null>(null);
     const passRef = useRef<HTMLInputElement | null>(null);
@@ -36,10 +28,10 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-5 text-lg p-3 sm:p-5 text-white">
             <div className="w-full flex flex-row justify-between sm:mb-12">
                 <button className="hidden sm:flex flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep] cursor-pointer" onClick={handleLogout}>Выход <IoMdExit /></button>
-                <Link className="flex flex-row items-center justify-center gap-2 w-full text-center sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/'>На главную <ImUndo2 /></Link>
+                {useUserStore.role !== "student" &&  <Link className="flex flex-row items-center justify-center gap-2 w-full text-center sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep]" to='/journal'>На главную <ImUndo2 /></Link>}
             </div>
-            <div className="flex justify-between w-full">
-                <div className="flex flex-col items-center gap-3 w-[35%] sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
+            <div className="w-full flex justify-between gap-7">
+                <div className="w-full mx-auto flex flex-col items-center gap-3 sm:max-w-md p-5 bg-[--respect-purple-deep] rounded-lg">
                 <AvatarContainer useUserStore={useUserStore} setAvatar={setAvatar} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Имя" type="text" defaultValue={useUserStore.name} required onChange={e => setChanges(prev => ({...prev, name: e.target.value}))} />
                 <input className="bg-[--respect-purple-light] w-full px-3 py-2 rounded-lg outline-hidden" placeholder="Эл. почта" type="email" defaultValue={useUserStore.email} required onChange={e => setChanges(prev => ({...prev, email: e.target.value}))} />
@@ -72,7 +64,8 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
                     }
                 }}>Сохранить изменения</button>
                 </div>
-                <DebtHistoryContainer/>
+                {useUserStore.role === 'teacher' && <DebtHistoryContainer/>}
+                {useUserStore.role === 'student' && <DebtHistoryContainer/>}
             </div>
            
            

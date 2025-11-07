@@ -39,6 +39,30 @@ export class TeachersController {
     return this.teachersService.getAllStudents();
   }
 
+  // ПОЛУЧЕНИЕ ВСЕХ ГРУПП (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  @Get('groups')
+  @ApiOperation({ summary: 'Получение всех групп (только для учителей)' })
+  @ApiResponse({ status: 200, description: 'Список групп успешно получен.' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера.' })
+  getAllGroups(@Request() req) {
+    const adminId = req.user.id;
+    return this.teachersService.getAllGroups();
+  }
+
+  // ПОЛУЧЕНИЕ ВСЕХ ПРЕДМЕТОВ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  @Get('lessons')
+  @ApiOperation({
+    summary: 'Выдача всех учебных предметов (только для учителей)',
+  })
+  @ApiResponse({ status: 201, description: 'Предметы успешно выданы' })
+  @ApiResponse({ status: 400, description: 'Ошибка при выдаче предметов' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  async getLessons(@Request() req) {
+    const adminId = req.user.id;
+    return this.teachersService.getLessons();
+  }
+
   // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
   @Get('students/:id/history')
   @ApiOperation({

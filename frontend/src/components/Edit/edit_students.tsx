@@ -13,7 +13,6 @@ import StudentPopup from "../common/popups/addPopups/add_students";
 import SingleStudentPopup from "../common/popups/addPopups/add_single_student";
 import {
   deleteStudent,
-  GetAllStudents,
   updateStudent,
 } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
@@ -23,6 +22,7 @@ import { Group } from "../../interfaces/group";
 import useStudentStore from "../../store/studentStore";
 import useGroupStore from "../../store/groupStore";
 import usePopupStore from "../../store/popupStore";
+import { GetAllStudents } from "../../service/admin";
 
 interface EditStudentsInterface {
   isOpen: boolean;

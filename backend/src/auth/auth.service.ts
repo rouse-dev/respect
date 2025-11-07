@@ -47,6 +47,7 @@ export class AuthService {
           }
 
           // Создаем объект пользователя из студента
+          isStudent = true;
           user = {
             id: student.id,
             email: student.email,

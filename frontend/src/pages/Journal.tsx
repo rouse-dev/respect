@@ -1,15 +1,16 @@
 import Students from "../components/Students/Students";
 import Sort from "../components/Sorting/Sort";
-import HomeContainer from "../components/Home/HomeContainer";
+import JournalContainer from "../components/Journal/JournalContainer";
+import { FC } from "react";
 
-const Home = () => {
+const Journal: FC = () => {
   return (
     <div className="max-w-6xl mx-auto flex flex-col gap-5 text-lg p-3 sm:p-5 text-white">
-      <HomeContainer />
+      <JournalContainer />
       <Sort />
       <Students />
     </div>
   );
 };
 
-export default Home;
+export default Journal;

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { GetAllGroups } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import useGroupStore from "../../store/groupStore";
 import useStudentStore from "../../store/studentStore";
+import { GetAllGroups } from "../../service/teacher";
 
 const Group = () => {
   const { currentGroup, setCurrentGroup, groups, setGroups } = useGroupStore();

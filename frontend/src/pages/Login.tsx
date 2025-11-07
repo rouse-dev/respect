@@ -1,6 +1,7 @@
+import { FC } from "react";
 import LoginContainer from "../components/Login/LoginContainer";
 
-const Login = () => {
+const Login: FC = () => {
   return (
     <LoginContainer />
   );

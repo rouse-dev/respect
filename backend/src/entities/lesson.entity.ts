@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { HistoryRep } from './history-rep.entity';
 import { User } from './user.entity';
 
 @Entity('lessons')
+@Unique(['name'])
 export class Lesson {
   @PrimaryGeneratedColumn()
   id: number;

@@ -128,8 +128,9 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   @ApiResponse({ status: 500, description: 'Ошибка сервера' })
   async getMe(@Request() req) {
+    console.log(req.user)
     const userId = req.user.id;
-    const isStudent = req.user.isStudent || false;
+    const isStudent = req.user.role === 'student';
     return this.authService.me(userId, isStudent);
   }
 }

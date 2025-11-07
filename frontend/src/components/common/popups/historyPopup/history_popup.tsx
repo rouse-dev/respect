@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { HistoryStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
@@ -8,6 +7,8 @@ import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
 import { Student } from "../../../../interfaces/student";
 import usePopupStore from "../../../../store/popupStore";
+import { HistoryStudent } from "../../../../service/teacher";
+import HistoryItem from "../../../../interfaces/history_item";
 
 interface HistoryPopupProps {
   student: Student
@@ -15,13 +16,7 @@ interface HistoryPopupProps {
   isOpen: boolean;
 }
 
-interface HistoryItem {
-  change: number;
-  reason: string;
-  createdAt: string;
-  lesson?: string;
-  class: string;
-}
+
 
 const HistoryPopup = ({
   student,

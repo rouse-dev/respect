@@ -1,4 +1,5 @@
-import { exportHistoryExcel } from "../../../../service/server";
+import { exportHistoryExcel } from "../../../../service/teacher";
+
 
 interface DownloadReputationHistoryButtonProps {
   studentId: number;

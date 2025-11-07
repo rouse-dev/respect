@@ -1,6 +1,6 @@
 import EditPanel from "../components/Edit/edit_panel";
 import { Debt } from "../pages/Debt";
-import Home from "../pages/Home";
+import Journal from "../pages/Journal";
 import Login from "../pages/Login";
 import Profile from "../pages/Profile";
 
@@ -22,7 +22,7 @@ export const AuthRoutes: RouteInterface[] = [
   {
     name: "Главная",
     path: "/",
-    component: Home,
+    component: Journal,
   },
   {
     name: "Профиль",

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChangeRespect, getLessons } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { toast } from "react-toastify";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { Student } from "../../../../interfaces/student";
 import { Subject } from "../../../../interfaces/subject";
+import { ChangeRespectAdd, getLessons } from "../../../../service/teacher";
 
 interface RemovePopupProps {
   student: Student;
@@ -68,7 +68,7 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
 
     setIsLoading(true);
     try {
-      const result = await ChangeRespect({
+      const result = await ChangeRespectAdd({
         
         studentId: student.id,
         change: deduction,

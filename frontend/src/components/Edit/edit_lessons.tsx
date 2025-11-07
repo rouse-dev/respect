@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaRegPlusSquare, FaTrashAlt, FaSave } from "react-icons/fa";
-import { deleteLesson, getLessons, updateLesson } from "../../service/server";
+import { deleteLesson, updateLesson } from "../../service/server";
 import LessonPopup from "../common/popups/addPopups/add_lesson";
 import Preloader from "../common/preloader/preloader";
 import { toast } from "react-toastify";
@@ -8,6 +8,7 @@ import { TbCancel } from "react-icons/tb";
 import usePopupStore from "../../store/popupStore";
 import useSubjectStore from "../../store/subjectStore";
 import { Subject } from "../../interfaces/subject";
+import { getLessons } from "../../service/admin";
 
 interface EditLessonsInterface {
   isOpen: boolean;

@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique } from 'typeorm';
 import { Student } from './student.entity';
 
 @Entity('groups')
+@Unique(['name'])
 export class Group {
   @PrimaryGeneratedColumn()
   id: number;

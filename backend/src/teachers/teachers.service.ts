@@ -12,6 +12,8 @@ import { Student } from '../entities/student.entity';
 import { HistoryRep } from '../entities/history-rep.entity';
 import { DebtRequest, RequestStatus } from '../entities/debt-request.entity';
 import { UpdateReputationDto } from './dto/update-reputation.dto';
+import { Group } from 'src/entities/group.entity';
+import { Lesson } from 'src/entities/lesson.entity';
 
 @Injectable()
 export class TeachersService {
@@ -22,6 +24,10 @@ export class TeachersService {
     private historyRepsRepository: Repository<HistoryRep>,
     @InjectRepository(DebtRequest)
     private debtRequestsRepository: Repository<DebtRequest>,
+    @InjectRepository(Group)
+    private groupsRepository: Repository<Group>,
+    @InjectRepository(Lesson)
+    private lessonsRepository: Repository<Lesson>,
   ) {}
 
   // ПОЛУЧЕНИЕ ВСЕХ СТУДЕНТОВ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
@@ -222,6 +228,22 @@ export class TeachersService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+  }
+
+  // ВЫДАТЬ ВСЕ ГРУППЫ
+  async getAllGroups() {
+    try {
+      return await this.groupsRepository.find({
+        relations: ['students'],
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // ВЫДАЧА ВСЕХ ПРЕДМЕТОВ
+  async getLessons() {
+    return await this.lessonsRepository.find();
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ ЗАЯВОК ДЛЯ УЧИТЕЛЯ

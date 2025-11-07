@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { GetAllStudents } from "../../service/server";
 import Preloader from "../common/preloader/preloader";
 import RespectButtons from "../common/popups/respectPopups/respect_buttons";
 import HistoryButton from "../common/popups/historyPopup/history_button";
@@ -7,6 +6,7 @@ import { TbMoodSad } from "react-icons/tb";
 import useFilterStore from "../../store/filterStore";
 import useStudentStore from "../../store/studentStore";
 import usePopupStore from "../../store/popupStore";
+import { GetAllStudents } from "../../service/teacher";
 
 const Students = () => {
   const { currentStudent, sortedStudents, setStudents } = useStudentStore();
