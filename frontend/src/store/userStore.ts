@@ -15,6 +15,7 @@ export interface UserStoreInterface {
     password: string,
     avatar: string,
     role: role,
+    studentId?: number,
     LoginUser: (data: UserLoginInterface) => void,
     CheckAuth: () => void,
     LogoutUser: () => void
@@ -38,6 +39,7 @@ const TryGetUser = async () => {
         password: response.data ? response.data.password : '',
         avatar: response.data ? response.data.avatar : '',
         role: response.data ? response.data.role : '',
+        studentId: response.data ? response.data.studentId : undefined,
     };
 }
 
@@ -49,6 +51,7 @@ const useUserStore = create<UserStoreInterface>()((set) => {
         password: '',
         avatar: '',
         role: '',
+        studentId:0,
         LoginUser: (data: UserLoginInterface) => {
             client.post('/api/auth/login', data).then(ss => {
                 console.log(ss)

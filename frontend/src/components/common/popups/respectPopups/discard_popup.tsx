@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { Student } from "../../../../interfaces/student";
 import { Subject } from "../../../../interfaces/subject";
-import { ChangeRespectAdd, getLessons } from "../../../../service/teacher";
+import { DebtCreate, getLessons } from "../../../../service/student";
 
 interface RemovePopupProps {
   student: Student;
@@ -51,30 +51,27 @@ const DiscardPopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
 
     switch (selectedOption.id) {
       case "propusk":
-        deduction = -100;
+        deduction = 100;
         reason = "Пропуск";
         break;
       case "skip_para":
-        deduction = -150;
+        deduction = 150;
         reason = "Прогул";
         break;
       case "dolg":
-        deduction = -50 * amount;
+        deduction = 50 * amount;
         reason = `Снятие долга (${amount} шт.)`;
         break;
     }
 
     setIsLoading(true);
     try {
-      const result = await ChangeRespectAdd({
-        
-        studentId: student.id,
+      const result = await DebtCreate({
+        lessonId: currentSubject.id,
         points: deduction,
-        reason,
-        lessonId: +currentSubject.id,
+        description: reason
       });
-      if (result.succes) {
-        toast.info("Долг списан");
+      if (result.success) {
         onClose();
       } else if(currentSubject.id === 0){
         toast.error("Выберите предмет")

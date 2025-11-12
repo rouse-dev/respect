@@ -44,6 +44,19 @@ export class StudentsController {
     return this.studentsService.getStudentHistory(studentId);
   }
 
+    // ПОЛУЧЕНИЕ ВСЕХ ПРЕДМЕТОВ ДЛЯ СТУДЕНТА
+  @Get('lessons')
+  @ApiOperation({
+    summary: 'Получение всех предметов для студента',
+  })
+  @ApiResponse({ status: 201, description: 'Предметы успешно выданы' })
+  @ApiResponse({ status: 400, description: 'Ошибка при выдаче предметов' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  async getLessons(@Request() req) {
+    const adminId = req.user.id;
+    return this.studentsService.getLessons();
+  }
+
   @Post('debt-requests')
   @ApiOperation({ summary: 'Отправить заявку на списание долга' })
   @ApiBody({ type: CreateDebtRequestDto })

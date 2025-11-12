@@ -7,6 +7,17 @@ interface DebtCreate {
     description:string;
 }
 
+export const getLessons = async () => {
+  try {
+    const response = await client.get(`/api/students/lessons`);
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+};
+
 export const DebtCreate = async (for_user: DebtCreate) => {
   try {
     const response = await client.post("/api/students/debt-requests", {

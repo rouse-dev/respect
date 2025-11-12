@@ -55,6 +55,11 @@ export class StudentsService {
     }
   }
 
+  // ВЫДАЧА ВСЕХ ПРЕДМЕТОВ
+  async getLessons() {
+    return await this.lessonRepository.find();
+  }
+
   // СОЗДАНИЕ ЗАЯВКИ НА СПИСАНИЕ ДОЛГА
   async createDebtRequest(
     studentId: number,
