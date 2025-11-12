@@ -28,8 +28,8 @@ const HistoryPopup = ({
   const [_, setSortedHistory] = useState<HistoryItem[]>([]);
   const [paginHistory, setPaginHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(Number);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(Number); //
+  const [currentPage, setCurrentPage] = useState(1); //
 
   const [sortRespect, setSortRespect] = useState('Все');
   const [selectedDate1, setSelectedDate1] = useState<string>('');

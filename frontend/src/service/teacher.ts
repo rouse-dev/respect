@@ -6,12 +6,13 @@ interface ChangeRespectData {
   studentId: number;
   date?: string;
   class?:number;
-  change: number;
+  points: number;
   reason: string;
   lessonId: number;
   isPunish?: boolean;
   newLesson?: string;
 }
+
 
 interface DebtI{
     id:number;
@@ -89,13 +90,16 @@ export const ChangeRespectAdd = async (newRep: ChangeRespectData) => {
 };
 // Тут новое название
 export const ChangeRespectRemove = async (newRep: ChangeRespectData) => {
+  console.log(newRep)
   try {
-    const response = await client.patch(
+    const response = await client.post(
       `/api/teachers/students/${newRep.studentId}/reputation/remove`,
       newRep
     );
+    
     return { succes: true, data: response };
   } catch (error) {
+    console.log(error)
     return {
       error: error instanceof Error ? error.message : "Произошла ошибка",
     };

@@ -4,9 +4,9 @@ import { User } from './user.entity';
 import { Lesson } from './lesson.entity';
 
 export enum RequestStatus {
-  PENDING = 'pending', // На рассмотрении
-  APPROVED = 'approved', // Одобрено
-  REJECTED = 'rejected' // Отклонено
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected'
 }
 
 @Entity('debt_requests')
@@ -50,6 +50,8 @@ export class DebtRequest {
   @JoinColumn({ name: 'teacherId' })
   teacher: User;
 
+  // Add the @ManyToOne decorator here
+  @ManyToOne(() => Lesson, lesson => lesson.debtRequests)
   @JoinColumn({ name: 'lessonId' })
   lesson: Lesson;
 }

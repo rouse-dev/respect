@@ -142,10 +142,6 @@ export class TeachersController {
   @Post('students/:id/reputation/remove')
   @ApiOperation({ summary: 'Убавление репутации студента' })
   @ApiResponse({ status: 200, description: 'Репутация успешно списана' })
-  @ApiResponse({
-    status: 400,
-    description: 'Недостаточно репутации для списания',
-  })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
@@ -157,7 +153,6 @@ export class TeachersController {
     const teacherId = req.user.id;
     return this.teachersService.removeReputation(
       +studentId,
-      teacherId,
       updateReputationDto,
     );
   }

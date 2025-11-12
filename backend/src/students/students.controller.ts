@@ -27,6 +27,23 @@ import { CreateDebtRequestDto } from './dto/create-debt-request.dto';
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
+  // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ ДЛЯ СТУДЕНТА
+  @Get('history')
+  @ApiOperation({
+    summary: 'Получить историю репутации для студента',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'История репутации успешно получена',
+  })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
+  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  async getStudentReputationHistory(@Request() req) {
+    const studentId = req.user.id;
+    return this.studentsService.getStudentHistory(studentId);
+  }
+
   @Post('debt-requests')
   @ApiOperation({ summary: 'Отправить заявку на списание долга' })
   @ApiBody({ type: CreateDebtRequestDto })

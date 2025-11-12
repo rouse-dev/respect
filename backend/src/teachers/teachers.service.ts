@@ -182,7 +182,6 @@ export class TeachersService {
   // УБАВЛЕНИЕ РЕПУТАЦИИ СТУДЕНТА
   async removeReputation(
     studentId: number,
-    teacherId: number,
     updateReputationDto: UpdateReputationDto,
   ) {
     try {
@@ -192,13 +191,6 @@ export class TeachersService {
 
       if (!student) {
         throw new NotFoundException('Студент не найден');
-      }
-
-      // Проверяем достаточно ли репутации для списания
-      if (student.reputation < updateReputationDto.points) {
-        throw new BadRequestException(
-          'У студента недостаточно репутации для списания',
-        );
       }
 
       // Убавляем репутацию

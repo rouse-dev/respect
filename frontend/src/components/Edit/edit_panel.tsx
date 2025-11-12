@@ -3,8 +3,6 @@ import EditPanelSelector from "./edit_panel_selector";
 import EditGroups from "./edit_groups";
 import EditStudents from "./edit_students";
 import EditLessons from "./edit_lessons";
-import { Link } from "react-router-dom";
-import { ImUndo2 } from "react-icons/im";
 import useUserStore from "../../store/userStore";
 import ProfileLink from "../Profile/ProfileLink";
 import editMode from "../../types/edit_mode";

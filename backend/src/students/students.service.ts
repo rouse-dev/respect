@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,6 +25,35 @@ export class StudentsService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+
+  // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ ДЛЯ СТУДЕНТА
+  async getStudentHistory(studentId: number) {
+    try {
+      const student = await this.studentRepository.findOne({
+        where: { id: studentId },
+        relations: ['historyReps', 'historyReps.lesson'],
+      });
+
+      if (!student) {
+        throw new NotFoundException('Студент не найден');
+      }
+
+      const formattedHistory = student.historyReps.map((record) => ({
+        id: record.id,
+        change: record.change,
+        reason: record.reason,
+        createdAt: record.createdAt,
+        lesson: record.lesson ? record.lesson.name : null,
+        class: record.class ? record.class : '',
+      }));
+
+      return formattedHistory;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Ошибка при получении истории репутации',
+      );
+    }
+  }
 
   // СОЗДАНИЕ ЗАЯВКИ НА СПИСАНИЕ ДОЛГА
   async createDebtRequest(
@@ -56,6 +86,7 @@ export class StudentsService {
     // Создаем заявку
     const debtRequest = this.debtRequestRepository.create({
       studentId,
+      teacherId: lesson.teacher_id,
       lessonId: createDebtRequestDto.lessonId,
       points: createDebtRequestDto.points,
       description: createDebtRequestDto.description,
@@ -82,7 +113,7 @@ export class StudentsService {
       order: { createdAt: 'DESC' },
     });
 
-    return debtRequests.map(request => ({
+    return debtRequests.map((request) => ({
       id: request.id,
       lesson: request.lesson ? request.lesson.name : 'Неизвестный предмет',
       points: request.points,
@@ -90,7 +121,6 @@ export class StudentsService {
       description: request.description,
       teacherComment: request.teacherComment,
       createdAt: request.createdAt,
-      teacher: request.teacher ? request.teacher.name : null,
     }));
   }
 
@@ -112,19 +142,23 @@ export class StudentsService {
 
     return {
       id: debtRequest.id,
-      lesson: debtRequest.lesson ? {
-        id: debtRequest.lesson.id,
-        name: debtRequest.lesson.name,
-      } : null,
+      lesson: debtRequest.lesson
+        ? {
+            id: debtRequest.lesson.id,
+            name: debtRequest.lesson.name,
+          }
+        : null,
       points: debtRequest.points,
       status: debtRequest.status,
       description: debtRequest.description,
       teacherComment: debtRequest.teacherComment,
       createdAt: debtRequest.createdAt,
-      teacher: debtRequest.teacher ? {
-        id: debtRequest.teacher.id,
-        name: debtRequest.teacher.name,
-      } : null,
+      teacher: debtRequest.teacher
+        ? {
+            id: debtRequest.teacher.id,
+            name: debtRequest.teacher.name,
+          }
+        : null,
       student: {
         id: debtRequest.student.id,
         name: debtRequest.student.name,

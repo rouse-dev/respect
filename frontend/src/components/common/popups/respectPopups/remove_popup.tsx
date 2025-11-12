@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { Subject } from "../../../../interfaces/subject";
 import { Student } from "../../../../interfaces/student";
-import { ChangeRespectRemove, getLessons } from "../../../../service/teacher";
+import {  ChangeRespectRemove, getLessons } from "../../../../service/teacher";
 
 interface RemovePopupProps {
   student: Student;
@@ -38,8 +38,6 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
   );
   const [lesson, setLesson] = useState(Number); // type number но из-за этого не показывает в начале placholder
   const [isLoading, setIsLoading] = useState(false);
-  const [isLessonNew, setIsLessonNew] = useState(false);
-  const [newLesson, setNewLesson] = useState("");
   const [dropdown, setDropdown] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,15 +49,14 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
 
     setIsLoading(true);
     try {
-      const fullReason = `${currentSubject.name}, Пара ${lesson}, ${date}: ${reason}`;
       const result = await ChangeRespectRemove({
         date:date,
         studentId: student.id,
-        change: -amount,
-        reason: fullReason,
+        points: amount,
+        reason: reason,
+        class:lesson,
         lessonId: +currentSubject.id,
         isPunish: true,
-        newLesson: newLesson,
       });
 
       if (result.succes) {
@@ -124,28 +121,8 @@ const RemovePopup = ({ student, onClose, isOpen }: RemovePopupProps) => {
                   {el.name}
                 </button>
               ))}
-              <button
-                className="px-3 py-2 cursor-pointer hover:backdrop-brightness-110 last:rounded-b-sm"
-                type="button"
-                onClick={() => {
-                  setIsLessonNew(true);
-                  setCurrentSubject({ id: -1, name: "- новый предмет -" });
-                }}
-              >
-                - новый предмет -
-              </button>
             </div>
           </div>
-
-          {isLessonNew && (
-            <input
-              type="text"
-              className="bg-[--respect-purple-deep] outline-hidden rounded-lg px-3 py-1"
-              placeholder="Название предмета"
-              onChange={(el) => setNewLesson(el.target.value)}
-            />
-          )}
-
           <input
             className="bg-[--respect-purple-deep] cursor-pointer outline-hidden rounded-lg px-3 py-1"
             type="date"

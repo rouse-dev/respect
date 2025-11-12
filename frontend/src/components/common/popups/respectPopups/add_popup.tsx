@@ -34,7 +34,6 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
   const [date, setDate] = useState(new Date().toLocaleDateString().split(".").reverse().join("-"));
   const [lesson, setLesson] = useState(Number);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLessonNew, setIsLessonNew] = useState(false);
   const [newLesson, setNewLesson] = useState("");
   const [dropdown, setDropdown] = useState(false);
 
@@ -51,7 +50,7 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
         date:date,
         class:lesson,
         studentId: student.id,
-        change: amount,
+        points: amount,
         reason: reason,
         lessonId: +currentSubject.id,
         newLesson: newLesson,
@@ -114,34 +113,15 @@ const AddPopup = ({ student, onClose, isOpen }: AddPopupProps) => {
                   key={i}
                   onClick={(_) => {
                     setCurrentSubject(el);
-                    setIsLessonNew(false);
                     setNewLesson("");
                   }}
                 >
                   {el.name}
                 </button>
               ))}
-              <button
-                className="px-3 cursor-pointer py-2 hover:backdrop-brightness-110 last:rounded-b-sm"
-                type="button"
-                onClick={() => {
-                  setIsLessonNew(true);
-                  setCurrentSubject({ id: -1, name: "- новый предмет -" });
-                }}
-              >
-                - новый предмет -
-              </button>
             </div>
           </div>
 
-          {isLessonNew && (
-            <input
-              type="text"
-              className="bg-[--respect-purple-deep] outline-hidden rounded-lg px-3 py-1"
-              onChange={(el) => setNewLesson(el.target.value)}
-              placeholder="Название предмета"
-            />
-          )}
           <input
             className="bg-[--respect-purple-deep] cursor-pointer outline-hidden rounded-lg px-3 py-1"
             type="date"
