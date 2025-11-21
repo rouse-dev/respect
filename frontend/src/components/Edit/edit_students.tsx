@@ -11,10 +11,7 @@ import { useEffect, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import StudentPopup from "../common/popups/addPopups/add_students";
 import SingleStudentPopup from "../common/popups/addPopups/add_single_student";
-import {
-  deleteStudent,
-  updateStudent,
-} from "../../service/server";
+import { deleteStudent, updateStudent } from "../../service/admin";
 import Preloader from "../common/preloader/preloader";
 import { TbCancel } from "react-icons/tb";
 import { Student, StudentData } from "../../interfaces/student";

@@ -7,6 +7,17 @@ interface DebtCreate {
     description:string;
 }
 
+export const getHistory = async () => {
+  try {
+    const response = await client.get(`/api/students/history`);
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+};
+
 export const getLessons = async () => {
   try {
     const response = await client.get(`/api/students/lessons`);
@@ -37,7 +48,7 @@ export const DebtCreate = async (for_user: DebtCreate) => {
 export const GetAllDebt = async () => {
   try {
     const response = await client.get("/api/students/debt-requests");
-    return { succes: true, data: response.data };
+    return { success: true, data: response.data };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Произошла ошибка",
@@ -47,7 +58,7 @@ export const GetAllDebt = async () => {
 export const GetAllDebtById = async (debtId:number) => {
   try {
     const response = await client.get( `/api/students/debt-requests/${debtId}`);
-    return { succes: true, data: response.data };
+    return { success: true, data: response.data };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Произошла ошибка",

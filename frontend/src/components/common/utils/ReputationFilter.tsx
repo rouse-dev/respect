@@ -1,5 +1,4 @@
 import { FaRegCalendarTimes } from "react-icons/fa";
-import useUserStore from "../../../../store/userStore";
 
 interface FilterInterface {
   sortRespect: string,
@@ -10,28 +9,10 @@ interface FilterInterface {
 }
 
 const Filter = ({sortRespect, setSortRespect, selectedDate1, selectedDate2, setSelectedDates}: FilterInterface) => {
-  const {role} = useUserStore();
-  
+
   const handleFilterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (role === 'student') {
-      switch (sortRespect) {
-        case 'Все': {
-          (e.target as HTMLElement).classList.replace('bg-purple-400', 'bg-green-400');
-          setSortRespect('Принятые');
-          break;
-        }
-        case 'Принятые': {
-          (e.target as HTMLElement).classList.replace('bg-green-400', 'bg-red-400');
-          setSortRespect('Отклоненные');
-          break;
-        }
-        case 'Отклоненные': {
-          (e.target as HTMLElement).classList.replace('bg-red-400', 'bg-purple-400');
-          setSortRespect('Все');
-          break;
-        }
-      }
-    } else {
+    
+      
       switch (sortRespect) {
         case 'Все': {
           (e.target as HTMLElement).classList.replace('bg-purple-400', 'bg-green-400');
@@ -49,7 +30,6 @@ const Filter = ({sortRespect, setSortRespect, selectedDate1, selectedDate2, setS
           break;
         }
       }
-    }
   };
 
   return (

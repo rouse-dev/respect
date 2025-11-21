@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Preloader from "../../preloader/preloader";
 import Paginator from "./Paginator";
 import ExcelHistoryButton from "./ExcelHistoryButton";
-import Filter from "./Filter";
+import Filter from "../../utils/ReputationFilter";
 import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
 import { Student } from "../../../../interfaces/student";

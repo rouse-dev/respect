@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { addLesson } from "../../../../service/server";
 import { Subject } from "../../../../interfaces/subject";
 import useSubjectStore from "../../../../store/subjectStore";
+import { addLesson } from "../../../../service/admin";
 
 interface AddLessonPopup{
     onClose:()=>void;

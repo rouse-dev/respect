@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { DebtHistoryContainer } from "./DebtHistory/DebtHistoryContainer";
 import { ChangeTeacherAvatar, ChangeTeacherInfo } from "../../service/auth";
 import { UserStoreInterface } from "../../store/userStore";
+import { HistoryInfo } from "./Student/HistoryInfo";
 
 interface ProfileInterface {
     handleLogout: () => void,
@@ -70,7 +71,7 @@ const Profile = ({ handleLogout, useUserStore }: ProfileInterface) => {
            
            
             <button className="flex sm:hidden flex-row items-center justify-center gap-2 w-full sm:w-fit px-3 py-2 rounded-lg bg-[--respect-purple-deep] cursor-pointer" onClick={handleLogout}>Выход <IoMdExit /></button> 
-           
+           {useUserStore.role === 'student' && <HistoryInfo useUserStore={useUserStore}/>}
         </div>
     )
 }

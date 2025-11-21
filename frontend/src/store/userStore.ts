@@ -8,6 +8,11 @@ interface UserLoginInterface {
     password: string,
 }
 
+interface GroupsInterface {
+    id: number,
+    name: string
+}
+
 export interface UserStoreInterface {
     auth: boolean,
     name: string,
@@ -16,6 +21,8 @@ export interface UserStoreInterface {
     avatar: string,
     role: role,
     studentId?: number,
+    reputation?: number,
+    groups?: GroupsInterface,
     LoginUser: (data: UserLoginInterface) => void,
     CheckAuth: () => void,
     LogoutUser: () => void
@@ -27,6 +34,8 @@ interface GetResponseInterface {
     email: string,
     avatar: string,
     role: role,
+    reputation?: number,
+    groups?: GroupsInterface,
 }
 
 const TryGetUser = async () => {
@@ -40,6 +49,8 @@ const TryGetUser = async () => {
         avatar: response.data ? response.data.avatar : '',
         role: response.data ? response.data.role : '',
         studentId: response.data ? response.data.studentId : undefined,
+        reputation: response.data ? response.data.reputation : undefined,
+        groups: response.data ? response.data.groups : undefined,
     };
 }
 

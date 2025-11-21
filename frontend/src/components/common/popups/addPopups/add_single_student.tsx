@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AddStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { toast } from "react-toastify";
@@ -7,7 +6,7 @@ import useStudentStore from "../../../../store/studentStore";
 import useGroupStore from "../../../../store/groupStore";
 import usePopupStore from "../../../../store/popupStore";
 import { Group } from "../../../../interfaces/group";
-import { GetAllGroups } from "../../../../service/teacher";
+import { AddStudentSingle, GetAllGroups } from "../../../../service/admin";
 
 interface SingleStudentPopupInterface {
   onClose: () => void;
@@ -52,7 +51,7 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
     setError(null);
 
     try {
-      AddStudent([{
+      AddStudentSingle([{
           name: studentName.trim(),
           groupsId: +selectedGroup.id,
         }]).then(res => {

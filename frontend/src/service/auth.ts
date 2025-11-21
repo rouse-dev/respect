@@ -67,3 +67,14 @@ export const ChangeTeacherAvatar = async (for_user: FormData) => {
     };
   }
 };
+
+export const getMe = async () => {
+  try {
+    const response = await client.get(`/api/auth/me`);
+    return response.data;
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+};

@@ -1,5 +1,4 @@
 import { useState, useEffect,useRef } from "react";
-import { AddStudent } from "../../../../service/server";
 import Preloader from "../../preloader/preloader";
 import ExcelReader from "../../utils/excelReader";
 import { toast } from "react-toastify";
@@ -11,6 +10,7 @@ import { StudentData } from "../../../../interfaces/student";
 import useStudentStore from "../../../../store/studentStore";
 import useGroupStore from "../../../../store/groupStore";
 import usePopupStore from "../../../../store/popupStore";
+import { AddStudentSingle } from "../../../../service/admin";
 import { GetAllGroups } from "../../../../service/teacher";
 
 interface AddStudentPopup {
@@ -63,7 +63,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
     setError(null);
 
     try {
-      AddStudent(data).then(res => {
+      AddStudentSingle(data).then(res => {
         setStudents([...students, ...res.data]);
         setExportGroup(null);
       });

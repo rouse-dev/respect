@@ -8,7 +8,7 @@ interface EditPanelSelectorInterface {
 }
 
 const EditPanelSelector = ({setMode}: EditPanelSelectorInterface) => {
-    const modes: editMode[] = ['Группы', 'Студенты', 'Предметы', 'Преподаватели'];
+    const modes: editMode[] = ['Группы', 'Студенты', 'Предметы', 'Пользователи'];
 
     return (
         <div className="relative max-w-3xl w-full mx-auto p-3 rounded-md flex flex-row gap-3 bg-[--respect-purple-deep]">
@@ -21,7 +21,7 @@ const EditPanelSelector = ({setMode}: EditPanelSelectorInterface) => {
                     'Группы': <FaUsers className="text-2xl" />,
                     'Студенты': <PiStudentBold className="text-2xl" />,
                     'Предметы': <ImBook className="text-2xl" />,
-                    'Преподаватели': <FaChalkboardTeacher className="text-2xl" />
+                    'Пользователи': <FaChalkboardTeacher className="text-2xl" />
                 }[el]} <p className="hidden sm:block">{el}</p></button>
             )}
         </div>
