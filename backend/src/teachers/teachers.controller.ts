@@ -50,17 +50,17 @@ export class TeachersController {
     return this.teachersService.getAllGroups();
   }
 
-  // ПОЛУЧЕНИЕ ВСЕХ ПРЕДМЕТОВ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
+  // ПОЛУЧЕНИЕ ПРЕДМЕТОВ УЧИТЕЛЯ (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)
   @Get('lessons')
   @ApiOperation({
-    summary: 'Выдача всех учебных предметов (только для учителей)',
+    summary: 'Выдача предметов учителя (только для учителей)',
   })
   @ApiResponse({ status: 201, description: 'Предметы успешно выданы' })
   @ApiResponse({ status: 400, description: 'Ошибка при выдаче предметов' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   async getLessons(@Request() req) {
-    const adminId = req.user.id;
-    return this.teachersService.getLessons();
+    const teacherId = req.user.id;
+    return this.teachersService.getLessons(teacherId);
   }
 
   // ПОЛУЧЕНИЕ ИСТОРИИ РЕПУТАЦИИ СТУДЕНТА (ТОЛЬКО ДЛЯ УЧИТЕЛЕЙ)

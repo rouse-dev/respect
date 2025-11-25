@@ -233,9 +233,11 @@ export class TeachersService {
     }
   }
 
-  // ВЫДАЧА ВСЕХ ПРЕДМЕТОВ
-  async getLessons() {
-    return await this.lessonsRepository.find();
+  // ВЫДАЧА ПРЕДМЕТОВ УЧИТЕЛЯ
+  async getLessons(teacherId: number) {
+    return await this.lessonsRepository.find({
+      where: { teacher_id: teacherId },
+    });
   }
 
   // ПОЛУЧЕНИЕ ВСЕХ ЗАЯВОК ДЛЯ УЧИТЕЛЯ
