@@ -21,9 +21,10 @@ const ExcelReader = ({ setData }: ExcelReaderProps) => {
 
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
       const formattedData = jsonData.map((row) => ({
-        
         name: `${row[0]} ${row[1]} ${row[2]}`,
-        groupsId: selectedGroup?.id || 0
+        groupsId: selectedGroup?.id || 0,
+        avatar: "uploads/avatars/default.jpg",
+        reputation: 0
       }));
 
       if (formattedData[0]?.name.includes("Фамилия")) {

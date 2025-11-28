@@ -10,13 +10,7 @@ import { StudentData } from "../../../../interfaces/student";
 import useStudentStore from "../../../../store/studentStore";
 import useGroupStore from "../../../../store/groupStore";
 import usePopupStore from "../../../../store/popupStore";
-import { AddStudentSingle } from "../../../../service/admin";
-import { GetAllGroups } from "../../../../service/teacher";
-
-interface AddStudentPopup {
-  onClose: () => void;
-  isOpen: boolean;
-}
+import { AddStudentMany, GetAllGroups } from "../../../../service/admin";
 
 interface AddStudentPopup {
   onClose: () => void;
@@ -28,6 +22,7 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
   const [data, setData] = useState<StudentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatedCredentials, setGeneratedCredentials] = useState<Array<{name: string, email: string, password: string}> | null>(null);
   const { students, setStudents } = useStudentStore();
   const { selectedGroup, setSelectedGroup, exportGroup, setExportGroup } = useGroupStore();
   const { setPopupActive } = usePopupStore();
@@ -63,12 +58,26 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
     setError(null);
 
     try {
-      AddStudentSingle(data).then(res => {
-        setStudents([...students, ...res.data]);
+      const response = await AddStudentMany(data);
+      if (response.succes && response.data) {
+        setStudents([...students, ...response.data]);
         setExportGroup(null);
-      });
-      toast.success('Студенты успешно добавлены')
-      onClose();
+        
+        // Extract credentials from all added students
+        const credentials = response.data.map((student: any) => ({
+          name: student.name,
+          email: student.generatedEmail,
+          password: student.generatedPassword
+        })).filter((cred: any) => cred.email && cred.password);
+        
+        if (credentials.length > 0) {
+          setGeneratedCredentials(credentials);
+        }
+        
+        toast.success('Студенты успешно добавлены');
+      } else {
+        setError("Ошибка при добавлении студентов");
+      }
     } catch (err) {
       setError("Ошибка при добавлении студентов");
     } finally {
@@ -140,6 +149,23 @@ const StudentPopup = ({ onClose, isOpen }: AddStudentPopup) => {
         </div>
         
         {selectedGroup && <ExcelReader setData={setData} />}
+
+        {generatedCredentials && generatedCredentials.length > 0 && (
+          <div className="w-full p-3 bg-green-100 border border-green-400 rounded-lg text-green-800 max-h-64 overflow-y-auto">
+            <h3 className="font-bold mb-2">Данные для входа студентов:</h3>
+            <div className="space-y-2 text-xs">
+              {generatedCredentials.map((cred, index) => (
+                <div key={index} className="border-b border-green-300 pb-2 last:border-b-0">
+                  <div><strong>ФИО:</strong> {cred.name}</div>
+                  <div><strong>Email:</strong> {cred.email}</div>
+                  <div><strong>Пароль:</strong> {cred.password}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs mt-2 text-green-600">Сохраните эти данные! Пароли не будут показаны снова.</p>
+          </div>
+        )}
+        
 
         <button
           type="submit"

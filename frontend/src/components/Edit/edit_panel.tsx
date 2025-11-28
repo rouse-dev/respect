@@ -3,6 +3,7 @@ import EditPanelSelector from "./edit_panel_selector";
 import EditGroups from "./edit_groups";
 import EditStudents from "./edit_students";
 import EditLessons from "./edit_lessons";
+import EditUsers from "./edit_users";
 import useUserStore from "../../store/userStore";
 import ProfileLink from "../Profile/ProfileLink";
 import editMode from "../../types/edit_mode";
@@ -19,6 +20,7 @@ const EditPanel: FC = () => {
         <EditGroups isOpen={mode === "Группы"} />
         <EditStudents isOpen={mode === "Студенты"} />
         <EditLessons isOpen={mode === "Предметы"} />
+        <EditUsers isOpen={mode === "Пользователи"} />
       </div>
     </div>
   );

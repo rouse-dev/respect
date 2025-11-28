@@ -18,6 +18,7 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
   const [studentName, setStudentName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
   const { selectedGroup, setSelectedGroup } = useGroupStore();
   const { students, setStudents } = useStudentStore();
   const { setPopupActive } = usePopupStore();
@@ -51,17 +52,31 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
     setError(null);
 
     try {
-      AddStudentSingle([{
-          name: studentName.trim(),
-          groupsId: +selectedGroup.id,
-        }]).then(res => {
-        setStudents([...students, ...res.data]);
+      const response = await AddStudentSingle({
+        name: studentName.trim(),
+        groupsId: +selectedGroup.id,
+        avatar: "uploads/avatars/default.jpg",
+        reputation: 0
+      });
+      
+      if (response.succes && response.data) {
+        setStudents([...students, response.data]);
         setSelectedGroup(null);
         setStudentName('');
         ((e.target as HTMLFormElement).querySelector('input[type=text]')! as HTMLInputElement).value = '';
-      });
-      toast.success('Студент успешно добавлен')
-      onClose();
+        
+        // Store generated credentials for display
+        if (response.data.generatedEmail && response.data.generatedPassword) {
+          setGeneratedCredentials({
+            email: response.data.generatedEmail,
+            password: response.data.generatedPassword
+          });
+        }
+        
+        toast.success('Студент успешно добавлен');
+      } else {
+        setError("Ошибка при добавлении студента");
+      }
     } catch (err) {
       setError("Ошибка при добавлении студента");
     } finally {
@@ -114,6 +129,17 @@ const SingleStudentPopup = ({ onClose, isOpen }: SingleStudentPopupInterface) =>
             </div>
           </div>
           </div>
+          {generatedCredentials && (
+            <div className="w-full p-3 bg-green-100 border border-green-400 rounded-lg text-green-800">
+              <h3 className="font-bold mb-2">Данные для входа студента:</h3>
+              <div className="space-y-1 text-sm">
+                <div><strong>Email:</strong> {generatedCredentials.email}</div>
+                <div><strong>Пароль:</strong> {generatedCredentials.password}</div>
+              </div>
+              <p className="text-xs mt-2 text-green-600">Сохраните эти данные! Пароль не будет показан снова.</p>
+            </div>
+          )}
+          
           <button
             type="submit"
             disabled={isLoading}

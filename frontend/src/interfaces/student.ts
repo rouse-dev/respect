@@ -19,4 +19,6 @@ export interface StudentData {
   id?: number;
   name: string;
   groupsId: number;
+  avatar?: string;
+  reputation?: number;
 }

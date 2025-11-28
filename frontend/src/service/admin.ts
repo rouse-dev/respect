@@ -50,17 +50,6 @@ export const CreateTeacher = async (for_user:CreateTeacher) => {
   }
 };
 
-export const getAllTeachers = async () => {
-  try {
-    const response = await client.get(`/api/admin/users`);
-    return response.data;
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Произшла ошибка",
-    };
-  }
-};
-
 export const addLessonsForTeacher = async (for_user:AddLessonForTeacher) => {
   try {
     const response = await client.post(`/api/admin/users/${for_user.idTeacher}/lessons`, for_user);
@@ -71,6 +60,8 @@ export const addLessonsForTeacher = async (for_user:AddLessonForTeacher) => {
     };
   }
 };
+
+
 
 export const deleteLessonforTeacher = async (idTeacher: number) => {
   try {
@@ -90,6 +81,37 @@ export const getUserById = async (idUser:number) => {
     const response = await client.get(`/api/admin/users/${idUser}`);
     return response.data;
   } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const response = await client.get('/api/admin/users');
+    return { success: true, data: response.data };
+  } catch (error) {
+    toast.error(Object(error).response?.data?.message || "Ошибка при загрузке пользователей");
+    return {
+      error: error instanceof Error ? error.message : "Произшла ошибка",
+    };
+  }
+};
+
+export const createUser = async (userData: {
+  email: string;
+  password: string;
+  name: string;
+  role: role;
+  lessonsIds?: number[];
+}) => {
+  try {
+    const response = await client.post('/api/admin/users', userData);
+    toast.success("Пользователь успешно создан!");
+    return { success: true, data: response.data };
+  } catch (error) {
+    toast.error(Object(error).response?.data?.message || "Ошибка при создании пользователя");
     return {
       error: error instanceof Error ? error.message : "Произшла ошибка",
     };
@@ -122,11 +144,9 @@ export const deleteUserById = async (idUser: number) => {
   }
 }
 //добавил к названию single
-export const AddStudentSingle = async (exported_students: StudentData[]) => {
+export const AddStudentSingle = async (studentData: StudentData) => {
   try {
-    const response = await client.post("/api/admin/students", {
-      students: exported_students,
-    });
+    const response = await client.post("/api/admin/students", studentData);
     return { succes: true, data: response.data };
   } catch (error) {
     return {
